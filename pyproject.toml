@@ -332,6 +332,8 @@ ignore_path = [
 # Ideally we would limit the paths to the source code where we want to ignore names,
 # but Vulture does not enable this.
 ignore_names = [
+    # Internal client attribute - will be used as methods are added
+    "_client",
     # pytest configuration
     "pytest_collect_file",
     "pytest_collection_modifyitems",
