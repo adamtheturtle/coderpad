@@ -350,7 +350,9 @@ repos:
       - id: ty
         name: ty
         stages: [pre-push]
-        entry: uv run --extra=dev ty check
+        entry: uv run --extra=dev ty check --exclude "src/coderpad_api/api/**" --exclude
+          "src/coderpad_api/models/**" --exclude "src/coderpad_api/client.py" --exclude
+          "src/coderpad_api/errors.py" --exclude "src/coderpad_api/types.py"
         language: python
         types_or: [python, toml]
         pass_filenames: false

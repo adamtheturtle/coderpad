@@ -325,16 +325,6 @@ module = [
 ]
 ignore_errors = true
 
-[tool.pyrefly]
-errors.non-exhaustive-match = "error"
-exclude = [
-    "src/coderpad_api/api/",
-    "src/coderpad_api/models/",
-    "src/coderpad_api/client.py",
-    "src/coderpad_api/errors.py",
-    "src/coderpad_api/types.py",
-]
-
 [tool.pyright]
 enableTypeIgnoreComments = false
 reportUnnecessaryTypeIgnoreComment = true
@@ -348,6 +338,9 @@ exclude = [
     "src/coderpad_api/models",
     "src/coderpad_api/types.py",
 ]
+
+[tool.ty]
+rules.non-exhaustive-match = "error"
 
 [tool.pytest]
 xfail_strict = true
