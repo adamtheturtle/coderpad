@@ -17,7 +17,7 @@ _BASE_URL = "https://api.interview.coderpad.io"
 def fixture_openapi_spec() -> dict[str, Any]:
     """Load the OpenAPI spec from the repo."""
     spec_text = _OPENAPI_SPEC_PATH.read_text(encoding="utf-8")
-    result: dict[str, Any] = json.loads(spec_text)
+    result: dict[str, Any] = json.loads(s=spec_text)
     return result
 
 
