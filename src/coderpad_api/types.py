@@ -1,5 +1,6 @@
 """Types for the CoderPad Interview API."""
 
+import enum
 from dataclasses import dataclass
 from typing import Self
 
@@ -19,6 +20,15 @@ from coderpad_api._dict_types import (
     TeamDict,
     TestCaseDict,
 )
+
+
+class SortOrder(enum.Enum):
+    """Sort order for list endpoints."""
+
+    CREATED_AT_ASC = "created_at,asc"
+    CREATED_AT_DESC = "created_at,desc"
+    UPDATED_AT_ASC = "updated_at,asc"
+    UPDATED_AT_DESC = "updated_at,desc"
 
 
 @dataclass(kw_only=True)

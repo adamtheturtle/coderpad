@@ -10,6 +10,7 @@ from coderpad_api.types import (
     PadEvent,
     Question,
     Quota,
+    SortOrder,
 )
 
 
@@ -37,13 +38,13 @@ class CoderPadClient:
     def list_pads(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> list[Pad]:
         """Retrieve a list of pads.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -51,7 +52,7 @@ class CoderPadClient:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -157,14 +158,14 @@ class CoderPadClient:
         self,
         *,
         pad_id: str,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> list[PadEvent]:
         """Retrieve a list of pad events.
 
         Args:
             pad_id: The id of the pad.
-            sort: Sort order, e.g. ``"created_at,asc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -172,7 +173,7 @@ class CoderPadClient:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -207,13 +208,13 @@ class CoderPadClient:
     def list_questions(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> list[Question]:
         """Retrieve a list of questions.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -221,7 +222,7 @@ class CoderPadClient:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -402,13 +403,13 @@ class CoderPadClient:
     def list_organization_pads(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> list[Pad]:
         """Retrieve pads for the entire organization.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -416,7 +417,7 @@ class CoderPadClient:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -430,13 +431,13 @@ class CoderPadClient:
     def list_organization_questions(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> list[Question]:
         """Retrieve questions for the entire organization.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -444,7 +445,7 @@ class CoderPadClient:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
