@@ -142,9 +142,9 @@ class CoderPadClient:
         if notes is not None:
             data["notes"] = notes
         if ended is not None:
-            data["ended"] = str(ended).lower()
+            data["ended"] = "true" if ended else "false"
         if deleted is not None:
-            data["deleted"] = str(deleted).lower()
+            data["deleted"] = "true" if deleted else "false"
         response = self._client.put(
             url=f"/api/pads/{pad_id}",
             data=data,
