@@ -255,6 +255,11 @@ MASTER.unsafe-load-any-extension = false
     "docs/source/conf.py:invalid-name",
     "docs/source/doccmd_*.py:invalid-name",
     "doccmd_README_rst_*.py:invalid-name",
+    "src/coderpad_api/api/**:all",
+    "src/coderpad_api/models/**:all",
+    "src/coderpad_api/client.py:all",
+    "src/coderpad_api/errors.py:all",
+    "src/coderpad_api/types.py:all",
 ]
 # Spelling dictionary name. Available dictionaries: none. To make it working
 # install python-enchant package.
@@ -304,7 +309,14 @@ max_supported_python = "3.14"
 [tool.mypy]
 strict = true
 files = [ "." ]
-exclude = [ "build" ]
+exclude = [
+    "build",
+    "src/coderpad_api/api/",
+    "src/coderpad_api/models/",
+    "src/coderpad_api/client\\.py",
+    "src/coderpad_api/errors\\.py",
+    "src/coderpad_api/types\\.py",
+]
 follow_untyped_imports = true
 plugins = [
     "mypy_strict_kwargs",
@@ -312,11 +324,25 @@ plugins = [
 
 [tool.pyrefly]
 errors.non-exhaustive-match = "error"
+exclude = [
+    "src/coderpad_api/api/",
+    "src/coderpad_api/models/",
+    "src/coderpad_api/client.py",
+    "src/coderpad_api/errors.py",
+    "src/coderpad_api/types.py",
+]
 
 [tool.pyright]
 enableTypeIgnoreComments = false
 reportUnnecessaryTypeIgnoreComment = true
 typeCheckingMode = "strict"
+exclude = [
+    "src/coderpad_api/api",
+    "src/coderpad_api/models",
+    "src/coderpad_api/client.py",
+    "src/coderpad_api/errors.py",
+    "src/coderpad_api/types.py",
+]
 
 [tool.pytest]
 xfail_strict = true
