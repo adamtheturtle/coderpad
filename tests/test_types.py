@@ -1,6 +1,13 @@
 """Tests for the CoderPad types."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from coderpad_api import PadEnvironment
+
+if TYPE_CHECKING:
+    from coderpad_api._dict_types import PadEnvironmentDict
 
 
 class TestPadEnvironment:
@@ -9,7 +16,7 @@ class TestPadEnvironment:
     @staticmethod
     def test_from_dict() -> None:
         """A PadEnvironment can be created from a dictionary."""
-        data = {
+        data: PadEnvironmentDict = {
             "id": 1,
             "pad_id": 2,
             "question_id": None,
