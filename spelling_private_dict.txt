@@ -31,6 +31,8 @@ pytest
 readme
 refactoring
 regex
+repo
+respx
 str
 todo
 txt
