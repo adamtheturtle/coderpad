@@ -22,6 +22,7 @@ Reference
    :maxdepth: 3
 
    api-reference
+   openapi-spec
    contributing
    release-process
    changelog
