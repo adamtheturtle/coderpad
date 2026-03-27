@@ -14,7 +14,7 @@ _BASE_URL = "https://api.interview.coderpad.io"
 
 
 @pytest.fixture(name="fixture_openapi_spec")
-def _fixture_openapi_spec() -> dict[str, Any]:
+def _fixture_openapi_spec() -> dict[str, Any]:  # pyright: ignore[reportUnusedFunction]
     """Load the OpenAPI spec from the repo."""
     spec_text = _OPENAPI_SPEC_PATH.read_text(encoding="utf-8")
     result: dict[str, Any] = json.loads(s=spec_text)
@@ -22,7 +22,7 @@ def _fixture_openapi_spec() -> dict[str, Any]:
 
 
 @pytest.fixture(name="fixture_mock_coderpad_api")
-def _fixture_mock_coderpad_api(
+def _fixture_mock_coderpad_api(  # pyright: ignore[reportUnusedFunction]
     fixture_openapi_spec: dict[str, Any],
 ) -> Generator[respx.MockRouter]:
     """Provide a respx mock router backed by the OpenAPI spec."""
