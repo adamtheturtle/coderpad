@@ -1,5 +1,6 @@
 """Types for the CoderPad Interview API."""
 
+import enum
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Self, TypeVar
@@ -45,6 +46,15 @@ class PaginatedList(list[_T]):
         super().__init__(iterable)
         self.total = total
         self.next_page = next_page
+
+
+class SortOrder(enum.Enum):
+    """Sort order for list endpoints."""
+
+    CREATED_AT_ASC = "created_at,asc"
+    CREATED_AT_DESC = "created_at,desc"
+    UPDATED_AT_ASC = "updated_at,asc"
+    UPDATED_AT_DESC = "updated_at,desc"
 
 
 @dataclass(kw_only=True)

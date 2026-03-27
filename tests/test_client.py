@@ -3,7 +3,7 @@
 import respx
 
 from coderpad_api.client import CoderPadClient
-from coderpad_api.types import PaginatedList
+from coderpad_api.types import PaginatedList, SortOrder
 
 
 class TestCoderPadClient:
@@ -53,7 +53,7 @@ class TestListPads:
     ) -> None:
         """Pads can be listed with a sort parameter."""
         result = fixture_coderpad_client.list_pads(
-            sort="updated_at,desc",
+            sort=SortOrder.UPDATED_AT_DESC,
         )
         assert isinstance(result, PaginatedList)
 
@@ -175,7 +175,7 @@ class TestGetPadEvents:
         """Pad events can be retrieved with sort and page."""
         result = fixture_coderpad_client.get_pad_events(
             pad_id="ABC1234",
-            sort="created_at,asc",
+            sort=SortOrder.CREATED_AT_ASC,
             page=1,
         )
         assert isinstance(result, PaginatedList)
@@ -212,7 +212,7 @@ class TestListQuestions:
     ) -> None:
         """Questions can be listed with sort and page."""
         result = fixture_coderpad_client.list_questions(
-            sort="updated_at,desc",
+            sort=SortOrder.UPDATED_AT_DESC,
             page=1,
         )
         assert isinstance(result, PaginatedList)
@@ -376,7 +376,7 @@ class TestListOrganizationPads:
     ) -> None:
         """Organization pads can be listed with optional arguments."""
         result = fixture_coderpad_client.list_organization_pads(
-            sort="updated_at,desc",
+            sort=SortOrder.UPDATED_AT_ASC,
             page=1,
         )
         assert isinstance(result, PaginatedList)
@@ -401,7 +401,7 @@ class TestListOrganizationQuestions:
         arguments.
         """
         result = fixture_coderpad_client.list_organization_questions(
-            sort="updated_at,desc",
+            sort=SortOrder.CREATED_AT_DESC,
             page=1,
         )
         assert isinstance(result, PaginatedList)
