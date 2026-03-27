@@ -1,7 +1,8 @@
-"""A library for the CoderPad Interview API."""
+"""A client library for accessing CoderPad Interview API."""
 
-from .client import CoderPadClient
+from .client import AuthenticatedClient, Client
 
-__all__ = [
-    "CoderPadClient",
-]
+__all__ = (
+    "AuthenticatedClient",
+    "Client",
+)

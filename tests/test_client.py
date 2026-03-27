@@ -3,26 +3,43 @@
 import httpx
 import respx
 
-from coderpad_api import CoderPadClient
+from coderpad_api import AuthenticatedClient
 
 
-class TestCoderPadClient:
-    """Tests for ``CoderPadClient``."""
+class TestAuthenticatedClient:
+    """Tests for ``AuthenticatedClient``."""
 
     @staticmethod
     def test_default_base_url() -> None:
         """The default base URL is the CoderPad Interview API."""
-        client = CoderPadClient(api_key="test-key")
-        assert client.base_url == "https://api.interview.coderpad.io"
+        client = AuthenticatedClient(
+            base_url="https://api.interview.coderpad.io",
+            token="test-key",
+        )
+        httpx_client = client.get_httpx_client()
+        assert str(httpx_client.base_url) == (
+            "https://api.interview.coderpad.io"
+        )
 
     @staticmethod
     def test_custom_base_url() -> None:
         """A custom base URL can be provided."""
-        client = CoderPadClient(
-            api_key="test-key",
+        client = AuthenticatedClient(
             base_url="https://custom.example.com",
+            token="test-key",
         )
-        assert client.base_url == "https://custom.example.com"
+        httpx_client = client.get_httpx_client()
+        assert str(httpx_client.base_url) == ("https://custom.example.com")
+
+    @staticmethod
+    def test_auth_header() -> None:
+        """The auth header is set with the Bearer prefix."""
+        client = AuthenticatedClient(
+            base_url="https://api.interview.coderpad.io",
+            token="test-key",
+        )
+        httpx_client = client.get_httpx_client()
+        assert httpx_client.headers["Authorization"] == "Bearer test-key"
 
     @staticmethod
     def test_mock_api_available(

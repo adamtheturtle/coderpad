@@ -32,7 +32,9 @@ dynamic = [
     "version",
 ]
 dependencies = [
+    "attrs>=22.2.0",
     "httpx>=0.28.0",
+    "python-dateutil>=2.8.0",
 ]
 optional-dependencies.dev = [
     "actionlint-py==1.7.11.24",
@@ -128,9 +130,31 @@ lint.per-file-ignores."docs/source/*.py" = [
     # Allow asserts in docs.
     "S101",
 ]
+lint.per-file-ignores."src/coderpad_api/api/**/*.py" = [
+    # Generated code - suppress all style and type annotation rules.
+    "ALL",
+]
+lint.per-file-ignores."src/coderpad_api/client.py" = [
+    # Generated code - suppress all style and type annotation rules.
+    "ALL",
+]
+lint.per-file-ignores."src/coderpad_api/errors.py" = [
+    # Generated code - suppress all style and type annotation rules.
+    "ALL",
+]
+lint.per-file-ignores."src/coderpad_api/models/**/*.py" = [
+    # Generated code - suppress all style and type annotation rules.
+    "ALL",
+]
+lint.per-file-ignores."src/coderpad_api/types.py" = [
+    # Generated code - suppress all style and type annotation rules.
+    "ALL",
+]
 lint.per-file-ignores."tests/*.py" = [
     # Allow asserts in tests.
     "S101",
+    # Allow hardcoded test tokens.
+    "S106",
 ]
 # Do not automatically remove commented out code.
 # We comment out code during development, and with VSCode auto-save, this code
@@ -318,6 +342,13 @@ linewrap-full-docstring = true
 fail-under = 100
 omit-covered-files = true
 verbose = 2
+exclude = [
+    "src/coderpad_api/api",
+    "src/coderpad_api/models",
+    "src/coderpad_api/client.py",
+    "src/coderpad_api/errors.py",
+    "src/coderpad_api/types.py",
+]
 
 [tool.doc8]
 max_line_length = 2000
@@ -334,6 +365,18 @@ ignore_path = [
 # Ideally we would limit the paths to the source code where we want to ignore names,
 # but Vulture does not enable this.
 ignore_names = [
+    # Generated API client functions and methods
+    "additional_keys",
+    "asyncio",
+    "asyncio_detailed",
+    "set_async_httpx_client",
+    "set_httpx_client",
+    "sync",
+    "sync_detailed",
+    "to_tuple",
+    "with_cookies",
+    "with_headers",
+    "with_timeout",
     # Internal client attribute - will be used as methods are added
     "_client",
     # pytest configuration
