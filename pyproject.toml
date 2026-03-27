@@ -340,10 +340,12 @@ enableTypeIgnoreComments = false
 reportUnnecessaryTypeIgnoreComment = true
 typeCheckingMode = "strict"
 exclude = [
+    ".venv",
+    "build",
     "src/coderpad_api/api",
-    "src/coderpad_api/models",
     "src/coderpad_api/client.py",
     "src/coderpad_api/errors.py",
+    "src/coderpad_api/models",
     "src/coderpad_api/types.py",
 ]
 
