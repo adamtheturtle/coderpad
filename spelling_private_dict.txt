@@ -1,5 +1,6 @@
-api
 Args
+Ubuntu
+api
 async
 asyncio
 beartype
@@ -33,6 +34,5 @@ regex
 str
 todo
 txt
-Ubuntu
 url
 yml
