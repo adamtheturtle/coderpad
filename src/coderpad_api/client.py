@@ -1,6 +1,13 @@
 """CoderPad Interview API client."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import httpx
+
+if TYPE_CHECKING:
+    import builtins
 
 from coderpad_api.types import (
     Organization,
@@ -13,33 +20,23 @@ from coderpad_api.types import (
 )
 
 
-class CoderPadClient:
-    """A client for the CoderPad Interview API."""
+class PadsNamespace:
+    """Namespace for pad operations."""
 
-    def __init__(
-        self,
-        *,
-        api_key: str,
-        base_url: str = "https://api.interview.coderpad.io",
-    ) -> None:
-        """Create a new CoderPad client.
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new pads namespace.
 
         Args:
-            api_key: The API key for authentication.
-            base_url: The base URL for the API.
+            client: The HTTP client to use for requests.
         """
-        self.base_url = base_url
-        self._client = httpx.Client(
-            base_url=base_url,
-            headers={"Authorization": f"Bearer {api_key}"},
-        )
+        self._client = client
 
-    def list_pads(
+    def list(
         self,
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> list[Pad]:
+    ) -> builtins.list[Pad]:
         """Retrieve a list of pads.
 
         Args:
@@ -62,7 +59,7 @@ class CoderPadClient:
         data = response.json()
         return [Pad.from_dict(data=item) for item in data["pads"]]
 
-    def create_pad(
+    def create(
         self,
         *,
         title: str | None = None,
@@ -97,7 +94,7 @@ class CoderPadClient:
         response.raise_for_status()
         return Pad.from_dict(data=response.json())
 
-    def get_pad(self, *, pad_id: str) -> Pad:
+    def get(self, *, pad_id: str) -> Pad:
         """Retrieve a pad by id.
 
         Args:
@@ -112,7 +109,7 @@ class CoderPadClient:
         response.raise_for_status()
         return Pad.from_dict(data=response.json())
 
-    def update_pad(
+    def update(
         self,
         *,
         pad_id: str,
@@ -153,13 +150,13 @@ class CoderPadClient:
         )
         response.raise_for_status()
 
-    def get_pad_events(
+    def get_events(
         self,
         *,
         pad_id: str,
         sort: str | None = None,
         page: int | None = None,
-    ) -> list[PadEvent]:
+    ) -> builtins.list[PadEvent]:
         """Retrieve a list of pad events.
 
         Args:
@@ -183,7 +180,7 @@ class CoderPadClient:
         data = response.json()
         return [PadEvent.from_dict(data=item) for item in data["events"]]
 
-    def get_pad_environment(
+    def get_environment(
         self,
         *,
         environment_id: str,
@@ -204,12 +201,24 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def list_questions(
+
+class QuestionsNamespace:
+    """Namespace for question operations."""
+
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new questions namespace.
+
+        Args:
+            client: The HTTP client to use for requests.
+        """
+        self._client = client
+
+    def list(
         self,
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> list[Question]:
+    ) -> builtins.list[Question]:
         """Retrieve a list of questions.
 
         Args:
@@ -232,7 +241,7 @@ class CoderPadClient:
         data = response.json()
         return [Question.from_dict(data=item) for item in data["questions"]]
 
-    def create_question(
+    def create(
         self,
         *,
         title: str,
@@ -273,7 +282,7 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def get_question(
+    def get(
         self,
         *,
         question_id: str,
@@ -294,7 +303,7 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def update_question(
+    def update(
         self,
         *,
         question_id: str,
@@ -331,7 +340,7 @@ class CoderPadClient:
         )
         response.raise_for_status()
 
-    def delete_question(
+    def delete(
         self,
         *,
         question_id: str,
@@ -346,17 +355,19 @@ class CoderPadClient:
         )
         response.raise_for_status()
 
-    def get_quota(self) -> Quota:
-        """Retrieve quota information.
 
-        Returns:
-            The quota details.
+class OrganizationNamespace:
+    """Namespace for organization operations."""
+
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new organization namespace.
+
+        Args:
+            client: The HTTP client to use for requests.
         """
-        response = self._client.get(url="/api/quota")
-        response.raise_for_status()
-        return Quota.from_dict(data=response.json())
+        self._client = client
 
-    def get_organization(self) -> Organization:
+    def get(self) -> Organization:
         """Retrieve organization information.
 
         Returns:
@@ -370,7 +381,7 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def get_organization_stats(
+    def get_stats(
         self,
         *,
         start_time: str | None = None,
@@ -399,12 +410,22 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def list_organization_pads(
+    def get_quota(self) -> Quota:
+        """Retrieve quota information.
+
+        Returns:
+            The quota details.
+        """
+        response = self._client.get(url="/api/quota")
+        response.raise_for_status()
+        return Quota.from_dict(data=response.json())
+
+    def list_pads(
         self,
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> list[Pad]:
+    ) -> builtins.list[Pad]:
         """Retrieve pads for the entire organization.
 
         Args:
@@ -427,12 +448,12 @@ class CoderPadClient:
         data = response.json()
         return [Pad.from_dict(data=item) for item in data["pads"]]
 
-    def list_organization_questions(
+    def list_questions(
         self,
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> list[Question]:
+    ) -> builtins.list[Question]:
         """Retrieve questions for the entire organization.
 
         Args:
@@ -454,3 +475,28 @@ class CoderPadClient:
         response.raise_for_status()
         data = response.json()
         return [Question.from_dict(data=item) for item in data["questions"]]
+
+
+class CoderPadClient:
+    """A client for the CoderPad Interview API."""
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        base_url: str = "https://api.interview.coderpad.io",
+    ) -> None:
+        """Create a new CoderPad client.
+
+        Args:
+            api_key: The API key for authentication.
+            base_url: The base URL for the API.
+        """
+        self.base_url = base_url
+        http_client = httpx.Client(
+            base_url=base_url,
+            headers={"Authorization": f"Bearer {api_key}"},
+        )
+        self.pads = PadsNamespace(client=http_client)
+        self.questions = QuestionsNamespace(client=http_client)
+        self.organization = OrganizationNamespace(client=http_client)
