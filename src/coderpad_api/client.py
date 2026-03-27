@@ -1,8 +1,19 @@
 """CoderPad Interview API client."""
 
-from typing import Any
-
 import httpx
+
+from coderpad_api._types import (
+    ListPadsResponse,
+    ListQuestionsResponse,
+    OrganizationResponse,
+    OrganizationStatsResponse,
+    PadEnvironmentResponse,
+    PadEventsResponse,
+    PadResponse,
+    QuestionResponse,
+    QuotaResponse,
+    StatusResponse,
+)
 
 
 class CoderPadClient:
@@ -31,7 +42,7 @@ class CoderPadClient:
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListPadsResponse:
         """Retrieve a list of pads.
 
         Args:
@@ -52,7 +63,7 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: ListPadsResponse = response.json()
         return result
 
     def create_pad(
@@ -62,7 +73,7 @@ class CoderPadClient:
         language: str | None = None,
         contents: str | None = None,
         notes: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> PadResponse:
         """Create a new pad.
 
         Args:
@@ -88,10 +99,10 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: PadResponse = response.json()
         return result
 
-    def get_pad(self, *, pad_id: str) -> dict[str, Any]:
+    def get_pad(self, *, pad_id: str) -> PadResponse:
         """Retrieve a pad by id.
 
         Args:
@@ -104,7 +115,7 @@ class CoderPadClient:
             url=f"/api/pads/{pad_id}",
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: PadResponse = response.json()
         return result
 
     def update_pad(
@@ -117,7 +128,7 @@ class CoderPadClient:
         notes: str | None = None,
         ended: bool | None = None,
         deleted: bool | None = None,
-    ) -> dict[str, Any]:
+    ) -> StatusResponse:
         """Modify an existing pad.
 
         Args:
@@ -150,7 +161,7 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: StatusResponse = response.json()
         return result
 
     def get_pad_events(
@@ -159,7 +170,7 @@ class CoderPadClient:
         pad_id: str,
         sort: str | None = None,
         page: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> PadEventsResponse:
         """Retrieve a list of pad events.
 
         Args:
@@ -180,14 +191,14 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: PadEventsResponse = response.json()
         return result
 
     def get_pad_environment(
         self,
         *,
         environment_id: str,
-    ) -> dict[str, Any]:
+    ) -> PadEnvironmentResponse:
         """Retrieve pad environment information.
 
         Args:
@@ -201,7 +212,7 @@ class CoderPadClient:
             url=f"/api/pad_environments/{environment_id}",
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: PadEnvironmentResponse = response.json()
         return result
 
     def list_questions(
@@ -209,7 +220,7 @@ class CoderPadClient:
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListQuestionsResponse:
         """Retrieve a list of questions.
 
         Args:
@@ -230,7 +241,7 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: ListQuestionsResponse = response.json()
         return result
 
     def create_question(
@@ -241,7 +252,7 @@ class CoderPadClient:
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> QuestionResponse:
         """Create a new question.
 
         Args:
@@ -271,14 +282,14 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: QuestionResponse = response.json()
         return result
 
     def get_question(
         self,
         *,
         question_id: str,
-    ) -> dict[str, Any]:
+    ) -> QuestionResponse:
         """Retrieve a question by id.
 
         Args:
@@ -292,7 +303,7 @@ class CoderPadClient:
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: QuestionResponse = response.json()
         return result
 
     def update_question(
@@ -304,7 +315,7 @@ class CoderPadClient:
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> StatusResponse:
         """Modify an existing question.
 
         Args:
@@ -334,14 +345,14 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: StatusResponse = response.json()
         return result
 
     def delete_question(
         self,
         *,
         question_id: str,
-    ) -> dict[str, Any]:
+    ) -> StatusResponse:
         """Delete a question.
 
         Args:
@@ -354,10 +365,10 @@ class CoderPadClient:
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: StatusResponse = response.json()
         return result
 
-    def get_quota(self) -> dict[str, Any]:
+    def get_quota(self) -> QuotaResponse:
         """Retrieve quota information.
 
         Returns:
@@ -365,10 +376,10 @@ class CoderPadClient:
         """
         response = self._client.get(url="/api/quota")
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: QuotaResponse = response.json()
         return result
 
-    def get_organization(self) -> dict[str, Any]:
+    def get_organization(self) -> OrganizationResponse:
         """Retrieve organization information.
 
         Returns:
@@ -379,7 +390,7 @@ class CoderPadClient:
             url="/api/organization",
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: OrganizationResponse = response.json()
         return result
 
     def get_organization_stats(
@@ -387,7 +398,7 @@ class CoderPadClient:
         *,
         start_time: str | None = None,
         end_time: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> OrganizationStatsResponse:
         """Retrieve pad usage stats for the organization.
 
         Args:
@@ -407,7 +418,7 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: OrganizationStatsResponse = response.json()
         return result
 
     def list_organization_pads(
@@ -415,7 +426,7 @@ class CoderPadClient:
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListPadsResponse:
         """Retrieve pads for the entire organization.
 
         Args:
@@ -436,7 +447,7 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: ListPadsResponse = response.json()
         return result
 
     def list_organization_questions(
@@ -444,7 +455,7 @@ class CoderPadClient:
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListQuestionsResponse:
         """Retrieve questions for the entire organization.
 
         Args:
@@ -465,5 +476,5 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: dict[str, Any] = response.json()
+        result: ListQuestionsResponse = response.json()
         return result

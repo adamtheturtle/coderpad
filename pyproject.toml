@@ -369,7 +369,7 @@ ignore_names = [
     "warning_is_error",
 ]
 # Duplicate some of .gitignore
-exclude = [ ".venv" ]
+exclude = [ ".venv", "src/coderpad_api/_types.py" ]
 
 [tool.yamlfix]
 section_whitelines = 1
