@@ -7,22 +7,15 @@ from coderpad_api._dict_types import (
     CandidateInstructionDict,
     CustomFileDict,
     FileContentDict,
-    ListPadsResponseDict,
-    ListQuestionsResponseDict,
-    OrganizationResponseDict,
-    OrganizationStatsResponseDict,
+    OrganizationDict,
+    OrganizationStatsDict,
     OrganizationStatsUserDict,
     OrganizationUserDict,
     PadDict,
     PadEnvironmentDict,
-    PadEnvironmentResponseDict,
     PadEventDict,
-    PadEventsResponseDict,
-    PadResponseDict,
     QuestionDict,
-    QuestionResponseDict,
-    QuotaResponseDict,
-    StatusResponseDict,
+    QuotaDict,
     TeamDict,
     TestCaseDict,
 )
@@ -452,322 +445,9 @@ class OrganizationStatsUser:
 
 
 @dataclass(kw_only=True)
-class StatusResponse:
-    """A response containing only a status."""
+class Quota:
+    """Quota information."""
 
-    status: str
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: StatusResponseDict,
-    ) -> Self:
-        """Create from an API response dictionary.
-
-        Args:
-            data: The dictionary to convert.
-
-        Returns:
-            A new instance.
-        """
-        return cls(status=data["status"])
-
-
-@dataclass(kw_only=True)
-class PadResponse:
-    """Response for creating or retrieving a single pad."""
-
-    status: str
-    id: str
-    title: str
-    state: str
-    owner_email: str
-    language: str | None
-    private: bool
-    execution_enabled: bool
-    contents: str | None
-    participants: list[str]
-    events: str
-    notes: str | None
-    created_at: str
-    updated_at: str
-    ended_at: str | None
-    url: str
-    playback: str
-    drawing: str | None
-    type: str
-    question_ids: list[int]
-    pad_environment_ids: list[int]
-    active_environment_id: int | None
-    team: Team
-    history: str | None = None
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: PadResponseDict,
-    ) -> Self:
-        """Create from an API response dictionary.
-
-        Args:
-            data: The dictionary to convert.
-
-        Returns:
-            A new instance.
-        """
-        return cls(
-            status=data["status"],
-            id=data["id"],
-            title=data["title"],
-            state=data["state"],
-            owner_email=data["owner_email"],
-            language=data.get("language"),
-            private=data["private"],
-            execution_enabled=data["execution_enabled"],
-            contents=data.get("contents"),
-            participants=data["participants"],
-            events=data["events"],
-            notes=data.get("notes"),
-            created_at=data["created_at"],
-            updated_at=data["updated_at"],
-            ended_at=data.get("ended_at"),
-            url=data["url"],
-            playback=data["playback"],
-            drawing=data.get("drawing"),
-            type=data["type"],
-            question_ids=data["question_ids"],
-            pad_environment_ids=data["pad_environment_ids"],
-            active_environment_id=data.get(
-                "active_environment_id",
-            ),
-            team=Team.from_dict(data=data["team"]),
-            history=data.get("history"),
-        )
-
-
-@dataclass(kw_only=True)
-class ListPadsResponse:
-    """Response for listing pads."""
-
-    status: str
-    pads: list[Pad]
-    next_page: str
-    total: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: ListPadsResponseDict,
-    ) -> Self:
-        """Create from an API response dictionary.
-
-        Args:
-            data: The dictionary to convert.
-
-        Returns:
-            A new instance.
-        """
-        return cls(
-            status=data["status"],
-            pads=[Pad.from_dict(data=item) for item in data["pads"]],
-            next_page=data["next_page"],
-            total=data["total"],
-        )
-
-
-@dataclass(kw_only=True)
-class PadEventsResponse:
-    """Response for retrieving pad events."""
-
-    status: str
-    events: list[PadEvent]
-    total: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: PadEventsResponseDict,
-    ) -> Self:
-        """Create from an API response dictionary.
-
-        Args:
-            data: The dictionary to convert.
-
-        Returns:
-            A new instance.
-        """
-        return cls(
-            status=data["status"],
-            events=[PadEvent.from_dict(data=item) for item in data["events"]],
-            total=data["total"],
-        )
-
-
-@dataclass(kw_only=True)
-class PadEnvironmentResponse:
-    """Response for retrieving a pad environment."""
-
-    status: str
-    id: int
-    pad_id: int
-    question_id: int | None
-    example_question_id: int | None
-    language: str
-    file_contents: list[FileContent]
-    created_at: str
-    updated_at: str
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: PadEnvironmentResponseDict,
-    ) -> Self:
-        """Create from an API response dictionary.
-
-        Args:
-            data: The dictionary to convert.
-
-        Returns:
-            A new instance.
-        """
-        return cls(
-            status=data["status"],
-            id=data["id"],
-            pad_id=data["pad_id"],
-            question_id=data.get("question_id"),
-            example_question_id=data.get(
-                "example_question_id",
-            ),
-            language=data["language"],
-            file_contents=[
-                FileContent.from_dict(data=item)
-                for item in data["file_contents"]
-            ],
-            created_at=data["created_at"],
-            updated_at=data["updated_at"],
-        )
-
-
-@dataclass(kw_only=True)
-class QuestionResponse:
-    """Response for creating or retrieving a question."""
-
-    status: str
-    id: int
-    title: str
-    owner_email: str
-    language: str | None
-    description: str | None
-    candidate_instructions: list[CandidateInstruction]
-    contents: str | None
-    shared: bool
-    used: int
-    take_home: bool
-    test_cases_enabled: bool
-    solution: str | None
-    pad_type: str
-    is_draft: bool
-    author_name: str
-    organization_name: str
-    custom_files: list[CustomFile]
-    created_at: str
-    updated_at: str
-    public_take_home_setting_id: int | None = None
-    contents_for_test_cases: str | None = None
-    test_cases: list[TestCase] | None = None
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: QuestionResponseDict,
-    ) -> Self:
-        """Create from an API response dictionary.
-
-        Args:
-            data: The dictionary to convert.
-
-        Returns:
-            A new instance.
-        """
-        raw_test_cases = data.get("test_cases")
-        return cls(
-            status=data["status"],
-            id=data["id"],
-            title=data["title"],
-            owner_email=data["owner_email"],
-            language=data.get("language"),
-            description=data.get("description"),
-            candidate_instructions=[
-                CandidateInstruction.from_dict(data=item)
-                for item in data["candidate_instructions"]
-            ],
-            contents=data.get("contents"),
-            shared=data["shared"],
-            used=data["used"],
-            take_home=data["take_home"],
-            test_cases_enabled=data["test_cases_enabled"],
-            solution=data.get("solution"),
-            pad_type=data["pad_type"],
-            is_draft=data["is_draft"],
-            author_name=data["author_name"],
-            organization_name=data["organization_name"],
-            custom_files=[
-                CustomFile.from_dict(data=item)
-                for item in data["custom_files"]
-            ],
-            created_at=data["created_at"],
-            updated_at=data["updated_at"],
-            public_take_home_setting_id=data.get(
-                "public_take_home_setting_id",
-            ),
-            contents_for_test_cases=data.get(
-                "contents_for_test_cases",
-            ),
-            test_cases=[
-                TestCase.from_dict(data=item) for item in raw_test_cases
-            ]
-            if raw_test_cases is not None
-            else None,
-        )
-
-
-@dataclass(kw_only=True)
-class ListQuestionsResponse:
-    """Response for listing questions."""
-
-    status: str
-    questions: list[Question]
-    next_page: str
-    total: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: ListQuestionsResponseDict,
-    ) -> Self:
-        """Create from an API response dictionary.
-
-        Args:
-            data: The dictionary to convert.
-
-        Returns:
-            A new instance.
-        """
-        return cls(
-            status=data["status"],
-            questions=[
-                Question.from_dict(data=item) for item in data["questions"]
-            ],
-            next_page=data["next_page"],
-            total=data["total"],
-        )
-
-
-@dataclass(kw_only=True)
-class QuotaResponse:
-    """Response for retrieving quota information."""
-
-    status: str
     trial_expires_at: str
     pads_used: int
     quota_reset_at: str
@@ -777,7 +457,7 @@ class QuotaResponse:
     @classmethod
     def from_dict(
         cls,
-        data: QuotaResponseDict,
+        data: QuotaDict,
     ) -> Self:
         """Create from an API response dictionary.
 
@@ -788,7 +468,6 @@ class QuotaResponse:
             A new instance.
         """
         return cls(
-            status=data["status"],
             trial_expires_at=data["trial_expires_at"],
             pads_used=data["pads_used"],
             quota_reset_at=data["quota_reset_at"],
@@ -798,10 +477,9 @@ class QuotaResponse:
 
 
 @dataclass(kw_only=True)
-class OrganizationResponse:
-    """Response for retrieving organization information."""
+class Organization:
+    """Organization information."""
 
-    status: str
     organization_name: str
     user_count: int
     users: list[OrganizationUser]
@@ -813,7 +491,7 @@ class OrganizationResponse:
     @classmethod
     def from_dict(
         cls,
-        data: OrganizationResponseDict,
+        data: OrganizationDict,
     ) -> Self:
         """Create from an API response dictionary.
 
@@ -824,7 +502,6 @@ class OrganizationResponse:
             A new instance.
         """
         return cls(
-            status=data["status"],
             organization_name=data["organization_name"],
             user_count=data["user_count"],
             users=[
@@ -840,10 +517,9 @@ class OrganizationResponse:
 
 
 @dataclass(kw_only=True)
-class OrganizationStatsResponse:
-    """Response for retrieving organization statistics."""
+class OrganizationStats:
+    """Organization usage statistics."""
 
-    status: str
     start_time: str
     end_time: str
     pads_created: int
@@ -852,7 +528,7 @@ class OrganizationStatsResponse:
     @classmethod
     def from_dict(
         cls,
-        data: OrganizationStatsResponseDict,
+        data: OrganizationStatsDict,
     ) -> Self:
         """Create from an API response dictionary.
 
@@ -863,7 +539,6 @@ class OrganizationStatsResponse:
             A new instance.
         """
         return cls(
-            status=data["status"],
             start_time=data["start_time"],
             end_time=data["end_time"],
             pads_created=data["pads_created"],

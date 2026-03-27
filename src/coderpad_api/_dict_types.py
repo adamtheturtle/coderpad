@@ -139,60 +139,9 @@ class OrganizationStatsUserDict(TypedDict):
     pads_created: int
 
 
-class StatusResponseDict(TypedDict):
-    """A response containing only a status."""
+class QuotaDict(TypedDict):
+    """Quota information."""
 
-    status: str
-
-
-class PadResponseDict(PadDict):
-    """Response for creating or retrieving a single pad."""
-
-    status: str
-
-
-class ListPadsResponseDict(TypedDict):
-    """Response for listing pads."""
-
-    status: str
-    pads: list[PadDict]
-    next_page: str
-    total: int
-
-
-class PadEventsResponseDict(TypedDict):
-    """Response for retrieving pad events."""
-
-    status: str
-    events: list[PadEventDict]
-    total: int
-
-
-class PadEnvironmentResponseDict(PadEnvironmentDict):
-    """Response for retrieving a pad environment."""
-
-    status: str
-
-
-class QuestionResponseDict(QuestionDict):
-    """Response for creating or retrieving a question."""
-
-    status: str
-
-
-class ListQuestionsResponseDict(TypedDict):
-    """Response for listing questions."""
-
-    status: str
-    questions: list[QuestionDict]
-    next_page: str
-    total: int
-
-
-class QuotaResponseDict(TypedDict):
-    """Response for retrieving quota information."""
-
-    status: str
     trial_expires_at: str
     pads_used: int
     quota_reset_at: str
@@ -200,10 +149,9 @@ class QuotaResponseDict(TypedDict):
     overages_enabled: bool
 
 
-class OrganizationResponseDict(TypedDict):
-    """Response for retrieving organization information."""
+class OrganizationDict(TypedDict):
+    """Organization information."""
 
-    status: str
     organization_name: str
     user_count: int
     users: list[OrganizationUserDict]
@@ -213,10 +161,9 @@ class OrganizationResponseDict(TypedDict):
     teams: list[TeamDict]
 
 
-class OrganizationStatsResponseDict(TypedDict):
-    """Response for retrieving organization statistics."""
+class OrganizationStatsDict(TypedDict):
+    """Organization usage statistics."""
 
-    status: str
     start_time: str
     end_time: str
     pads_created: int
