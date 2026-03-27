@@ -1,7 +1,8 @@
 """Types for the CoderPad Interview API."""
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, TypeVar
 
 from coderpad_api._dict_types import (
     CandidateInstructionDict,
@@ -19,6 +20,31 @@ from coderpad_api._dict_types import (
     TeamDict,
     TestCaseDict,
 )
+
+_T = TypeVar("_T")
+
+
+class PaginatedList(list[_T]):
+    """A list with pagination metadata from the API response."""
+
+    def __init__(
+        self,
+        iterable: Iterable[_T] = (),
+        /,
+        *,
+        total: int,
+        next_page: str | None = None,
+    ) -> None:
+        """Create a new paginated list.
+
+        Args:
+            iterable: The items for the list.
+            total: Total number of items across all pages.
+            next_page: URL for the next page, or ``None``.
+        """
+        super().__init__(iterable)
+        self.total = total
+        self.next_page = next_page
 
 
 @dataclass(kw_only=True)

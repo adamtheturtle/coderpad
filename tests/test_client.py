@@ -3,6 +3,7 @@
 import respx
 
 from coderpad_api.client import CoderPadClient
+from coderpad_api.types import PaginatedList
 
 
 class TestCoderPadClient:
@@ -43,7 +44,8 @@ class TestListPads:
     ) -> None:
         """Pads can be listed."""
         result = fixture_coderpad_client.list_pads()
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
+        assert isinstance(result.total, int)
 
     @staticmethod
     def test_list_pads_with_sort(
@@ -53,7 +55,7 @@ class TestListPads:
         result = fixture_coderpad_client.list_pads(
             sort="updated_at,desc",
         )
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
     @staticmethod
     def test_list_pads_with_page(
@@ -61,7 +63,7 @@ class TestListPads:
     ) -> None:
         """Pads can be listed with a page parameter."""
         result = fixture_coderpad_client.list_pads(page=2)
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
 
 class TestCreatePad:
@@ -164,7 +166,7 @@ class TestGetPadEvents:
         result = fixture_coderpad_client.get_pad_events(
             pad_id="ABC1234",
         )
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
     @staticmethod
     def test_get_pad_events_with_params(
@@ -176,7 +178,7 @@ class TestGetPadEvents:
             sort="created_at,asc",
             page=1,
         )
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
 
 class TestGetPadEnvironment:
@@ -202,7 +204,7 @@ class TestListQuestions:
     ) -> None:
         """Questions can be listed."""
         result = fixture_coderpad_client.list_questions()
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
     @staticmethod
     def test_list_questions_with_params(
@@ -213,7 +215,7 @@ class TestListQuestions:
             sort="updated_at,desc",
             page=1,
         )
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
 
 class TestCreateQuestion:
@@ -366,7 +368,7 @@ class TestListOrganizationPads:
     ) -> None:
         """Organization pads can be listed."""
         result = fixture_coderpad_client.list_organization_pads()
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
     @staticmethod
     def test_list_organization_pads_with_params(
@@ -377,7 +379,7 @@ class TestListOrganizationPads:
             sort="updated_at,desc",
             page=1,
         )
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
 
 class TestListOrganizationQuestions:
@@ -389,7 +391,7 @@ class TestListOrganizationQuestions:
     ) -> None:
         """Organization questions can be listed."""
         result = fixture_coderpad_client.list_organization_questions()
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
 
     @staticmethod
     def test_list_organization_questions_with_params(
@@ -402,4 +404,4 @@ class TestListOrganizationQuestions:
             sort="updated_at,desc",
             page=1,
         )
-        assert isinstance(result, list)
+        assert isinstance(result, PaginatedList)
