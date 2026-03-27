@@ -1,6 +1,7 @@
 """Types for the CoderPad Interview API."""
 
 from dataclasses import dataclass
+from typing import Self
 
 from coderpad_api._dict_types import (
     CandidateInstructionDict,
@@ -35,7 +36,7 @@ class Team:
     name: str
 
     @classmethod
-    def from_dict(cls, data: TeamDict) -> "Team":
+    def from_dict(cls, data: TeamDict) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -79,7 +80,7 @@ class Pad:
     history: str | None = None
 
     @classmethod
-    def from_dict(cls, data: PadDict) -> "Pad":
+    def from_dict(cls, data: PadDict) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -132,7 +133,7 @@ class PadEvent:
     def from_dict(
         cls,
         data: PadEventDict,
-    ) -> "PadEvent":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -163,7 +164,7 @@ class FileContent:
     def from_dict(
         cls,
         data: FileContentDict,
-    ) -> "FileContent":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -196,7 +197,7 @@ class PadEnvironment:
     def from_dict(
         cls,
         data: PadEnvironmentDict,
-    ) -> "PadEnvironment":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -233,7 +234,7 @@ class CandidateInstruction:
     def from_dict(
         cls,
         data: CandidateInstructionDict,
-    ) -> "CandidateInstruction":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -264,7 +265,7 @@ class TestCase:
     def from_dict(
         cls,
         data: TestCaseDict,
-    ) -> "TestCase":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -295,7 +296,7 @@ class CustomFile:
     def from_dict(
         cls,
         data: CustomFileDict,
-    ) -> "CustomFile":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -344,7 +345,7 @@ class Question:
     def from_dict(
         cls,
         data: QuestionDict,
-    ) -> "Question":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -406,7 +407,7 @@ class OrganizationUser:
     def from_dict(
         cls,
         data: OrganizationUserDict,
-    ) -> "OrganizationUser":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -434,7 +435,7 @@ class OrganizationStatsUser:
     def from_dict(
         cls,
         data: OrganizationStatsUserDict,
-    ) -> "OrganizationStatsUser":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -460,7 +461,7 @@ class StatusResponse:
     def from_dict(
         cls,
         data: StatusResponseDict,
-    ) -> "StatusResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -505,7 +506,7 @@ class PadResponse:
     def from_dict(
         cls,
         data: PadResponseDict,
-    ) -> "PadResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -557,7 +558,7 @@ class ListPadsResponse:
     def from_dict(
         cls,
         data: ListPadsResponseDict,
-    ) -> "ListPadsResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -586,7 +587,7 @@ class PadEventsResponse:
     def from_dict(
         cls,
         data: PadEventsResponseDict,
-    ) -> "PadEventsResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -620,7 +621,7 @@ class PadEnvironmentResponse:
     def from_dict(
         cls,
         data: PadEnvironmentResponseDict,
-    ) -> "PadEnvironmentResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -679,7 +680,7 @@ class QuestionResponse:
     def from_dict(
         cls,
         data: QuestionResponseDict,
-    ) -> "QuestionResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -743,7 +744,7 @@ class ListQuestionsResponse:
     def from_dict(
         cls,
         data: ListQuestionsResponseDict,
-    ) -> "ListQuestionsResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -777,7 +778,7 @@ class QuotaResponse:
     def from_dict(
         cls,
         data: QuotaResponseDict,
-    ) -> "QuotaResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -813,7 +814,7 @@ class OrganizationResponse:
     def from_dict(
         cls,
         data: OrganizationResponseDict,
-    ) -> "OrganizationResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
@@ -852,7 +853,7 @@ class OrganizationStatsResponse:
     def from_dict(
         cls,
         data: OrganizationStatsResponseDict,
-    ) -> "OrganizationStatsResponse":
+    ) -> Self:
         """Create from an API response dictionary.
 
         Args:
