@@ -8,7 +8,7 @@ import pytest
 import respx
 from openapi_mock import add_openapi_to_respx
 
-from coderpad_api import CoderPadClient
+from coderpad_api.client import CoderPadClient
 
 _OPENAPI_SPEC_PATH = Path(__file__).parent.parent / "openapi.json"
 _BASE_URL = "https://api.interview.coderpad.io"
