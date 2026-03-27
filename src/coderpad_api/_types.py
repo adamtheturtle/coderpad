@@ -244,7 +244,7 @@ class CandidateInstruction:
         """
         return cls(
             instructions=data["instructions"],
-            default_visible=data.get(
+            default_visible=data.get(  # type: ignore[call-overload]
                 "default_visible",
                 False,
             ),
@@ -473,10 +473,33 @@ class StatusResponse:
 
 
 @dataclass(kw_only=True)
-class PadResponse(Pad):
+class PadResponse:
     """Response for creating or retrieving a single pad."""
 
     status: str
+    id: str
+    title: str
+    state: str
+    owner_email: str
+    language: str | None
+    private: bool
+    execution_enabled: bool
+    contents: str | None
+    participants: list[str]
+    events: str
+    notes: str | None
+    created_at: str
+    updated_at: str
+    ended_at: str | None
+    url: str
+    playback: str
+    drawing: str | None
+    type: str
+    question_ids: list[int]
+    pad_environment_ids: list[int]
+    active_environment_id: int | None
+    team: Team
+    history: str | None = None
 
     @classmethod
     def from_dict(
@@ -580,10 +603,18 @@ class PadEventsResponse:
 
 
 @dataclass(kw_only=True)
-class PadEnvironmentResponse(PadEnvironment):
+class PadEnvironmentResponse:
     """Response for retrieving a pad environment."""
 
     status: str
+    id: int
+    pad_id: int
+    question_id: int | None
+    example_question_id: int | None
+    language: str
+    file_contents: list[FileContent]
+    created_at: str
+    updated_at: str
 
     @classmethod
     def from_dict(
@@ -617,10 +648,32 @@ class PadEnvironmentResponse(PadEnvironment):
 
 
 @dataclass(kw_only=True)
-class QuestionResponse(Question):
+class QuestionResponse:
     """Response for creating or retrieving a question."""
 
     status: str
+    id: int
+    title: str
+    owner_email: str
+    language: str | None
+    description: str | None
+    candidate_instructions: list[CandidateInstruction]
+    contents: str | None
+    shared: bool
+    used: int
+    take_home: bool
+    test_cases_enabled: bool
+    solution: str | None
+    pad_type: str
+    is_draft: bool
+    author_name: str
+    organization_name: str
+    custom_files: list[CustomFile]
+    created_at: str
+    updated_at: str
+    public_take_home_setting_id: int | None = None
+    contents_for_test_cases: str | None = None
+    test_cases: list[TestCase] | None = None
 
     @classmethod
     def from_dict(
