@@ -379,7 +379,7 @@ class TestListOrganizationPads:
     def test_list_organization_pads_with_params(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
-        """Organization pads can be listed with params."""
+        """Organization pads can be listed with optional arguments."""
         result = fixture_coderpad_client.list_organization_pads(
             sort="updated_at,desc",
             page=1,
@@ -402,7 +402,9 @@ class TestListOrganizationQuestions:
     def test_list_organization_questions_with_params(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
-        """Organization questions can be listed with params."""
+        """Organization questions can be listed with optional
+        arguments.
+        """
         result = fixture_coderpad_client.list_organization_questions(
             sort="updated_at,desc",
             page=1,
