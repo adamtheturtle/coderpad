@@ -45,6 +45,7 @@ optional-dependencies.dev = [
     "interrogate==1.7.0",
     "mypy[faster-cache]==1.19.1",
     "mypy-strict-kwargs==2026.1.12",
+    "openapi-mock==2026.3.2",
     "prek==0.3.8",
     "pydocstringformatter==0.7.5",
     "pydocstyle==6.3",
@@ -58,6 +59,7 @@ optional-dependencies.dev = [
     "pytest==9.0.2",
     "pytest-cov==7.1.0",
     "pyyaml==6.0.3",
+    "respx==0.22.0",
     "ruff==0.15.8",
     # We add shellcheck-py not only for shell scripts and shell code blocks,
     # but also because having it installed means that ``actionlint-py`` will
