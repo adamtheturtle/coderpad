@@ -3,7 +3,7 @@
   "info": {
     "title": "CoderPad Interview API",
     "version": "1.0.0",
-    "description": "CoderPad provides a simple API for programmatically creating and managing interview pads. You can use the API to integrate these pads with your internal interview scheduling platform or to get a text dump of an interview after the fact.\n\nCoderPad provides a standard REST API that returns results in JSON format.\n\n# Authentication\n\nThe API uses a simple HTTP `Authorization` header to authenticate you. If you visit [your settings page](https://coderpad.io/settings), you’ll see your API key (this one is fake):\n\n**8af9a3412559d803707937250dc1569d**\n\nYou can then make requests against the API endpoint like so:\n\n``` plaintext\ncurl -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/pads\n\n ```\n\nThe authorization type for Interview is `Bearer token`:\n\n<img src=\"https://content.pstmn.io/20d5a999-b7d0-4a7d-a30c-23677d3a4f16/aW1hZ2UucG5n\" width=\"1160\" height=\"181\">\n\n# Errors\n\nThe API will always return a top-level JSON object, along with a status code to indicate success or failure. When successful, the API will return an HTTP 200, as well as `{ status: \"OK\" }`.\n\nWhen calls are unsuccessful, they return an appropriate HTTP code, as well as something like\n\n``` json\n{\n  \"status\": \"ERROR\",\n  \"message\": \"Invalid API key\"\n}\n\n ```\n\nThe following is a table of HTTP codes from errors that you can expect to see:\n\n| HTTP Code | Message | Description |\n| --- | --- | --- |\n| 200 |  | Everything’s good! |\n| 400 | Bad Request | You sent a malformed request, like a programming language we don’t yet support. |\n| 401 | Invalid API key | Your API key wasn’t tied to a valid account. |\n| 403 | Forbidden | You don’t have permission to access that resource. |\n| 404 | Resource not found | We couldn’t find that resource for you… It probably doesn’t exist. |\n| 429 | Over quota | You’ve exceeded the number of pads your plan allows in a month. |\n\n# Languages\n\nWhen a resource contains a `language` field, it’s value is one of a set list:\n\n- angular\n    \n- bash\n    \n- c\n    \n- clojure\n    \n- coffeescript\n    \n- cpp\n    \n- csharp\n    \n- django\n    \n- elixir\n    \n- erlang\n    \n- fsharp\n    \n- gin\n    \n- haskell\n    \n- html\n    \n- java\n    \n- javascript\n    \n- julia\n    \n- kotlin\n    \n- lua\n    \n- markdown\n    \n- node\n    \n- objc\n    \n- ocaml\n    \n- perl\n    \n- php\n    \n- plaintext\n    \n- postgresql\n    \n- python\n    \n- rails\n    \n- react\n    \n- ruby\n    \n- rust\n    \n- spring\n    \n- svelte\n    \n- swift\n    \n- tcl\n    \n- typescript\n    \n- vb\n    \n- vue"
+    "description": "CoderPad provides a simple API for programmatically creating and managing interview pads. You can use the API to integrate these pads with your internal interview scheduling platform or to get a text dump of an interview after the fact.\n\nCoderPad provides a standard REST API that returns results in JSON format.\n\n# Authentication\n\nThe API uses a simple HTTP `Authorization` header to authenticate you. If you visit [your settings page](https://coderpad.io/settings), you\u2019ll see your API key (this one is fake):\n\n**8af9a3412559d803707937250dc1569d**\n\nYou can then make requests against the API endpoint like so:\n\n``` plaintext\ncurl -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/pads\n\n ```\n\nThe authorization type for Interview is `Bearer token`:\n\n<img src=\"https://content.pstmn.io/20d5a999-b7d0-4a7d-a30c-23677d3a4f16/aW1hZ2UucG5n\" width=\"1160\" height=\"181\">\n\n# Errors\n\nThe API will always return a top-level JSON object, along with a status code to indicate success or failure. When successful, the API will return an HTTP 200, as well as `{ status: \"OK\" }`.\n\nWhen calls are unsuccessful, they return an appropriate HTTP code, as well as something like\n\n``` json\n{\n  \"status\": \"ERROR\",\n  \"message\": \"Invalid API key\"\n}\n\n ```\n\nThe following is a table of HTTP codes from errors that you can expect to see:\n\n| HTTP Code | Message | Description |\n| --- | --- | --- |\n| 200 |  | Everything\u2019s good! |\n| 400 | Bad Request | You sent a malformed request, like a programming language we don\u2019t yet support. |\n| 401 | Invalid API key | Your API key wasn\u2019t tied to a valid account. |\n| 403 | Forbidden | You don\u2019t have permission to access that resource. |\n| 404 | Resource not found | We couldn\u2019t find that resource for you\u2026 It probably doesn\u2019t exist. |\n| 429 | Over quota | You\u2019ve exceeded the number of pads your plan allows in a month. |\n\n# Languages\n\nWhen a resource contains a `language` field, it\u2019s value is one of a set list:\n\n- angular\n    \n- bash\n    \n- c\n    \n- clojure\n    \n- coffeescript\n    \n- cpp\n    \n- csharp\n    \n- django\n    \n- elixir\n    \n- erlang\n    \n- fsharp\n    \n- gin\n    \n- haskell\n    \n- html\n    \n- java\n    \n- javascript\n    \n- julia\n    \n- kotlin\n    \n- lua\n    \n- markdown\n    \n- node\n    \n- objc\n    \n- ocaml\n    \n- perl\n    \n- php\n    \n- plaintext\n    \n- postgresql\n    \n- python\n    \n- rails\n    \n- react\n    \n- ruby\n    \n- rust\n    \n- spring\n    \n- svelte\n    \n- swift\n    \n- tcl\n    \n- typescript\n    \n- vb\n    \n- vue"
   },
   "servers": [
     {
@@ -302,7 +302,9 @@
                       "private": true,
                       "execution_enabled": true,
                       "contents": null,
-                      "participants": ["some.person"],
+                      "participants": [
+                        "some.person"
+                      ],
                       "events": "https://app.coderpad.io/api/pads/AB12345/events",
                       "notes": null,
                       "created_at": "2023-08-02T12:22:30Z",
@@ -314,7 +316,9 @@
                       "drawing": null,
                       "type": "live",
                       "question_ids": [],
-                      "pad_environment_ids": [5467777],
+                      "pad_environment_ids": [
+                        5467777
+                      ],
                       "active_environment_id": 5467777,
                       "team": {
                         "id": "68264172-5a54-4ac3-962b-cb8d1ad15d05",
@@ -330,7 +334,9 @@
                       "private": true,
                       "execution_enabled": true,
                       "contents": null,
-                      "participants": ["person.some"],
+                      "participants": [
+                        "person.some"
+                      ],
                       "events": "https://app.coderpad.io/api/pads/CGH8767/events",
                       "notes": null,
                       "created_at": "2023-08-02T10:27:51Z",
@@ -342,7 +348,10 @@
                       "drawing": null,
                       "type": "live",
                       "question_ids": [],
-                      "pad_environment_ids": [1234567, 7654321],
+                      "pad_environment_ids": [
+                        1234567,
+                        7654321
+                      ],
                       "active_environment_id": 7654321,
                       "team": {
                         "id": "4a0f61a3-3013-49f5-9eb7-9f83712a49bf",
@@ -358,7 +367,9 @@
                       "private": true,
                       "execution_enabled": true,
                       "contents": null,
-                      "participants": ["robert.coder"],
+                      "participants": [
+                        "robert.coder"
+                      ],
                       "events": "https://app.coderpad.io/api/pads/12PQRTS/events",
                       "notes": "This is a good candidaite",
                       "created_at": "2023-08-02T09:25:49Z",
@@ -369,8 +380,14 @@
                       "history": "https://coderpad-7.firebaseio.com/12PQRTS/history.json",
                       "drawing": null,
                       "type": "live",
-                      "question_ids": [54321],
-                      "pad_environment_ids": [1234567, 1234568, 1234569],
+                      "question_ids": [
+                        54321
+                      ],
+                      "pad_environment_ids": [
+                        1234567,
+                        1234568,
+                        1234569
+                      ],
                       "active_environment_id": 1234569,
                       "team": {
                         "id": "68264172-5a54-4ac3-962b-cb8d1ad15d05",
@@ -385,7 +402,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Pads"],
+        "tags": [
+          "v1.0",
+          "Pads"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -675,7 +695,9 @@
                   "drawing": null,
                   "type": "live",
                   "question_ids": [],
-                  "pad_environment_ids": [5018867],
+                  "pad_environment_ids": [
+                    5018867
+                  ],
                   "active_environment_id": null,
                   "team": {
                     "id": "68264172-5a54-4ac3-962b-cb8d1ad15d05",
@@ -686,201 +708,16 @@
             }
           }
         },
-        "tags": ["v1.0", "Pads"],
+        "tags": [
+          "v1.0",
+          "Pads"
+        ],
         "security": [
           {
             "BearerAuth": []
           }
         ],
         "description": "Create a new pad. You can set some initial conditions as well.\n\n```\ncurl \\\n  --data title=\"Rob Zombie's Interview\" \\\n  --data language=\"ruby\" \\\n  --data contents=\"print 'Hello, World'\" \\\n  --data notes=\"Your private notes\" \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/pads\n\n ```\n\nreturns\n\n``` json\n{\n  \"status\": \"OK\",\n  \"id\": \"AFQ2K9A3\",\n  \"title\": \"Rob Zombie's Interview\",\n  \"owner_email\": \"fbueller@gmail.com\",\n  \"language\": \"ruby\",\n  \"participants\": [\"vincent\"],\n  \"contents\": \"print 'Hello, World'\",\n  \"notes\": \"Your private notes\",\n  \"events\": \"https://app.coderpad.io/api/pads/AFQ2K9A3/events\",\n  \"private\": false,\n  \"execution_enabled\": true,\n  \"created_at\": \"2014-11-14T03:02:45Z\",\n  \"updated_at\": \"2014-11-14T03:02:45Z\",\n  \"ended_at\": null,\n  \"url\": \"https://coderpad.io/AFQ2K9A3\",\n  \"playback\": \"https://coderpad.io/AFQ2K9A3/playback\",\n  \"history\": \"https://coderpad.firebaseio.com/AFQ2K9A3/history.json\",\n  \"drawing\": null,\n  \"pad_environment_ids\": [\n    1234567,\n    7654321\n  ],\n  \"active_environment_id\": 1234567,\n  \"team\": {\n    \"id\": \"68264172-5a54-4ac3-962b-cb8d1ad15d05\",\n    \"name\": \"Main Team\"\n  }\n}\n\n ```\n\nThis method can return a quota exceeded error if you are over your used pad limit for the month."
-      },
-      "put": {
-        "summary": "Modify a pad",
-        "responses": {
-          "200": {
-            "description": "Successful request",
-            "headers": {
-              "Date": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Wed, 02 Aug 2023 14:20:57 GMT"
-              },
-              "Transfer-Encoding": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "chunked"
-              },
-              "Connection": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "keep-alive"
-              },
-              "X-Frame-Options": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "SAMEORIGIN"
-              },
-              "X-Xss-Protection": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "1; mode=block"
-              },
-              "X-Content-Type-Options": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "nosniff"
-              },
-              "X-Download-Options": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "noopen"
-              },
-              "X-Permitted-Cross-Domain-Policies": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "none"
-              },
-              "Referrer-Policy": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "strict-origin-when-cross-origin"
-              },
-              "X-Ua-Compatible": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "IE=edge"
-              },
-              "Strict-Transport-Security": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "max-age=63072000; includeSubDomains"
-              },
-              "X-Robots-Tag": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "none"
-              },
-              "Vary": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Accept-Encoding, Origin"
-              },
-              "Etag": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "W/\"f91924ee263f0f16771114170bca8e1e\""
-              },
-              "Cache-Control": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "max-age=0, private, must-revalidate"
-              },
-              "Content-Security-Policy": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "default-src 'self' https: blob:; connect-src 'self' ws: https: wss: file: https://edge.fullstory.com https://rs.fullstory.com https://sentry.io; img-src 'self' https: data: http: blob: https://www.googletagmanager.com https://rs.fullstory.com; object-src 'none'; script-src 'self' https: https://*.firebaseio.com https://www.googletagmanager.com https://edge.fullstory.com https://rs.fullstory.com https://js.hs-analytics.net https://www.google-analytics.com https://connect.facebook.net https://widget.intercom.io 'unsafe-inline' 'unsafe-eval'; worker-src 'self' https: blob:; style-src 'self' https: blob: 'unsafe-inline' 'unsafe-eval'; media-src 'self' https: data: blob:; font-src 'self' https: data: chrome-extension moz-extension https://fonts.gstatic.com http://themes.googleusercontent.com; report-uri /csp-report"
-              },
-              "Set-Cookie": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "_coderpad_rails_session_3=8a7366cd51b2d7268b8deef226174d91; domain=coderpad-staging.io; path=/; HttpOnly; SameSite=Lax; secure"
-              },
-              "X-Request-Id": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "9bf3bbfc-e45a-4304-97d8-51673f9f65db"
-              },
-              "X-Runtime": {
-                "schema": {
-                  "type": "number"
-                },
-                "example": "0.034633"
-              },
-              "Via": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "1.1 vegur"
-              },
-              "CF-Cache-Status": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "DYNAMIC"
-              },
-              "Report-To": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=%2Fth%2FuClORs8iRwWlGFysbAXd3uTobUJPZbFyHf%2FWIS22I9VjgETLjgDSLjqf%2FsEF5AKoIM5GceuVZD2XRtQo8CigJYpMcjPVLJXR9Eed0LKf67nhNXNZ68vx4ZPIr6bwh%2FNspgkvpX2c\"}],\"group\":\"cf-nel\",\"max_age\":604800}"
-              },
-              "NEL": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}"
-              },
-              "Server": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "cloudflare"
-              },
-              "CF-RAY": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "7f06f6e95b0c58cc-IAD"
-              },
-              "Content-Encoding": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "br"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "example": {
-                  "status": "OK"
-                }
-              }
-            }
-          }
-        },
-        "tags": ["v1.0", "Pads"],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "description": "Modifies an existing pad. You can specify any of the valid parameters you used to create the pad.\n\nYou may also use this endpoint to end the interview, by setting the `ended` attribute to `true`, or delete the interview, by setting the `deleted` attribute to `true`. Values other than `true` will be ignored.\n\n```\ncurl \\\n  -X PUT --data title=\"Interview with Greg\" \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/pads/AFQ2K9A3\n\n ```\n\nPlease note that resetting the contents in the middle of an ongoing interview session will probably break something. It will also destroy the history for that pad. Use with caution."
       }
     },
     "/api/pads/{id}": {
@@ -1153,7 +990,9 @@
                   "private": true,
                   "execution_enabled": true,
                   "contents": null,
-                  "participants": ["some.person"],
+                  "participants": [
+                    "some.person"
+                  ],
                   "events": "https://app.coderpad.io/api/pads/983SDkjdsh/events",
                   "notes": null,
                   "created_at": "2023-08-02T10:27:51Z",
@@ -1164,7 +1003,10 @@
                   "drawing": null,
                   "type": "live",
                   "question_ids": [],
-                  "pad_environment_ids": [1234567, 7654321],
+                  "pad_environment_ids": [
+                    1234567,
+                    7654321
+                  ],
                   "active_environment_id": 1234567,
                   "team": {
                     "id": "68264172-5a54-4ac3-962b-cb8d1ad15d05",
@@ -1175,7 +1017,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Pads"],
+        "tags": [
+          "v1.0",
+          "Pads"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1193,7 +1038,198 @@
             "type": "string"
           }
         }
-      ]
+      ],
+      "put": {
+        "summary": "Modify a pad",
+        "responses": {
+          "200": {
+            "description": "Successful request",
+            "headers": {
+              "Date": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Wed, 02 Aug 2023 14:20:57 GMT"
+              },
+              "Transfer-Encoding": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "chunked"
+              },
+              "Connection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "keep-alive"
+              },
+              "X-Frame-Options": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "SAMEORIGIN"
+              },
+              "X-Xss-Protection": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "1; mode=block"
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "nosniff"
+              },
+              "X-Download-Options": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "noopen"
+              },
+              "X-Permitted-Cross-Domain-Policies": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "none"
+              },
+              "Referrer-Policy": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "strict-origin-when-cross-origin"
+              },
+              "X-Ua-Compatible": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "IE=edge"
+              },
+              "Strict-Transport-Security": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "max-age=63072000; includeSubDomains"
+              },
+              "X-Robots-Tag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "none"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Accept-Encoding, Origin"
+              },
+              "Etag": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "W/\"f91924ee263f0f16771114170bca8e1e\""
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "max-age=0, private, must-revalidate"
+              },
+              "Content-Security-Policy": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "default-src 'self' https: blob:; connect-src 'self' ws: https: wss: file: https://edge.fullstory.com https://rs.fullstory.com https://sentry.io; img-src 'self' https: data: http: blob: https://www.googletagmanager.com https://rs.fullstory.com; object-src 'none'; script-src 'self' https: https://*.firebaseio.com https://www.googletagmanager.com https://edge.fullstory.com https://rs.fullstory.com https://js.hs-analytics.net https://www.google-analytics.com https://connect.facebook.net https://widget.intercom.io 'unsafe-inline' 'unsafe-eval'; worker-src 'self' https: blob:; style-src 'self' https: blob: 'unsafe-inline' 'unsafe-eval'; media-src 'self' https: data: blob:; font-src 'self' https: data: chrome-extension moz-extension https://fonts.gstatic.com http://themes.googleusercontent.com; report-uri /csp-report"
+              },
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "_coderpad_rails_session_3=8a7366cd51b2d7268b8deef226174d91; domain=coderpad-staging.io; path=/; HttpOnly; SameSite=Lax; secure"
+              },
+              "X-Request-Id": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "9bf3bbfc-e45a-4304-97d8-51673f9f65db"
+              },
+              "X-Runtime": {
+                "schema": {
+                  "type": "number"
+                },
+                "example": "0.034633"
+              },
+              "Via": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "1.1 vegur"
+              },
+              "CF-Cache-Status": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "DYNAMIC"
+              },
+              "Report-To": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=%2Fth%2FuClORs8iRwWlGFysbAXd3uTobUJPZbFyHf%2FWIS22I9VjgETLjgDSLjqf%2FsEF5AKoIM5GceuVZD2XRtQo8CigJYpMcjPVLJXR9Eed0LKf67nhNXNZ68vx4ZPIr6bwh%2FNspgkvpX2c\"}],\"group\":\"cf-nel\",\"max_age\":604800}"
+              },
+              "NEL": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}"
+              },
+              "Server": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "cloudflare"
+              },
+              "CF-RAY": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "7f06f6e95b0c58cc-IAD"
+              },
+              "Content-Encoding": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "br"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "OK"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "v1.0",
+          "Pads"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Modifies an existing pad. You can specify any of the valid parameters you used to create the pad.\n\nYou may also use this endpoint to end the interview, by setting the `ended` attribute to `true`, or delete the interview, by setting the `deleted` attribute to `true`. Values other than `true` will be ignored.\n\n```\ncurl \\\n  -X PUT --data title=\"Interview with Greg\" \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/pads/AFQ2K9A3\n\n ```\n\nPlease note that resetting the contents in the middle of an ongoing interview session will probably break something. It will also destroy the history for that pad. Use with caution."
+      }
     },
     "/api/pads/{id}/events": {
       "get": {
@@ -1466,7 +1502,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Pads"],
+        "tags": [
+          "v1.0",
+          "Pads"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -1716,13 +1755,16 @@
             }
           }
         },
-        "tags": ["v1.0", "Pad Environments"],
+        "tags": [
+          "v1.0",
+          "Pad Environments"
+        ],
         "security": [
           {
             "BearerAuth": []
           }
         ],
-        "description": "Returns detail about a particular pad environment. Doing a straightforward curl like so:\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/pad_environments/42\n\n ```\n\nyields:\n\n``` json\n{\n  \"status\": \"OK\",\n  \"id\": 1,\n  \"pad_id\": 3,\n  \"question_id\": null,\n  \"example_question_id\": null,\n  \"language\": \"ruby\",\n  \"file_contents\": [\n    {\n      \"path\": \"coderpad/main.rb\",\n      \"contents\": \"5.times do\\n  puts 'Hello, World!'\\nend\\n\"\n    }\n  ],\n  \"created_at\": \"2022-09-12T13:49:45.390-07:00\",\n  \"updated_at\": \"2022-09-12T13:50:42.058-07:00\"\n}\n\n ```\n\nFields returned:\n\n| Field | Description |\n| --- | --- |\n| id | `string` Primary key for the object. Use this to query or modify this resource later. |\n| pad_id | `string` The pad this environment belongs to. |\n| question_id | `string` If this is a question environment, this is the identifier for the question, otherwise null. |\n| example_question_id | `string` If you used one of CoderPad's example questions in the pad environment, the ID will be listed in this field. Example: `examples/035-django-shopping-list`. |\n| language | `string` Chosen language for the pad environment. One of a [set list](#Languages). |\n| file_contents | `object` Returns latest contents of pad environment. Note: If the environment language is a multi-file framework or project, for each file in the project a separate object with “path\", ”contents”, and “history” will be returned. See the `file_contents` object table below for more info. |\n| created_at | `datetime` When the environment was created, in UTC ISO 8601, like `2015-01-30T00:22:55.520Z`. |\n| updated_at | `datetime` Similarly, when the environment was last updated. |\n\nThe **file_contents** field contains information about the files associated with the environment. It is represented as an array of objects with the following fields:\n\n| Field | Description |\n| --- | --- |\n| path | `string` The path to the file. |\n| contents | `string` Initial contents of the file. Defaults to the example code for the language/file combination. |\n| history (optional) | `string` A URL that displays a JSON file that contains pad history information. This field will only be available once edits have been made to the pad. |\n\nAll values returned by this endpoint are real-time as of the moment you request them."
+        "description": "Returns detail about a particular pad environment. Doing a straightforward curl like so:\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/pad_environments/42\n\n ```\n\nyields:\n\n``` json\n{\n  \"status\": \"OK\",\n  \"id\": 1,\n  \"pad_id\": 3,\n  \"question_id\": null,\n  \"example_question_id\": null,\n  \"language\": \"ruby\",\n  \"file_contents\": [\n    {\n      \"path\": \"coderpad/main.rb\",\n      \"contents\": \"5.times do\\n  puts 'Hello, World!'\\nend\\n\"\n    }\n  ],\n  \"created_at\": \"2022-09-12T13:49:45.390-07:00\",\n  \"updated_at\": \"2022-09-12T13:50:42.058-07:00\"\n}\n\n ```\n\nFields returned:\n\n| Field | Description |\n| --- | --- |\n| id | `string` Primary key for the object. Use this to query or modify this resource later. |\n| pad_id | `string` The pad this environment belongs to. |\n| question_id | `string` If this is a question environment, this is the identifier for the question, otherwise null. |\n| example_question_id | `string` If you used one of CoderPad's example questions in the pad environment, the ID will be listed in this field. Example: `examples/035-django-shopping-list`. |\n| language | `string` Chosen language for the pad environment. One of a [set list](#Languages). |\n| file_contents | `object` Returns latest contents of pad environment. Note: If the environment language is a multi-file framework or project, for each file in the project a separate object with \u201cpath\", \u201dcontents\u201d, and \u201chistory\u201d will be returned. See the `file_contents` object table below for more info. |\n| created_at | `datetime` When the environment was created, in UTC ISO 8601, like `2015-01-30T00:22:55.520Z`. |\n| updated_at | `datetime` Similarly, when the environment was last updated. |\n\nThe **file_contents** field contains information about the files associated with the environment. It is represented as an array of objects with the following fields:\n\n| Field | Description |\n| --- | --- |\n| path | `string` The path to the file. |\n| contents | `string` Initial contents of the file. Defaults to the example code for the language/file combination. |\n| history (optional) | `string` A URL that displays a JSON file that contains pad history information. This field will only be available once edits have been made to the pad. |\n\nAll values returned by this endpoint are real-time as of the moment you request them."
       },
       "parameters": [
         {
@@ -2006,13 +2048,16 @@
             }
           }
         },
-        "tags": ["v1.0", "Questions"],
+        "tags": [
+          "v1.0",
+          "Questions"
+        ],
         "security": [
           {
             "BearerAuth": []
           }
         ],
-        "description": "Returns details about a particular question. You can view questions visible to you, which includes your own questions as well as colleagues’ questions where `shared` is set to `true`. If you’re an organization owner, you can view all questions in the organization.\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/questions/42\n\n ```\n\nyields:\n\n``` json\n{\n  \"status\": \"OK\",\n  \"id\": 42,\n  \"title\": \"Are fruits tomatoes?\",\n  \"author_name\": \"Molly Macadamia\",\n  \"owner_email\": \"molly@macadamia.net\",\n  \"language\": \"postgresql\",\n  \"description\": \"Use SQL magic to discover the answer.\",\n  \"contents\": \"SELECT * FROM fruits;\\n\",\n  \"shared\": true,\n  \"used\": 0,\n  \"created_at\": \"2019-01-25T02:07:12Z\",\n  \"updated_at\": \"2019-01-25T02:07:12Z\"\n}\n\n ```\n\nFields returned:\n\n| Field | Description |\n| --- | --- |\n| id | `string` Primary key for the object. Use this to query or modify this resource later. |\n| title | `string` User-assigned title of the question. |\n| author_name | `string` Name of the person who authored this question. This is the same person as the owner referenced by owner_email. |\n| owner_email | `string` Email address of the person who owns the question. |\n| language | `string` Chosen language for the question. One of a [set list](#Languages). |\n| description | `string` Notes for yourself (or colleagues) on what this question is about, and what good and bad answers might look like. |\n| contents | `string`User-assigned question contents. This text is inserted into your interview session if you choose to use this question. |\n| shared | `boolean` Specifies whether this question is shared with the user’s organization. Defaults to `true`. |\n| used | `int` A counter counting the number of times this question was used to create pads. |\n| created_at | `datetime` The time when the question was created, in UTC ISO 8601, like `2019-01-30T00:22:55.520Z`. |\n| updated_at | `datetime` Similarly, the time when the question was last updated. |"
+        "description": "Returns details about a particular question. You can view questions visible to you, which includes your own questions as well as colleagues\u2019 questions where `shared` is set to `true`. If you\u2019re an organization owner, you can view all questions in the organization.\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/questions/42\n\n ```\n\nyields:\n\n``` json\n{\n  \"status\": \"OK\",\n  \"id\": 42,\n  \"title\": \"Are fruits tomatoes?\",\n  \"author_name\": \"Molly Macadamia\",\n  \"owner_email\": \"molly@macadamia.net\",\n  \"language\": \"postgresql\",\n  \"description\": \"Use SQL magic to discover the answer.\",\n  \"contents\": \"SELECT * FROM fruits;\\n\",\n  \"shared\": true,\n  \"used\": 0,\n  \"created_at\": \"2019-01-25T02:07:12Z\",\n  \"updated_at\": \"2019-01-25T02:07:12Z\"\n}\n\n ```\n\nFields returned:\n\n| Field | Description |\n| --- | --- |\n| id | `string` Primary key for the object. Use this to query or modify this resource later. |\n| title | `string` User-assigned title of the question. |\n| author_name | `string` Name of the person who authored this question. This is the same person as the owner referenced by owner_email. |\n| owner_email | `string` Email address of the person who owns the question. |\n| language | `string` Chosen language for the question. One of a [set list](#Languages). |\n| description | `string` Notes for yourself (or colleagues) on what this question is about, and what good and bad answers might look like. |\n| contents | `string`User-assigned question contents. This text is inserted into your interview session if you choose to use this question. |\n| shared | `boolean` Specifies whether this question is shared with the user\u2019s organization. Defaults to `true`. |\n| used | `int` A counter counting the number of times this question was used to create pads. |\n| created_at | `datetime` The time when the question was created, in UTC ISO 8601, like `2019-01-30T00:22:55.520Z`. |\n| updated_at | `datetime` Similarly, the time when the question was last updated. |"
       },
       "parameters": [
         {
@@ -2198,7 +2243,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Questions"],
+        "tags": [
+          "v1.0",
+          "Questions"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -2380,7 +2428,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Questions"],
+        "tags": [
+          "v1.0",
+          "Questions"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -2734,19 +2785,25 @@
                           "id": 756,
                           "return_value": "\"const _ = require('lodash');\\n\\nfunction sayWhat(what) {\\n  console.log('Hello, World');\\n  console.log(`\\n}\\n\\n_.times(5, sayHello);\\n\"",
                           "visible": false,
-                          "arguments": ["1583819946183"]
+                          "arguments": [
+                            "1583819946183"
+                          ]
                         },
                         {
                           "id": 757,
                           "return_value": "\"\"",
                           "visible": false,
-                          "arguments": ["-232"]
+                          "arguments": [
+                            "-232"
+                          ]
                         },
                         {
                           "id": 758,
                           "return_value": "\"\"",
                           "visible": false,
-                          "arguments": ["0"]
+                          "arguments": [
+                            "0"
+                          ]
                         }
                       ],
                       "created_at": "2020-08-17T07:27:53Z",
@@ -2785,7 +2842,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Questions"],
+        "tags": [
+          "v1.0",
+          "Questions"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3046,7 +3106,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Questions"],
+        "tags": [
+          "v1.0",
+          "Questions"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3252,8 +3315,11 @@
             }
           }
         },
-        "tags": ["v1.0", "Quota"],
-        "description": "This endpoint returns basic information about your organization’s monthly pad quota (or your quota, if you are not a part of an organization). For example, if you are a user in an organization with a monthly quota of 120 pads, the following:\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/quota\n\n ```\n\nreturns:\n\n``` json\n{\n  \"status\": \"OK\",\n  \"trial_expires_at\": \"2018-01-30T16:16:00.000-08:00\",\n  \"pads_used\": 33,\n  \"quota_reset_at\": \"2018-01-25T14:51:37.084-08:00\",\n  \"unlimited\": false,\n  \"pads_remaining\": 87,\n  \"billing_cycle_pad_limit\": 120\n}\n\n ```\n\nFields returned:\n\n| Field | Description |\n| --- | --- |\n| trial_expires_at | `datetime` The date your trial will expire, or has expired, in UTC ISO 8601 format (e.g., `2018-01-25T14:51:37.084-08:00`). |\n| pads_used | `int` The number of pads used during the current billing cycle. |\n| quota_reset_at | `datetime` The date, in UTC ISO 8601, that your quota was last reset. Pad quotas are reset every billing cycle. |\n| unlimited | `boolean` Indicates whether your billing plan allows for unmetered usage. |\n| pads_remaining | `int` The number of pads remaining for the current billing cycle. Not returned if `unlimited` is true. |\n| billing_cycle_pad_limit | `int` The total number of pads allocated for the billing cycle. Not returned if `unlimited` is true. |"
+        "tags": [
+          "v1.0",
+          "Quota"
+        ],
+        "description": "This endpoint returns basic information about your organization\u2019s monthly pad quota (or your quota, if you are not a part of an organization). For example, if you are a user in an organization with a monthly quota of 120 pads, the following:\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  https://app.coderpad.io/api/quota\n\n ```\n\nreturns:\n\n``` json\n{\n  \"status\": \"OK\",\n  \"trial_expires_at\": \"2018-01-30T16:16:00.000-08:00\",\n  \"pads_used\": 33,\n  \"quota_reset_at\": \"2018-01-25T14:51:37.084-08:00\",\n  \"unlimited\": false,\n  \"pads_remaining\": 87,\n  \"billing_cycle_pad_limit\": 120\n}\n\n ```\n\nFields returned:\n\n| Field | Description |\n| --- | --- |\n| trial_expires_at | `datetime` The date your trial will expire, or has expired, in UTC ISO 8601 format (e.g., `2018-01-25T14:51:37.084-08:00`). |\n| pads_used | `int` The number of pads used during the current billing cycle. |\n| quota_reset_at | `datetime` The date, in UTC ISO 8601, that your quota was last reset. Pad quotas are reset every billing cycle. |\n| unlimited | `boolean` Indicates whether your billing plan allows for unmetered usage. |\n| pads_remaining | `int` The number of pads remaining for the current billing cycle. Not returned if `unlimited` is true. |\n| billing_cycle_pad_limit | `int` The total number of pads allocated for the billing cycle. Not returned if `unlimited` is true. |"
       }
     },
     "/api/organization": {
@@ -3497,7 +3563,9 @@
                     {
                       "email": "person.two@company.io",
                       "name": "person.two",
-                      "teams": ["4a0f61a3-3013-49f5-9eb7-9f83712a49bf"]
+                      "teams": [
+                        "4a0f61a3-3013-49f5-9eb7-9f83712a49bf"
+                      ]
                     },
                     {
                       "email": "buddy@company.io",
@@ -3530,7 +3598,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Organization"],
+        "tags": [
+          "v1.0",
+          "Organization"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -3763,7 +3834,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Organization"],
+        "tags": [
+          "v1.0",
+          "Organization"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4060,7 +4134,11 @@
                       "private": false,
                       "execution_enabled": true,
                       "contents": null,
-                      "participants": ["Loick", "Candidate Luke", "some.user"],
+                      "participants": [
+                        "Loick",
+                        "Candidate Luke",
+                        "some.user"
+                      ],
                       "events": "https://app.coderpad.io/api/pads/ABC1234/events",
                       "notes": "Here is where our private notes will live\n",
                       "created_at": "2023-08-03T14:46:43Z",
@@ -4071,8 +4149,13 @@
                       "history": "https://coderpad-10.firebaseio.com/ABC1234/history.json",
                       "drawing": null,
                       "type": "live",
-                      "question_ids": [9876543],
-                      "pad_environment_ids": [1234567, 2345678],
+                      "question_ids": [
+                        9876543
+                      ],
+                      "pad_environment_ids": [
+                        1234567,
+                        2345678
+                      ],
                       "active_environment_id": 2345678,
                       "team": {
                         "id": "ddc4ce0a-93ec-4bad-9a1a-3d2db96f6220",
@@ -4088,7 +4171,9 @@
                       "private": false,
                       "execution_enabled": true,
                       "contents": null,
-                      "participants": ["chase.bailkin"],
+                      "participants": [
+                        "chase.bailkin"
+                      ],
                       "events": "https://app.coderpad.io/api/pads/XYZ4567/events",
                       "notes": "",
                       "created_at": "2023-08-03T14:22:53Z",
@@ -4099,8 +4184,13 @@
                       "history": "https://coderpad-4.firebaseio.com/XYZ4567/history.json",
                       "drawing": null,
                       "type": "live",
-                      "question_ids": [253253],
-                      "pad_environment_ids": [5556666, 6667777],
+                      "question_ids": [
+                        253253
+                      ],
+                      "pad_environment_ids": [
+                        5556666,
+                        6667777
+                      ],
                       "active_environment_id": 6667777,
                       "team": {
                         "id": "68264172-5a54-4ac3-962b-cb8d1ad15d05",
@@ -4115,7 +4205,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Organization"],
+        "tags": [
+          "v1.0",
+          "Organization"
+        ],
         "security": [
           {
             "BearerAuth": []
@@ -4459,13 +4552,16 @@
             }
           }
         },
-        "tags": ["v1.0", "Organization"],
+        "tags": [
+          "v1.0",
+          "Organization"
+        ],
         "security": [
           {
             "BearerAuth": []
           }
         ],
-        "description": "This endpoint is similar to [<i>GET /api/questions</i>](#d2fa48b3-dbfe-4b9b-af97-9a4df8562f1e), except that it returns all the questions in your organization visible to you. You’ll see your own questions as well as colleagues’ questions where the `shared` boolean is set to `true`. If you are an organization owner, you can see every question in the organization.\n\nThe endpoint also performs sorting and pagination identically to [<i>GET /api/questions</i>](#d2fa48b3-dbfe-4b9b-af97-9a4df8562f1e).\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  \"https://app.coderpad.io/api/organization/questions?sort=updated_at,desc\"\n\n ```\n\nreturns\n\n```\n{\n  \"status\": \"OK\",\n  \"questions\": [\n    {\n      \"id\": 12,\n      \"title\": \"Are avocados fruity?\",\n      \"owner_email\": \"alice@fruits-party.io\",\n      \"language\": \"ruby\",\n      \"description\": \"Fruit puzzler round 2?\",\n      \"contents\": \"def is_fruity?(thing);\\\\n  end\\\\n\",\n      \"shared\": true,\n      \"used\": 0,\n      \"created_at\": \"2019-01-28T22:08:09Z\",\n      \"updated_at\": \"2019-01-28T22:08:09Z\"\n    }\n    // ... followed by the rest of the questions in the organization visible to you\n  ],\n  \"next_page\": \"https://app.coderpad.io/api/organization/questions?sort=updated_at,desc&page=2\",\n  \"total\": 256\n}\n\n ```"
+        "description": "This endpoint is similar to [<i>GET /api/questions</i>](#d2fa48b3-dbfe-4b9b-af97-9a4df8562f1e), except that it returns all the questions in your organization visible to you. You\u2019ll see your own questions as well as colleagues\u2019 questions where the `shared` boolean is set to `true`. If you are an organization owner, you can see every question in the organization.\n\nThe endpoint also performs sorting and pagination identically to [<i>GET /api/questions</i>](#d2fa48b3-dbfe-4b9b-af97-9a4df8562f1e).\n\n```\ncurl \\\n  -H 'Authorization: Token token=\"8af9a3412559d803707937250dc1569d\"' \\\n  \"https://app.coderpad.io/api/organization/questions?sort=updated_at,desc\"\n\n ```\n\nreturns\n\n```\n{\n  \"status\": \"OK\",\n  \"questions\": [\n    {\n      \"id\": 12,\n      \"title\": \"Are avocados fruity?\",\n      \"owner_email\": \"alice@fruits-party.io\",\n      \"language\": \"ruby\",\n      \"description\": \"Fruit puzzler round 2?\",\n      \"contents\": \"def is_fruity?(thing);\\\\n  end\\\\n\",\n      \"shared\": true,\n      \"used\": 0,\n      \"created_at\": \"2019-01-28T22:08:09Z\",\n      \"updated_at\": \"2019-01-28T22:08:09Z\"\n    }\n    // ... followed by the rest of the questions in the organization visible to you\n  ],\n  \"next_page\": \"https://app.coderpad.io/api/organization/questions?sort=updated_at,desc&page=2\",\n  \"total\": 256\n}\n\n ```"
       }
     },
     "/api/organization/users": {
@@ -4672,7 +4768,9 @@
                     {
                       "email": "person.two@company.io",
                       "name": "person.two",
-                      "teams": ["4a0f61a3-3013-49f5-9eb7-9f83712a49bf"]
+                      "teams": [
+                        "4a0f61a3-3013-49f5-9eb7-9f83712a49bf"
+                      ]
                     },
                     {
                       "email": "buddy@company.io",
@@ -4688,7 +4786,10 @@
             }
           }
         },
-        "tags": ["v1.0", "Organization"],
+        "tags": [
+          "v1.0",
+          "Organization"
+        ],
         "security": [
           {
             "BearerAuth": []
