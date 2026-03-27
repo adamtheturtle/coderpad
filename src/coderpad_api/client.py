@@ -23,13 +23,7 @@ from coderpad_api.types import (
 class PadsNamespace:
     """Namespace for pad operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
-        """Create a new pads namespace.
-
-        Args:
-            client: The HTTP client to use for requests.
-        """
-        self._client = client
+    _client: httpx.Client
 
     def list(
         self,
@@ -205,13 +199,7 @@ class PadsNamespace:
 class QuestionsNamespace:
     """Namespace for question operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
-        """Create a new questions namespace.
-
-        Args:
-            client: The HTTP client to use for requests.
-        """
-        self._client = client
+    _client: httpx.Client
 
     def list(
         self,
@@ -359,13 +347,7 @@ class QuestionsNamespace:
 class OrganizationNamespace:
     """Namespace for organization operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
-        """Create a new organization namespace.
-
-        Args:
-            client: The HTTP client to use for requests.
-        """
-        self._client = client
+    _client: httpx.Client
 
     def get(self) -> Organization:
         """Retrieve organization information.
@@ -477,6 +459,19 @@ class OrganizationNamespace:
         return [Question.from_dict(data=item) for item in data["questions"]]
 
 
+def _set_client(
+    namespace: PadsNamespace | QuestionsNamespace | OrganizationNamespace,
+    client: httpx.Client,
+) -> None:
+    """Set the HTTP client on a namespace instance.
+
+    Args:
+        namespace: The namespace to configure.
+        client: The HTTP client.
+    """
+    namespace._client = client  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+
+
 class CoderPadClient:
     """A client for the CoderPad Interview API."""
 
@@ -497,6 +492,12 @@ class CoderPadClient:
             base_url=base_url,
             headers={"Authorization": f"Bearer {api_key}"},
         )
-        self.pads = PadsNamespace(client=http_client)
-        self.questions = QuestionsNamespace(client=http_client)
-        self.organization = OrganizationNamespace(client=http_client)
+        self.pads: PadsNamespace = PadsNamespace()
+        _set_client(namespace=self.pads, client=http_client)
+        self.questions: QuestionsNamespace = QuestionsNamespace()
+        _set_client(namespace=self.questions, client=http_client)
+        self.organization: OrganizationNamespace = OrganizationNamespace()
+        _set_client(
+            namespace=self.organization,
+            client=http_client,
+        )
