@@ -31,6 +31,9 @@ pytest
 readme
 refactoring
 regex
+repo
+reportUnusedFunction
+respx
 str
 todo
 txt
