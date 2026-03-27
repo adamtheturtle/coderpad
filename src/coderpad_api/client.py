@@ -8,6 +8,7 @@ from coderpad_api.types import (
     Pad,
     PadEnvironment,
     PadEvent,
+    PaginatedList,
     Question,
     Quota,
     SortOrder,
@@ -40,7 +41,7 @@ class CoderPadClient:
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> list[Pad]:
+    ) -> PaginatedList[Pad]:
         """Retrieve a list of pads.
 
         Args:
@@ -48,7 +49,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The list of pads.
+            The list of pads with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -61,7 +62,11 @@ class CoderPadClient:
         )
         response.raise_for_status()
         data = response.json()
-        return [Pad.from_dict(data=item) for item in data["pads"]]
+        return PaginatedList(
+            [Pad.from_dict(data=item) for item in data["pads"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def create_pad(
         self,
@@ -160,7 +165,7 @@ class CoderPadClient:
         pad_id: str,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> list[PadEvent]:
+    ) -> PaginatedList[PadEvent]:
         """Retrieve a list of pad events.
 
         Args:
@@ -169,7 +174,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The list of pad events.
+            The list of pad events with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -182,7 +187,11 @@ class CoderPadClient:
         )
         response.raise_for_status()
         data = response.json()
-        return [PadEvent.from_dict(data=item) for item in data["events"]]
+        return PaginatedList(
+            [PadEvent.from_dict(data=item) for item in data["events"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def get_pad_environment(
         self,
@@ -210,7 +219,7 @@ class CoderPadClient:
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> list[Question]:
+    ) -> PaginatedList[Question]:
         """Retrieve a list of questions.
 
         Args:
@@ -218,7 +227,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The list of questions.
+            The list of questions with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -231,7 +240,11 @@ class CoderPadClient:
         )
         response.raise_for_status()
         data = response.json()
-        return [Question.from_dict(data=item) for item in data["questions"]]
+        return PaginatedList(
+            [Question.from_dict(data=item) for item in data["questions"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def create_question(
         self,
@@ -405,7 +418,7 @@ class CoderPadClient:
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> list[Pad]:
+    ) -> PaginatedList[Pad]:
         """Retrieve pads for the entire organization.
 
         Args:
@@ -413,7 +426,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The list of pads.
+            The list of pads with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -426,14 +439,18 @@ class CoderPadClient:
         )
         response.raise_for_status()
         data = response.json()
-        return [Pad.from_dict(data=item) for item in data["pads"]]
+        return PaginatedList(
+            [Pad.from_dict(data=item) for item in data["pads"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def list_organization_questions(
         self,
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> list[Question]:
+    ) -> PaginatedList[Question]:
         """Retrieve questions for the entire organization.
 
         Args:
@@ -441,7 +458,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The list of questions.
+            The list of questions with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -454,4 +471,8 @@ class CoderPadClient:
         )
         response.raise_for_status()
         data = response.json()
-        return [Question.from_dict(data=item) for item in data["questions"]]
+        return PaginatedList(
+            [Question.from_dict(data=item) for item in data["questions"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
