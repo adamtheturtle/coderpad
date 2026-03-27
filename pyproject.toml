@@ -309,18 +309,21 @@ max_supported_python = "3.14"
 [tool.mypy]
 strict = true
 files = [ "." ]
-exclude = [
-    "build",
-    "src/coderpad_api/api/",
-    "src/coderpad_api/models/",
-    "src/coderpad_api/client\\.py",
-    "src/coderpad_api/errors\\.py",
-    "src/coderpad_api/types\\.py",
-]
+exclude = [ "build" ]
 follow_untyped_imports = true
 plugins = [
     "mypy_strict_kwargs",
 ]
+
+[[tool.mypy.overrides]]
+module = [
+    "coderpad_api.api.*",
+    "coderpad_api.client",
+    "coderpad_api.errors",
+    "coderpad_api.models.*",
+    "coderpad_api.types",
+]
+ignore_errors = true
 
 [tool.pyrefly]
 errors.non-exhaustive-match = "error"

@@ -17,8 +17,8 @@ class TestAuthenticatedClient:
             token="test-key",
         )
         httpx_client = client.get_httpx_client()
-        assert str(httpx_client.base_url) == (
-            "https://api.interview.coderpad.io"
+        assert httpx_client.base_url == httpx.URL(
+            url="https://api.interview.coderpad.io"
         )
 
     @staticmethod
@@ -29,7 +29,9 @@ class TestAuthenticatedClient:
             token="test-key",
         )
         httpx_client = client.get_httpx_client()
-        assert str(httpx_client.base_url) == ("https://custom.example.com")
+        assert httpx_client.base_url == httpx.URL(
+            url="https://custom.example.com"
+        )
 
     @staticmethod
     def test_auth_header() -> None:
