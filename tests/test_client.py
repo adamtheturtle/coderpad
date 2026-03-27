@@ -2,7 +2,7 @@
 
 import respx
 
-from coderpad_api import CoderPadClient
+from coderpad_api.client import CoderPadClient
 
 
 class TestCoderPadClient:

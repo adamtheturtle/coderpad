@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from coderpad_api import PadEnvironment
+from coderpad_api.types import PadEnvironment
 
 if TYPE_CHECKING:
     from coderpad_api._dict_types import PadEnvironmentDict

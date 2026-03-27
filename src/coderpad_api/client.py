@@ -2,7 +2,7 @@
 
 import httpx
 
-from coderpad_api._types import (
+from coderpad_api.types import (
     ListPadsResponse,
     ListQuestionsResponse,
     OrganizationResponse,
