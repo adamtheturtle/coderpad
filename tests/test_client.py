@@ -43,7 +43,7 @@ class TestListPads:
     ) -> None:
         """Pads can be listed."""
         result = fixture_coderpad_client.list_pads()
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
     @staticmethod
     def test_list_pads_with_sort(
@@ -53,7 +53,7 @@ class TestListPads:
         result = fixture_coderpad_client.list_pads(
             sort="updated_at,desc",
         )
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
     @staticmethod
     def test_list_pads_with_page(
@@ -61,7 +61,7 @@ class TestListPads:
     ) -> None:
         """Pads can be listed with a page parameter."""
         result = fixture_coderpad_client.list_pads(page=2)
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
 
 class TestCreatePad:
@@ -76,7 +76,7 @@ class TestCreatePad:
             title="Test Pad",
             language="python",
         )
-        assert result.status == "OK"
+        assert result.id
 
     @staticmethod
     def test_create_pad_all_params(
@@ -89,7 +89,7 @@ class TestCreatePad:
             contents="print('hello')",
             notes="Private notes",
         )
-        assert result.status == "OK"
+        assert result.id
 
     @staticmethod
     def test_create_pad_minimal(
@@ -97,7 +97,7 @@ class TestCreatePad:
     ) -> None:
         """A pad can be created with no parameters."""
         result = fixture_coderpad_client.create_pad()
-        assert result.status == "OK"
+        assert result.id
 
 
 class TestGetPad:
@@ -111,7 +111,7 @@ class TestGetPad:
         result = fixture_coderpad_client.get_pad(
             pad_id="ABC1234",
         )
-        assert result.status == "OK"
+        assert result.id
 
 
 class TestUpdatePad:
@@ -122,29 +122,27 @@ class TestUpdatePad:
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """A pad can be updated."""
-        result = fixture_coderpad_client.update_pad(
+        fixture_coderpad_client.update_pad(
             pad_id="ABC1234",
             title="Updated Title",
         )
-        assert result.status == "OK"
 
     @staticmethod
     def test_update_pad_no_title(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """A pad can be updated without a title."""
-        result = fixture_coderpad_client.update_pad(
+        fixture_coderpad_client.update_pad(
             pad_id="ABC1234",
             language="python",
         )
-        assert result.status == "OK"
 
     @staticmethod
     def test_update_pad_all_params(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """A pad can be updated with all parameters."""
-        result = fixture_coderpad_client.update_pad(
+        fixture_coderpad_client.update_pad(
             pad_id="ABC1234",
             title="Updated Title",
             language="python",
@@ -153,7 +151,6 @@ class TestUpdatePad:
             ended=True,
             deleted=False,
         )
-        assert result.status == "OK"
 
 
 class TestGetPadEvents:
@@ -167,7 +164,7 @@ class TestGetPadEvents:
         result = fixture_coderpad_client.get_pad_events(
             pad_id="ABC1234",
         )
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
     @staticmethod
     def test_get_pad_events_with_params(
@@ -179,7 +176,7 @@ class TestGetPadEvents:
             sort="created_at,asc",
             page=1,
         )
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
 
 class TestGetPadEnvironment:
@@ -193,7 +190,7 @@ class TestGetPadEnvironment:
         result = fixture_coderpad_client.get_pad_environment(
             environment_id="123",
         )
-        assert result.status == "OK"
+        assert result.id
 
 
 class TestListQuestions:
@@ -205,7 +202,7 @@ class TestListQuestions:
     ) -> None:
         """Questions can be listed."""
         result = fixture_coderpad_client.list_questions()
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
     @staticmethod
     def test_list_questions_with_params(
@@ -216,7 +213,7 @@ class TestListQuestions:
             sort="updated_at,desc",
             page=1,
         )
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
 
 class TestCreateQuestion:
@@ -231,7 +228,7 @@ class TestCreateQuestion:
             title="Test Question",
             language="python",
         )
-        assert result.status == "OK"
+        assert result.id
 
     @staticmethod
     def test_create_question_all_params(
@@ -245,7 +242,7 @@ class TestCreateQuestion:
             contents="def solve(): pass",
             solution="def solve(): return 42",
         )
-        assert result.status == "OK"
+        assert result.id
 
 
 class TestGetQuestion:
@@ -259,7 +256,7 @@ class TestGetQuestion:
         result = fixture_coderpad_client.get_question(
             question_id="123",
         )
-        assert result.status == "OK"
+        assert result.id
 
 
 class TestUpdateQuestion:
@@ -270,29 +267,27 @@ class TestUpdateQuestion:
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """A question can be updated."""
-        result = fixture_coderpad_client.update_question(
+        fixture_coderpad_client.update_question(
             question_id="123",
             title="Updated Question",
         )
-        assert result.status == "OK"
 
     @staticmethod
     def test_update_question_no_title(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """A question can be updated without a title."""
-        result = fixture_coderpad_client.update_question(
+        fixture_coderpad_client.update_question(
             question_id="123",
             language="ruby",
         )
-        assert result.status == "OK"
 
     @staticmethod
     def test_update_question_all_params(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """A question can be updated with all parameters."""
-        result = fixture_coderpad_client.update_question(
+        fixture_coderpad_client.update_question(
             question_id="123",
             title="Updated",
             language="ruby",
@@ -300,7 +295,6 @@ class TestUpdateQuestion:
             contents="puts 'hi'",
             solution="puts 'answer'",
         )
-        assert result.status == "OK"
 
 
 class TestDeleteQuestion:
@@ -311,10 +305,9 @@ class TestDeleteQuestion:
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """A question can be deleted."""
-        result = fixture_coderpad_client.delete_question(
+        fixture_coderpad_client.delete_question(
             question_id="123",
         )
-        assert result.status == "OK"
 
 
 class TestGetQuota:
@@ -326,7 +319,7 @@ class TestGetQuota:
     ) -> None:
         """Quota information can be retrieved."""
         result = fixture_coderpad_client.get_quota()
-        assert result.status == "OK"
+        assert result.pads_used >= 0
 
 
 class TestGetOrganization:
@@ -338,7 +331,7 @@ class TestGetOrganization:
     ) -> None:
         """Organization information can be retrieved."""
         result = fixture_coderpad_client.get_organization()
-        assert result.status == "OK"
+        assert result.organization_name
 
 
 class TestGetOrganizationStats:
@@ -350,7 +343,7 @@ class TestGetOrganizationStats:
     ) -> None:
         """Organization stats can be retrieved."""
         result = fixture_coderpad_client.get_organization_stats()
-        assert result.status == "OK"
+        assert result.pads_created >= 0
 
     @staticmethod
     def test_get_organization_stats_with_params(
@@ -361,7 +354,7 @@ class TestGetOrganizationStats:
             start_time="2023-07-01T00:00:00Z",
             end_time="2023-07-31T00:00:00Z",
         )
-        assert result.status == "OK"
+        assert result.pads_created >= 0
 
 
 class TestListOrganizationPads:
@@ -373,7 +366,7 @@ class TestListOrganizationPads:
     ) -> None:
         """Organization pads can be listed."""
         result = fixture_coderpad_client.list_organization_pads()
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
     @staticmethod
     def test_list_organization_pads_with_params(
@@ -384,7 +377,7 @@ class TestListOrganizationPads:
             sort="updated_at,desc",
             page=1,
         )
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
 
 class TestListOrganizationQuestions:
@@ -396,7 +389,7 @@ class TestListOrganizationQuestions:
     ) -> None:
         """Organization questions can be listed."""
         result = fixture_coderpad_client.list_organization_questions()
-        assert result.status == "OK"
+        assert isinstance(result, list)
 
     @staticmethod
     def test_list_organization_questions_with_params(
@@ -409,4 +402,4 @@ class TestListOrganizationQuestions:
             sort="updated_at,desc",
             page=1,
         )
-        assert result.status == "OK"
+        assert isinstance(result, list)

@@ -3,16 +3,13 @@
 import httpx
 
 from coderpad_api.types import (
-    ListPadsResponse,
-    ListQuestionsResponse,
-    OrganizationResponse,
-    OrganizationStatsResponse,
-    PadEnvironmentResponse,
-    PadEventsResponse,
-    PadResponse,
-    QuestionResponse,
-    QuotaResponse,
-    StatusResponse,
+    Organization,
+    OrganizationStats,
+    Pad,
+    PadEnvironment,
+    PadEvent,
+    Question,
+    Quota,
 )
 
 
@@ -42,7 +39,7 @@ class CoderPadClient:
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> ListPadsResponse:
+    ) -> list[Pad]:
         """Retrieve a list of pads.
 
         Args:
@@ -50,8 +47,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The JSON response containing pads, next_page,
-            and total.
+            The list of pads.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -63,7 +59,8 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        return ListPadsResponse.from_dict(data=response.json())
+        data = response.json()
+        return [Pad.from_dict(data=item) for item in data["pads"]]
 
     def create_pad(
         self,
@@ -72,7 +69,7 @@ class CoderPadClient:
         language: str | None = None,
         contents: str | None = None,
         notes: str | None = None,
-    ) -> PadResponse:
+    ) -> Pad:
         """Create a new pad.
 
         Args:
@@ -82,7 +79,7 @@ class CoderPadClient:
             notes: Private notes for the interviewer.
 
         Returns:
-            The JSON response containing the created pad.
+            The created pad.
         """
         data: dict[str, str] = {}
         if title is not None:
@@ -98,22 +95,22 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        return PadResponse.from_dict(data=response.json())
+        return Pad.from_dict(data=response.json())
 
-    def get_pad(self, *, pad_id: str) -> PadResponse:
+    def get_pad(self, *, pad_id: str) -> Pad:
         """Retrieve a pad by id.
 
         Args:
             pad_id: The id of the pad.
 
         Returns:
-            The JSON response containing the pad details.
+            The pad.
         """
         response = self._client.get(
             url=f"/api/pads/{pad_id}",
         )
         response.raise_for_status()
-        return PadResponse.from_dict(data=response.json())
+        return Pad.from_dict(data=response.json())
 
     def update_pad(
         self,
@@ -125,7 +122,7 @@ class CoderPadClient:
         notes: str | None = None,
         ended: bool | None = None,
         deleted: bool | None = None,
-    ) -> StatusResponse:
+    ) -> None:
         """Modify an existing pad.
 
         Args:
@@ -136,9 +133,6 @@ class CoderPadClient:
             notes: New private notes.
             ended: Set to ``True`` to end the interview.
             deleted: Set to ``True`` to delete the pad.
-
-        Returns:
-            The JSON response.
         """
         data: dict[str, str] = {}
         if title is not None:
@@ -158,7 +152,6 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        return StatusResponse.from_dict(data=response.json())
 
     def get_pad_events(
         self,
@@ -166,7 +159,7 @@ class CoderPadClient:
         pad_id: str,
         sort: str | None = None,
         page: int | None = None,
-    ) -> PadEventsResponse:
+    ) -> list[PadEvent]:
         """Retrieve a list of pad events.
 
         Args:
@@ -175,7 +168,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The JSON response containing events and total.
+            The list of pad events.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -187,29 +180,27 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        return PadEventsResponse.from_dict(
-            data=response.json(),
-        )
+        data = response.json()
+        return [PadEvent.from_dict(data=item) for item in data["events"]]
 
     def get_pad_environment(
         self,
         *,
         environment_id: str,
-    ) -> PadEnvironmentResponse:
+    ) -> PadEnvironment:
         """Retrieve pad environment information.
 
         Args:
             environment_id: The id of the pad environment.
 
         Returns:
-            The JSON response containing the environment
-            details.
+            The pad environment.
         """
         response = self._client.get(
             url=f"/api/pad_environments/{environment_id}",
         )
         response.raise_for_status()
-        return PadEnvironmentResponse.from_dict(
+        return PadEnvironment.from_dict(
             data=response.json(),
         )
 
@@ -218,7 +209,7 @@ class CoderPadClient:
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> ListQuestionsResponse:
+    ) -> list[Question]:
         """Retrieve a list of questions.
 
         Args:
@@ -226,8 +217,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The JSON response containing questions,
-            next_page, and total.
+            The list of questions.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -239,9 +229,8 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        return ListQuestionsResponse.from_dict(
-            data=response.json(),
-        )
+        data = response.json()
+        return [Question.from_dict(data=item) for item in data["questions"]]
 
     def create_question(
         self,
@@ -251,7 +240,7 @@ class CoderPadClient:
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
-    ) -> QuestionResponse:
+    ) -> Question:
         """Create a new question.
 
         Args:
@@ -263,8 +252,7 @@ class CoderPadClient:
             solution: The solution to the question.
 
         Returns:
-            The JSON response containing the created
-            question.
+            The created question.
         """
         data: dict[str, str] = {
             "title": title,
@@ -281,7 +269,7 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        return QuestionResponse.from_dict(
+        return Question.from_dict(
             data=response.json(),
         )
 
@@ -289,21 +277,20 @@ class CoderPadClient:
         self,
         *,
         question_id: str,
-    ) -> QuestionResponse:
+    ) -> Question:
         """Retrieve a question by id.
 
         Args:
             question_id: The id of the question.
 
         Returns:
-            The JSON response containing the question
-            details.
+            The question.
         """
         response = self._client.get(
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
-        return QuestionResponse.from_dict(
+        return Question.from_dict(
             data=response.json(),
         )
 
@@ -316,7 +303,7 @@ class CoderPadClient:
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
-    ) -> StatusResponse:
+    ) -> None:
         """Modify an existing question.
 
         Args:
@@ -326,9 +313,6 @@ class CoderPadClient:
             description: New description.
             contents: New contents.
             solution: New solution.
-
-        Returns:
-            The JSON response.
         """
         data: dict[str, str] = {}
         if title is not None:
@@ -346,49 +330,43 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        return StatusResponse.from_dict(data=response.json())
 
     def delete_question(
         self,
         *,
         question_id: str,
-    ) -> StatusResponse:
+    ) -> None:
         """Delete a question.
 
         Args:
             question_id: The id of the question.
-
-        Returns:
-            The JSON response.
         """
         response = self._client.delete(
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
-        return StatusResponse.from_dict(data=response.json())
 
-    def get_quota(self) -> QuotaResponse:
+    def get_quota(self) -> Quota:
         """Retrieve quota information.
 
         Returns:
-            The JSON response containing quota details.
+            The quota details.
         """
         response = self._client.get(url="/api/quota")
         response.raise_for_status()
-        return QuotaResponse.from_dict(data=response.json())
+        return Quota.from_dict(data=response.json())
 
-    def get_organization(self) -> OrganizationResponse:
+    def get_organization(self) -> Organization:
         """Retrieve organization information.
 
         Returns:
-            The JSON response containing organization
-            details.
+            The organization details.
         """
         response = self._client.get(
             url="/api/organization",
         )
         response.raise_for_status()
-        return OrganizationResponse.from_dict(
+        return Organization.from_dict(
             data=response.json(),
         )
 
@@ -397,7 +375,7 @@ class CoderPadClient:
         *,
         start_time: str | None = None,
         end_time: str | None = None,
-    ) -> OrganizationStatsResponse:
+    ) -> OrganizationStats:
         """Retrieve pad usage stats for the organization.
 
         Args:
@@ -405,7 +383,7 @@ class CoderPadClient:
             end_time: ISO 8601 end of the search window.
 
         Returns:
-            The JSON response containing usage statistics.
+            The usage statistics.
         """
         params: dict[str, str] = {}
         if start_time is not None:
@@ -417,7 +395,7 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        return OrganizationStatsResponse.from_dict(
+        return OrganizationStats.from_dict(
             data=response.json(),
         )
 
@@ -426,7 +404,7 @@ class CoderPadClient:
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> ListPadsResponse:
+    ) -> list[Pad]:
         """Retrieve pads for the entire organization.
 
         Args:
@@ -434,8 +412,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The JSON response containing pads, next_page,
-            and total.
+            The list of pads.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -447,16 +424,15 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        return ListPadsResponse.from_dict(
-            data=response.json(),
-        )
+        data = response.json()
+        return [Pad.from_dict(data=item) for item in data["pads"]]
 
     def list_organization_questions(
         self,
         *,
         sort: str | None = None,
         page: int | None = None,
-    ) -> ListQuestionsResponse:
+    ) -> list[Question]:
         """Retrieve questions for the entire organization.
 
         Args:
@@ -464,8 +440,7 @@ class CoderPadClient:
             page: Page number for pagination.
 
         Returns:
-            The JSON response containing questions,
-            next_page, and total.
+            The list of questions.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -477,6 +452,5 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        return ListQuestionsResponse.from_dict(
-            data=response.json(),
-        )
+        data = response.json()
+        return [Question.from_dict(data=item) for item in data["questions"]]
