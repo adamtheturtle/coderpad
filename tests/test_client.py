@@ -10,7 +10,4 @@ class TestCoderPadClient:
     def test_default_base_url() -> None:
         """The default base URL is the CoderPad Interview API."""
         client = CoderPadClient(api_key="test-key")
-        assert (
-            str(client._client.base_url)
-            == "https://api.interview.coderpad.io"
-        )
+        assert client.base_url == "https://api.interview.coderpad.io"

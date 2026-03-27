@@ -17,9 +17,8 @@ class CoderPadClient:
         api_key: str,
         base_url: str = "https://api.interview.coderpad.io",
     ) -> None:
-        self._api_key = api_key
-        self._base_url = base_url
+        self.base_url = base_url
         self._client = httpx.Client(
-            base_url=self._base_url,
-            headers={"Authorization": f"Bearer {self._api_key}"},
+            base_url=base_url,
+            headers={"Authorization": f"Bearer {api_key}"},
         )
