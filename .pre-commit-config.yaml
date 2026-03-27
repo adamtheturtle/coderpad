@@ -395,7 +395,9 @@ repos:
       - id: pyrefly
         name: pyrefly
         stages: [pre-push]
-        entry: uv run --extra=dev pyrefly check
+        entry: uv run --extra=dev pyrefly check --project-excludes "src/coderpad_api/api/**"
+          --project-excludes "src/coderpad_api/models/**" --project-excludes "src/coderpad_api/client.py"
+          --project-excludes "src/coderpad_api/errors.py" --project-excludes "src/coderpad_api/types.py"
         language: python
         types_or: [python, toml]
         pass_filenames: false
