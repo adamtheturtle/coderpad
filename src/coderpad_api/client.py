@@ -63,8 +63,7 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: ListPadsResponse = response.json()
-        return result
+        return ListPadsResponse.from_dict(data=response.json())
 
     def create_pad(
         self,
@@ -99,8 +98,7 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: PadResponse = response.json()
-        return result
+        return PadResponse.from_dict(data=response.json())
 
     def get_pad(self, *, pad_id: str) -> PadResponse:
         """Retrieve a pad by id.
@@ -115,8 +113,7 @@ class CoderPadClient:
             url=f"/api/pads/{pad_id}",
         )
         response.raise_for_status()
-        result: PadResponse = response.json()
-        return result
+        return PadResponse.from_dict(data=response.json())
 
     def update_pad(
         self,
@@ -161,8 +158,7 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: StatusResponse = response.json()
-        return result
+        return StatusResponse.from_dict(data=response.json())
 
     def get_pad_events(
         self,
@@ -191,8 +187,9 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: PadEventsResponse = response.json()
-        return result
+        return PadEventsResponse.from_dict(
+            data=response.json(),
+        )
 
     def get_pad_environment(
         self,
@@ -212,8 +209,9 @@ class CoderPadClient:
             url=f"/api/pad_environments/{environment_id}",
         )
         response.raise_for_status()
-        result: PadEnvironmentResponse = response.json()
-        return result
+        return PadEnvironmentResponse.from_dict(
+            data=response.json(),
+        )
 
     def list_questions(
         self,
@@ -241,8 +239,9 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: ListQuestionsResponse = response.json()
-        return result
+        return ListQuestionsResponse.from_dict(
+            data=response.json(),
+        )
 
     def create_question(
         self,
@@ -282,8 +281,9 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: QuestionResponse = response.json()
-        return result
+        return QuestionResponse.from_dict(
+            data=response.json(),
+        )
 
     def get_question(
         self,
@@ -303,8 +303,9 @@ class CoderPadClient:
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
-        result: QuestionResponse = response.json()
-        return result
+        return QuestionResponse.from_dict(
+            data=response.json(),
+        )
 
     def update_question(
         self,
@@ -345,8 +346,7 @@ class CoderPadClient:
             data=data,
         )
         response.raise_for_status()
-        result: StatusResponse = response.json()
-        return result
+        return StatusResponse.from_dict(data=response.json())
 
     def delete_question(
         self,
@@ -365,8 +365,7 @@ class CoderPadClient:
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
-        result: StatusResponse = response.json()
-        return result
+        return StatusResponse.from_dict(data=response.json())
 
     def get_quota(self) -> QuotaResponse:
         """Retrieve quota information.
@@ -376,8 +375,7 @@ class CoderPadClient:
         """
         response = self._client.get(url="/api/quota")
         response.raise_for_status()
-        result: QuotaResponse = response.json()
-        return result
+        return QuotaResponse.from_dict(data=response.json())
 
     def get_organization(self) -> OrganizationResponse:
         """Retrieve organization information.
@@ -390,8 +388,9 @@ class CoderPadClient:
             url="/api/organization",
         )
         response.raise_for_status()
-        result: OrganizationResponse = response.json()
-        return result
+        return OrganizationResponse.from_dict(
+            data=response.json(),
+        )
 
     def get_organization_stats(
         self,
@@ -418,8 +417,9 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: OrganizationStatsResponse = response.json()
-        return result
+        return OrganizationStatsResponse.from_dict(
+            data=response.json(),
+        )
 
     def list_organization_pads(
         self,
@@ -447,8 +447,9 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: ListPadsResponse = response.json()
-        return result
+        return ListPadsResponse.from_dict(
+            data=response.json(),
+        )
 
     def list_organization_questions(
         self,
@@ -476,5 +477,6 @@ class CoderPadClient:
             params=params,
         )
         response.raise_for_status()
-        result: ListQuestionsResponse = response.json()
-        return result
+        return ListQuestionsResponse.from_dict(
+            data=response.json(),
+        )

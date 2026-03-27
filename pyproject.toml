@@ -360,6 +360,7 @@ ignore_names = [
     "master_doc",
     "nitpicky",
     "nitpick_ignore",
+    "nitpick_ignore_regex",
     "project_copyright",
     "pygments_style",
     "rst_prolog",
@@ -369,7 +370,7 @@ ignore_names = [
     "warning_is_error",
 ]
 # Duplicate some of .gitignore
-exclude = [ ".venv", "src/coderpad_api/_types.py" ]
+exclude = [ ".venv", "src/coderpad_api/_dict_types.py", "src/coderpad_api/_types.py" ]
 
 [tool.yamlfix]
 section_whitelines = 1

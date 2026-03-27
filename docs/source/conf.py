@@ -69,6 +69,9 @@ intersphinx_mapping = {
 }
 nitpicky = True
 nitpick_ignore: list[tuple[str, str]] = []
+nitpick_ignore_regex = [
+    (r"py:class", r"coderpad_api\._dict_types\..*"),
+]
 warning_is_error = True
 
 autoclass_content = "both"
