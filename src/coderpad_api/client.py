@@ -486,7 +486,7 @@ def _set_client(
         namespace: The namespace to configure.
         client: The HTTP client.
     """
-    namespace._client = client  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+    namespace._client = client  # pylint: disable=protected-access  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
 
 class CoderPadClient:
