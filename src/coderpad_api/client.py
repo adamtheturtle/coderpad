@@ -2,12 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import httpx
-
-if TYPE_CHECKING:
-    import builtins
 
 from coderpad_api.types import (
     Organization,
@@ -15,6 +10,7 @@ from coderpad_api.types import (
     Pad,
     PadEnvironment,
     PadEvent,
+    PaginatedList,
     Question,
     Quota,
     SortOrder,
@@ -31,7 +27,7 @@ class PadsNamespace:
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> builtins.list[Pad]:
+    ) -> PaginatedList[Pad]:
         """Retrieve a list of pads.
 
         Args:
@@ -39,7 +35,7 @@ class PadsNamespace:
             page: Page number for pagination.
 
         Returns:
-            The list of pads.
+            The list of pads with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -52,7 +48,11 @@ class PadsNamespace:
         )
         response.raise_for_status()
         data = response.json()
-        return [Pad.from_dict(data=item) for item in data["pads"]]
+        return PaginatedList(
+            [Pad.from_dict(data=item) for item in data["pads"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def create(
         self,
@@ -151,7 +151,7 @@ class PadsNamespace:
         pad_id: str,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> builtins.list[PadEvent]:
+    ) -> PaginatedList[PadEvent]:
         """Retrieve a list of pad events.
 
         Args:
@@ -160,7 +160,7 @@ class PadsNamespace:
             page: Page number for pagination.
 
         Returns:
-            The list of pad events.
+            The list of pad events with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -173,7 +173,11 @@ class PadsNamespace:
         )
         response.raise_for_status()
         data = response.json()
-        return [PadEvent.from_dict(data=item) for item in data["events"]]
+        return PaginatedList(
+            [PadEvent.from_dict(data=item) for item in data["events"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def get_environment(
         self,
@@ -207,7 +211,7 @@ class QuestionsNamespace:
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> builtins.list[Question]:
+    ) -> PaginatedList[Question]:
         """Retrieve a list of questions.
 
         Args:
@@ -215,7 +219,7 @@ class QuestionsNamespace:
             page: Page number for pagination.
 
         Returns:
-            The list of questions.
+            The list of questions with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -228,7 +232,11 @@ class QuestionsNamespace:
         )
         response.raise_for_status()
         data = response.json()
-        return [Question.from_dict(data=item) for item in data["questions"]]
+        return PaginatedList(
+            [Question.from_dict(data=item) for item in data["questions"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def create(
         self,
@@ -408,7 +416,7 @@ class OrganizationNamespace:
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> builtins.list[Pad]:
+    ) -> PaginatedList[Pad]:
         """Retrieve pads for the entire organization.
 
         Args:
@@ -416,7 +424,7 @@ class OrganizationNamespace:
             page: Page number for pagination.
 
         Returns:
-            The list of pads.
+            The list of pads with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -429,14 +437,18 @@ class OrganizationNamespace:
         )
         response.raise_for_status()
         data = response.json()
-        return [Pad.from_dict(data=item) for item in data["pads"]]
+        return PaginatedList(
+            [Pad.from_dict(data=item) for item in data["pads"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
     def list_questions(
         self,
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
-    ) -> builtins.list[Question]:
+    ) -> PaginatedList[Question]:
         """Retrieve questions for the entire organization.
 
         Args:
@@ -444,7 +456,7 @@ class OrganizationNamespace:
             page: Page number for pagination.
 
         Returns:
-            The list of questions.
+            The list of questions with pagination metadata.
         """
         params: dict[str, str | int] = {}
         if sort is not None:
@@ -457,7 +469,11 @@ class OrganizationNamespace:
         )
         response.raise_for_status()
         data = response.json()
-        return [Question.from_dict(data=item) for item in data["questions"]]
+        return PaginatedList(
+            [Question.from_dict(data=item) for item in data["questions"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
 
 
 def _set_client(
