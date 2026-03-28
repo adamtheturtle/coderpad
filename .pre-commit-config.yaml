@@ -340,7 +340,7 @@ repos:
       - id: pyright-verifytypes
         name: pyright-verifytypes
         stages: [pre-push]
-        entry: uv run --extra=dev -m pyright --verifytypes coderpad_api
+        entry: uv run --extra=dev -m pyright --verifytypes coderpad_api --ignoreexternal
         language: python
         pass_filenames: false
         types_or: [python]

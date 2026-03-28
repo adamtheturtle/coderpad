@@ -22,7 +22,13 @@ from coderpad_api.types import (
 class PadsNamespace:
     """Namespace for pad operations."""
 
-    _client: httpx.Client
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new pads namespace.
+
+        Args:
+            client: The HTTP client.
+        """
+        self.client = client
 
     def list(
         self,
@@ -44,7 +50,7 @@ class PadsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self._client.get(
+        response = self.client.get(
             url="/api/pads/",
             params=params,
         )
@@ -84,7 +90,7 @@ class PadsNamespace:
             data["contents"] = contents
         if notes is not None:
             data["notes"] = notes
-        response = self._client.post(
+        response = self.client.post(
             url="/api/pads/",
             data=data,
         )
@@ -100,7 +106,7 @@ class PadsNamespace:
         Returns:
             The pad.
         """
-        response = self._client.get(
+        response = self.client.get(
             url=f"/api/pads/{pad_id}",
         )
         response.raise_for_status()
@@ -141,7 +147,7 @@ class PadsNamespace:
             data["ended"] = "true" if ended else "false"
         if deleted is not None:
             data["deleted"] = "true" if deleted else "false"
-        response = self._client.put(
+        response = self.client.put(
             url=f"/api/pads/{pad_id}",
             data=data,
         )
@@ -169,7 +175,7 @@ class PadsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self._client.get(
+        response = self.client.get(
             url=f"/api/pads/{pad_id}/events",
             params=params,
         )
@@ -194,7 +200,7 @@ class PadsNamespace:
         Returns:
             The pad environment.
         """
-        response = self._client.get(
+        response = self.client.get(
             url=f"/api/pad_environments/{environment_id}",
         )
         response.raise_for_status()
@@ -207,7 +213,13 @@ class PadsNamespace:
 class QuestionsNamespace:
     """Namespace for question operations."""
 
-    _client: httpx.Client
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new questions namespace.
+
+        Args:
+            client: The HTTP client.
+        """
+        self.client = client
 
     def list(
         self,
@@ -229,7 +241,7 @@ class QuestionsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self._client.get(
+        response = self.client.get(
             url="/api/questions/",
             params=params,
         )
@@ -273,7 +285,7 @@ class QuestionsNamespace:
             data["contents"] = contents
         if solution is not None:
             data["solution"] = solution
-        response = self._client.post(
+        response = self.client.post(
             url="/api/questions/",
             data=data,
         )
@@ -295,7 +307,7 @@ class QuestionsNamespace:
         Returns:
             The question.
         """
-        response = self._client.get(
+        response = self.client.get(
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
@@ -334,7 +346,7 @@ class QuestionsNamespace:
             data["contents"] = contents
         if solution is not None:
             data["solution"] = solution
-        response = self._client.put(
+        response = self.client.put(
             url=f"/api/questions/{question_id}",
             data=data,
         )
@@ -350,7 +362,7 @@ class QuestionsNamespace:
         Args:
             question_id: The id of the question.
         """
-        response = self._client.delete(
+        response = self.client.delete(
             url=f"/api/questions/{question_id}",
         )
         response.raise_for_status()
@@ -360,7 +372,13 @@ class QuestionsNamespace:
 class OrganizationPadsNamespace:
     """Namespace for organization pad operations."""
 
-    _client: httpx.Client
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new organization pads namespace.
+
+        Args:
+            client: The HTTP client.
+        """
+        self.client = client
 
     def list(
         self,
@@ -382,7 +400,7 @@ class OrganizationPadsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self._client.get(
+        response = self.client.get(
             url="/api/organization/pads",
             params=params,
         )
@@ -399,7 +417,13 @@ class OrganizationPadsNamespace:
 class OrganizationQuestionsNamespace:
     """Namespace for organization question operations."""
 
-    _client: httpx.Client
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new organization questions namespace.
+
+        Args:
+            client: The HTTP client.
+        """
+        self.client = client
 
     def list(
         self,
@@ -421,7 +445,7 @@ class OrganizationQuestionsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self._client.get(
+        response = self.client.get(
             url="/api/organization/questions",
             params=params,
         )
@@ -438,9 +462,19 @@ class OrganizationQuestionsNamespace:
 class OrganizationNamespace:
     """Namespace for organization operations."""
 
-    _client: httpx.Client
-    pads: OrganizationPadsNamespace
-    questions: OrganizationQuestionsNamespace
+    def __init__(self, *, client: httpx.Client) -> None:
+        """Create a new organization namespace.
+
+        Args:
+            client: The HTTP client.
+        """
+        self.client = client
+        self.pads: OrganizationPadsNamespace = OrganizationPadsNamespace(
+            client=client,
+        )
+        self.questions: OrganizationQuestionsNamespace = (
+            OrganizationQuestionsNamespace(client=client)
+        )
 
     def get(self) -> Organization:
         """Retrieve organization information.
@@ -448,7 +482,7 @@ class OrganizationNamespace:
         Returns:
             The organization details.
         """
-        response = self._client.get(
+        response = self.client.get(
             url="/api/organization",
         )
         response.raise_for_status()
@@ -476,7 +510,7 @@ class OrganizationNamespace:
             params["start_time"] = start_time
         if end_time is not None:
             params["end_time"] = end_time
-        response = self._client.get(
+        response = self.client.get(
             url="/api/organization/stats",
             params=params,
         )
@@ -491,31 +525,9 @@ class OrganizationNamespace:
         Returns:
             The quota details.
         """
-        response = self._client.get(url="/api/quota")
+        response = self.client.get(url="/api/quota")
         response.raise_for_status()
         return Quota.from_dict(data=response.json())
-
-
-_Namespace = (
-    PadsNamespace
-    | QuestionsNamespace
-    | OrganizationNamespace
-    | OrganizationPadsNamespace
-    | OrganizationQuestionsNamespace
-)
-
-
-def _set_client(
-    namespace: _Namespace,
-    client: httpx.Client,
-) -> None:
-    """Set the HTTP client on a namespace instance.
-
-    Args:
-        namespace: The namespace to configure.
-        client: The HTTP client.
-    """
-    namespace._client = client  # pylint: disable=protected-access  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
 
 @beartype
@@ -539,16 +551,10 @@ class CoderPadClient:
             base_url=base_url,
             headers={"Authorization": f"Bearer {api_key}"},
         )
-        self.pads: PadsNamespace = PadsNamespace()
-        _set_client(namespace=self.pads, client=http_client)
-        self.questions: QuestionsNamespace = QuestionsNamespace()
-        _set_client(namespace=self.questions, client=http_client)
-        self.organization: OrganizationNamespace = OrganizationNamespace()
-        _set_client(namespace=self.organization, client=http_client)
-        self.organization.pads = OrganizationPadsNamespace()
-        _set_client(namespace=self.organization.pads, client=http_client)
-        self.organization.questions = OrganizationQuestionsNamespace()
-        _set_client(
-            namespace=self.organization.questions,
+        self.pads: PadsNamespace = PadsNamespace(client=http_client)
+        self.questions: QuestionsNamespace = QuestionsNamespace(
+            client=http_client,
+        )
+        self.organization: OrganizationNamespace = OrganizationNamespace(
             client=http_client,
         )
