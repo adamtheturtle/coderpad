@@ -5,6 +5,8 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Self, TypeVar
 
+from beartype import beartype
+
 from coderpad_api._dict_types import (
     CandidateInstructionDict,
     CustomFileDict,
@@ -25,6 +27,7 @@ from coderpad_api._dict_types import (
 _T = TypeVar("_T")
 
 
+@beartype
 class PaginatedList(list[_T]):
     """A list with pagination metadata from the API response."""
 
@@ -57,6 +60,7 @@ class SortOrder(enum.Enum):
     UPDATED_AT_DESC = "updated_at,desc"
 
 
+@beartype
 @dataclass(kw_only=True)
 class Team:
     """A team within an organization."""
@@ -80,6 +84,7 @@ class Team:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class Pad:
     """A CoderPad interview pad."""
@@ -147,6 +152,7 @@ class Pad:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class PadEvent:
     """An event associated with a pad."""
@@ -181,6 +187,7 @@ class PadEvent:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class FileContent:
     """A file within a pad environment."""
@@ -209,6 +216,7 @@ class FileContent:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class PadEnvironment:
     """A pad environment."""
@@ -252,6 +260,7 @@ class PadEnvironment:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class CandidateInstruction:
     """Instructions shown to a candidate."""
@@ -281,6 +290,7 @@ class CandidateInstruction:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class TestCase:
     """A test case for a question."""
@@ -311,6 +321,7 @@ class TestCase:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class CustomFile:
     """A custom file attached to a question."""
@@ -343,6 +354,7 @@ class CustomFile:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class Question:
     """A CoderPad question."""
@@ -424,6 +436,7 @@ class Question:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class OrganizationUser:
     """A user within an organization."""
@@ -452,6 +465,7 @@ class OrganizationUser:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class OrganizationStatsUser:
     """A user's pad usage statistics."""
@@ -480,6 +494,7 @@ class OrganizationStatsUser:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class Quota:
     """Quota information."""
@@ -512,6 +527,7 @@ class Quota:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class Organization:
     """Organization information."""
@@ -552,6 +568,7 @@ class Organization:
         )
 
 
+@beartype
 @dataclass(kw_only=True)
 class OrganizationStats:
     """Organization usage statistics."""

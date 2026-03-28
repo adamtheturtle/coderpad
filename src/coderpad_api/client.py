@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import httpx
+from beartype import beartype
 
 from coderpad_api.types import (
     Organization,
@@ -17,6 +18,7 @@ from coderpad_api.types import (
 )
 
 
+@beartype
 class PadsNamespace:
     """Namespace for pad operations."""
 
@@ -201,6 +203,7 @@ class PadsNamespace:
         )
 
 
+@beartype
 class QuestionsNamespace:
     """Namespace for question operations."""
 
@@ -353,6 +356,7 @@ class QuestionsNamespace:
         response.raise_for_status()
 
 
+@beartype
 class OrganizationPadsNamespace:
     """Namespace for organization pad operations."""
 
@@ -391,6 +395,7 @@ class OrganizationPadsNamespace:
         )
 
 
+@beartype
 class OrganizationQuestionsNamespace:
     """Namespace for organization question operations."""
 
@@ -429,6 +434,7 @@ class OrganizationQuestionsNamespace:
         )
 
 
+@beartype
 class OrganizationNamespace:
     """Namespace for organization operations."""
 
@@ -512,6 +518,7 @@ def _set_client(
     namespace._client = client  # pylint: disable=protected-access  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
 
+@beartype
 class CoderPadClient:
     """A client for the CoderPad Interview API."""
 
