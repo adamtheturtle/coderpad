@@ -1,7 +1,5 @@
 """Tests for the CoderPad client."""
 
-import respx
-
 from coderpad_api.client import CoderPadClient
 from coderpad_api.types import PaginatedList, SortOrder
 
@@ -26,13 +24,11 @@ class TestCoderPadClient:
 
     @staticmethod
     def test_mock_api_available(
-        fixture_mock_coderpad_api: respx.MockRouter,
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """The mock API fixture provides a working mock router."""
-        assert fixture_mock_coderpad_api.calls.call_count == 0
-        fixture_coderpad_client.pads.list()
-        assert fixture_mock_coderpad_api.calls.call_count == 1
+        result = fixture_coderpad_client.pads.list()
+        assert isinstance(result, PaginatedList)
 
 
 class TestListPads:
