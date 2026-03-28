@@ -39,7 +39,7 @@ def _fixture_mock_coderpad_api(  # pyright: ignore[reportUnusedFunction]
         yield mock_router
 
 
-@pytest.fixture(name="fixture_coderpad_client")
+@pytest.fixture(name="coderpad_client")
 def _fixture_coderpad_client(  # pyright: ignore[reportUnusedFunction]
     fixture_mock_coderpad_api: respx.MockRouter,
 ) -> CoderPadClient:
