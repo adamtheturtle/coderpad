@@ -16,12 +16,14 @@ http
 https
 httpx
 io
+iterable
 json
 kwargs
 linters
 linting
 macOS
 metadata
+namespace
 noqa
 plugins
 pragma
@@ -32,6 +34,7 @@ readme
 refactoring
 regex
 repo
+reportPrivateUsage
 reportUnusedFunction
 respx
 str

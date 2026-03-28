@@ -1,5 +1,7 @@
 """CoderPad Interview API client."""
 
+from __future__ import annotations
+
 import httpx
 
 from coderpad_api.types import (
@@ -15,28 +17,12 @@ from coderpad_api.types import (
 )
 
 
-class CoderPadClient:
-    """A client for the CoderPad Interview API."""
+class PadsNamespace:
+    """Namespace for pad operations."""
 
-    def __init__(
-        self,
-        *,
-        api_key: str,
-        base_url: str = "https://api.interview.coderpad.io",
-    ) -> None:
-        """Create a new CoderPad client.
+    _client: httpx.Client
 
-        Args:
-            api_key: The API key for authentication.
-            base_url: The base URL for the API.
-        """
-        self.base_url = base_url
-        self._client = httpx.Client(
-            base_url=base_url,
-            headers={"Authorization": f"Bearer {api_key}"},
-        )
-
-    def list_pads(
+    def list(
         self,
         *,
         sort: SortOrder | None = None,
@@ -68,7 +54,7 @@ class CoderPadClient:
             next_page=data.get("next_page"),
         )
 
-    def create_pad(
+    def create(
         self,
         *,
         title: str | None = None,
@@ -103,7 +89,7 @@ class CoderPadClient:
         response.raise_for_status()
         return Pad.from_dict(data=response.json())
 
-    def get_pad(self, *, pad_id: str) -> Pad:
+    def get(self, *, pad_id: str) -> Pad:
         """Retrieve a pad by id.
 
         Args:
@@ -118,7 +104,7 @@ class CoderPadClient:
         response.raise_for_status()
         return Pad.from_dict(data=response.json())
 
-    def update_pad(
+    def update(
         self,
         *,
         pad_id: str,
@@ -159,7 +145,7 @@ class CoderPadClient:
         )
         response.raise_for_status()
 
-    def get_pad_events(
+    def get_events(
         self,
         *,
         pad_id: str,
@@ -193,7 +179,7 @@ class CoderPadClient:
             next_page=data.get("next_page"),
         )
 
-    def get_pad_environment(
+    def get_environment(
         self,
         *,
         environment_id: str,
@@ -214,7 +200,13 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def list_questions(
+
+class QuestionsNamespace:
+    """Namespace for question operations."""
+
+    _client: httpx.Client
+
+    def list(
         self,
         *,
         sort: SortOrder | None = None,
@@ -246,7 +238,7 @@ class CoderPadClient:
             next_page=data.get("next_page"),
         )
 
-    def create_question(
+    def create(
         self,
         *,
         title: str,
@@ -287,7 +279,7 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def get_question(
+    def get(
         self,
         *,
         question_id: str,
@@ -308,7 +300,7 @@ class CoderPadClient:
             data=response.json(),
         )
 
-    def update_question(
+    def update(
         self,
         *,
         question_id: str,
@@ -345,7 +337,7 @@ class CoderPadClient:
         )
         response.raise_for_status()
 
-    def delete_question(
+    def delete(
         self,
         *,
         question_id: str,
@@ -360,60 +352,13 @@ class CoderPadClient:
         )
         response.raise_for_status()
 
-    def get_quota(self) -> Quota:
-        """Retrieve quota information.
 
-        Returns:
-            The quota details.
-        """
-        response = self._client.get(url="/api/quota")
-        response.raise_for_status()
-        return Quota.from_dict(data=response.json())
+class OrganizationPadsNamespace:
+    """Namespace for organization pad operations."""
 
-    def get_organization(self) -> Organization:
-        """Retrieve organization information.
+    _client: httpx.Client
 
-        Returns:
-            The organization details.
-        """
-        response = self._client.get(
-            url="/api/organization",
-        )
-        response.raise_for_status()
-        return Organization.from_dict(
-            data=response.json(),
-        )
-
-    def get_organization_stats(
-        self,
-        *,
-        start_time: str | None = None,
-        end_time: str | None = None,
-    ) -> OrganizationStats:
-        """Retrieve pad usage stats for the organization.
-
-        Args:
-            start_time: ISO 8601 start of the search window.
-            end_time: ISO 8601 end of the search window.
-
-        Returns:
-            The usage statistics.
-        """
-        params: dict[str, str] = {}
-        if start_time is not None:
-            params["start_time"] = start_time
-        if end_time is not None:
-            params["end_time"] = end_time
-        response = self._client.get(
-            url="/api/organization/stats",
-            params=params,
-        )
-        response.raise_for_status()
-        return OrganizationStats.from_dict(
-            data=response.json(),
-        )
-
-    def list_organization_pads(
+    def list(
         self,
         *,
         sort: SortOrder | None = None,
@@ -445,7 +390,13 @@ class CoderPadClient:
             next_page=data.get("next_page"),
         )
 
-    def list_organization_questions(
+
+class OrganizationQuestionsNamespace:
+    """Namespace for organization question operations."""
+
+    _client: httpx.Client
+
+    def list(
         self,
         *,
         sort: SortOrder | None = None,
@@ -475,4 +426,122 @@ class CoderPadClient:
             [Question.from_dict(data=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
+        )
+
+
+class OrganizationNamespace:
+    """Namespace for organization operations."""
+
+    _client: httpx.Client
+    pads: OrganizationPadsNamespace
+    questions: OrganizationQuestionsNamespace
+
+    def get(self) -> Organization:
+        """Retrieve organization information.
+
+        Returns:
+            The organization details.
+        """
+        response = self._client.get(
+            url="/api/organization",
+        )
+        response.raise_for_status()
+        return Organization.from_dict(
+            data=response.json(),
+        )
+
+    def get_stats(
+        self,
+        *,
+        start_time: str | None = None,
+        end_time: str | None = None,
+    ) -> OrganizationStats:
+        """Retrieve pad usage stats for the organization.
+
+        Args:
+            start_time: ISO 8601 start of the search window.
+            end_time: ISO 8601 end of the search window.
+
+        Returns:
+            The usage statistics.
+        """
+        params: dict[str, str] = {}
+        if start_time is not None:
+            params["start_time"] = start_time
+        if end_time is not None:
+            params["end_time"] = end_time
+        response = self._client.get(
+            url="/api/organization/stats",
+            params=params,
+        )
+        response.raise_for_status()
+        return OrganizationStats.from_dict(
+            data=response.json(),
+        )
+
+    def get_quota(self) -> Quota:
+        """Retrieve quota information.
+
+        Returns:
+            The quota details.
+        """
+        response = self._client.get(url="/api/quota")
+        response.raise_for_status()
+        return Quota.from_dict(data=response.json())
+
+
+_Namespace = (
+    PadsNamespace
+    | QuestionsNamespace
+    | OrganizationNamespace
+    | OrganizationPadsNamespace
+    | OrganizationQuestionsNamespace
+)
+
+
+def _set_client(
+    namespace: _Namespace,
+    client: httpx.Client,
+) -> None:
+    """Set the HTTP client on a namespace instance.
+
+    Args:
+        namespace: The namespace to configure.
+        client: The HTTP client.
+    """
+    namespace._client = client  # pylint: disable=protected-access  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+
+
+class CoderPadClient:
+    """A client for the CoderPad Interview API."""
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        base_url: str = "https://api.interview.coderpad.io",
+    ) -> None:
+        """Create a new CoderPad client.
+
+        Args:
+            api_key: The API key for authentication.
+            base_url: The base URL for the API.
+        """
+        self.base_url = base_url
+        http_client = httpx.Client(
+            base_url=base_url,
+            headers={"Authorization": f"Bearer {api_key}"},
+        )
+        self.pads: PadsNamespace = PadsNamespace()
+        _set_client(namespace=self.pads, client=http_client)
+        self.questions: QuestionsNamespace = QuestionsNamespace()
+        _set_client(namespace=self.questions, client=http_client)
+        self.organization: OrganizationNamespace = OrganizationNamespace()
+        _set_client(namespace=self.organization, client=http_client)
+        self.organization.pads = OrganizationPadsNamespace()
+        _set_client(namespace=self.organization.pads, client=http_client)
+        self.organization.questions = OrganizationQuestionsNamespace()
+        _set_client(
+            namespace=self.organization.questions,
+            client=http_client,
         )
