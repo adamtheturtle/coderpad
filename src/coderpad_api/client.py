@@ -17,6 +17,7 @@ from coderpad_api.types import (
     PadEvent,
     Question,
     Quota,
+    SortOrder,
 )
 
 
@@ -28,13 +29,13 @@ class PadsNamespace:
     def list(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> builtins.list[Pad]:
         """Retrieve a list of pads.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -42,7 +43,7 @@ class PadsNamespace:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -148,14 +149,14 @@ class PadsNamespace:
         self,
         *,
         pad_id: str,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> builtins.list[PadEvent]:
         """Retrieve a list of pad events.
 
         Args:
             pad_id: The id of the pad.
-            sort: Sort order, e.g. ``"created_at,asc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -163,7 +164,7 @@ class PadsNamespace:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -204,13 +205,13 @@ class QuestionsNamespace:
     def list(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> builtins.list[Question]:
         """Retrieve a list of questions.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -218,7 +219,7 @@ class QuestionsNamespace:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -405,13 +406,13 @@ class OrganizationNamespace:
     def list_pads(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> builtins.list[Pad]:
         """Retrieve pads for the entire organization.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -419,7 +420,7 @@ class OrganizationNamespace:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
@@ -433,13 +434,13 @@ class OrganizationNamespace:
     def list_questions(
         self,
         *,
-        sort: str | None = None,
+        sort: SortOrder | None = None,
         page: int | None = None,
     ) -> builtins.list[Question]:
         """Retrieve questions for the entire organization.
 
         Args:
-            sort: Sort order, e.g. ``"updated_at,desc"``.
+            sort: Sort order.
             page: Page number for pagination.
 
         Returns:
@@ -447,7 +448,7 @@ class OrganizationNamespace:
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort.value
         if page is not None:
             params["page"] = page
         response = self._client.get(
