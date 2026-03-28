@@ -360,14 +360,14 @@ class TestGetOrganizationStats:
 
 
 class TestListOrganizationPads:
-    """Tests for ``CoderPadClient.organization.list_pads``."""
+    """Tests for ``CoderPadClient.organization.pads.list``."""
 
     @staticmethod
     def test_list_organization_pads(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """Organization pads can be listed."""
-        result = fixture_coderpad_client.organization.list_pads()
+        result = fixture_coderpad_client.organization.pads.list()
         assert isinstance(result, PaginatedList)
 
     @staticmethod
@@ -375,7 +375,7 @@ class TestListOrganizationPads:
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """Organization pads can be listed with optional arguments."""
-        result = fixture_coderpad_client.organization.list_pads(
+        result = fixture_coderpad_client.organization.pads.list(
             sort=SortOrder.UPDATED_AT_ASC,
             page=1,
         )
@@ -383,14 +383,14 @@ class TestListOrganizationPads:
 
 
 class TestListOrganizationQuestions:
-    """Tests for ``CoderPadClient.organization.list_questions``."""
+    """Tests for ``CoderPadClient.organization.questions.list``."""
 
     @staticmethod
     def test_list_organization_questions(
         fixture_coderpad_client: CoderPadClient,
     ) -> None:
         """Organization questions can be listed."""
-        result = fixture_coderpad_client.organization.list_questions()
+        result = fixture_coderpad_client.organization.questions.list()
         assert isinstance(result, PaginatedList)
 
     @staticmethod
@@ -400,7 +400,7 @@ class TestListOrganizationQuestions:
         """Organization questions can be listed with optional
         arguments.
         """
-        result = fixture_coderpad_client.organization.list_questions(
+        result = fixture_coderpad_client.organization.questions.list(
             sort=SortOrder.CREATED_AT_DESC,
             page=1,
         )

@@ -353,10 +353,88 @@ class QuestionsNamespace:
         response.raise_for_status()
 
 
+class OrganizationPadsNamespace:
+    """Namespace for organization pad operations."""
+
+    _client: httpx.Client
+
+    def list(
+        self,
+        *,
+        sort: SortOrder | None = None,
+        page: int | None = None,
+    ) -> PaginatedList[Pad]:
+        """Retrieve pads for the entire organization.
+
+        Args:
+            sort: Sort order.
+            page: Page number for pagination.
+
+        Returns:
+            The list of pads with pagination metadata.
+        """
+        params: dict[str, str | int] = {}
+        if sort is not None:
+            params["sort"] = sort.value
+        if page is not None:
+            params["page"] = page
+        response = self._client.get(
+            url="/api/organization/pads",
+            params=params,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return PaginatedList(
+            [Pad.from_dict(data=item) for item in data["pads"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
+
+
+class OrganizationQuestionsNamespace:
+    """Namespace for organization question operations."""
+
+    _client: httpx.Client
+
+    def list(
+        self,
+        *,
+        sort: SortOrder | None = None,
+        page: int | None = None,
+    ) -> PaginatedList[Question]:
+        """Retrieve questions for the entire organization.
+
+        Args:
+            sort: Sort order.
+            page: Page number for pagination.
+
+        Returns:
+            The list of questions with pagination metadata.
+        """
+        params: dict[str, str | int] = {}
+        if sort is not None:
+            params["sort"] = sort.value
+        if page is not None:
+            params["page"] = page
+        response = self._client.get(
+            url="/api/organization/questions",
+            params=params,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return PaginatedList(
+            [Question.from_dict(data=item) for item in data["questions"]],
+            total=data["total"],
+            next_page=data.get("next_page"),
+        )
+
+
 class OrganizationNamespace:
     """Namespace for organization operations."""
 
     _client: httpx.Client
+    pads: OrganizationPadsNamespace
+    questions: OrganizationQuestionsNamespace
 
     def get(self) -> Organization:
         """Retrieve organization information.
@@ -411,73 +489,18 @@ class OrganizationNamespace:
         response.raise_for_status()
         return Quota.from_dict(data=response.json())
 
-    def list_pads(
-        self,
-        *,
-        sort: SortOrder | None = None,
-        page: int | None = None,
-    ) -> PaginatedList[Pad]:
-        """Retrieve pads for the entire organization.
 
-        Args:
-            sort: Sort order.
-            page: Page number for pagination.
-
-        Returns:
-            The list of pads with pagination metadata.
-        """
-        params: dict[str, str | int] = {}
-        if sort is not None:
-            params["sort"] = sort.value
-        if page is not None:
-            params["page"] = page
-        response = self._client.get(
-            url="/api/organization/pads",
-            params=params,
-        )
-        response.raise_for_status()
-        data = response.json()
-        return PaginatedList(
-            [Pad.from_dict(data=item) for item in data["pads"]],
-            total=data["total"],
-            next_page=data.get("next_page"),
-        )
-
-    def list_questions(
-        self,
-        *,
-        sort: SortOrder | None = None,
-        page: int | None = None,
-    ) -> PaginatedList[Question]:
-        """Retrieve questions for the entire organization.
-
-        Args:
-            sort: Sort order.
-            page: Page number for pagination.
-
-        Returns:
-            The list of questions with pagination metadata.
-        """
-        params: dict[str, str | int] = {}
-        if sort is not None:
-            params["sort"] = sort.value
-        if page is not None:
-            params["page"] = page
-        response = self._client.get(
-            url="/api/organization/questions",
-            params=params,
-        )
-        response.raise_for_status()
-        data = response.json()
-        return PaginatedList(
-            [Question.from_dict(data=item) for item in data["questions"]],
-            total=data["total"],
-            next_page=data.get("next_page"),
-        )
+_Namespace = (
+    PadsNamespace
+    | QuestionsNamespace
+    | OrganizationNamespace
+    | OrganizationPadsNamespace
+    | OrganizationQuestionsNamespace
+)
 
 
 def _set_client(
-    namespace: PadsNamespace | QuestionsNamespace | OrganizationNamespace,
+    namespace: _Namespace,
     client: httpx.Client,
 ) -> None:
     """Set the HTTP client on a namespace instance.
@@ -514,7 +537,11 @@ class CoderPadClient:
         self.questions: QuestionsNamespace = QuestionsNamespace()
         _set_client(namespace=self.questions, client=http_client)
         self.organization: OrganizationNamespace = OrganizationNamespace()
+        _set_client(namespace=self.organization, client=http_client)
+        self.organization.pads = OrganizationPadsNamespace()
+        _set_client(namespace=self.organization.pads, client=http_client)
+        self.organization.questions = OrganizationQuestionsNamespace()
         _set_client(
-            namespace=self.organization,
+            namespace=self.organization.questions,
             client=http_client,
         )
