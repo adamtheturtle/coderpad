@@ -35,7 +35,6 @@ refactoring
 regex
 repo
 reportPrivateUsage
-reportUnusedFunction
 respx
 str
 todo
