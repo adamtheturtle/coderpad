@@ -70,7 +70,6 @@ intersphinx_mapping = {
 nitpicky = True
 nitpick_ignore: list[tuple[str, str]] = [
     ("py:class", "coderpad_api.types._T"),
-    ("py:class", "httpx.Client"),
 ]
 nitpick_ignore_regex = [
     (r"py:class", r"coderpad_api\._dict_types\..*"),

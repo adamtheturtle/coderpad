@@ -92,7 +92,7 @@ class Transport(Protocol):
             A ``TransportResponse`` populated from the HTTP
             response.
         """
-        ...
+        ...  # pylint: disable=unnecessary-ellipsis
 
 
 @beartype

@@ -1,9 +1,13 @@
 """Tests for the CoderPad client."""
 
+import pytest
+
 from coderpad_api.client import CoderPadClient
 from coderpad_api.transports import (
+    HTTPStatusError,
     HTTPXTransport,
     Transport,
+    TransportResponse,
 )
 from coderpad_api.types import SortOrder
 
@@ -56,6 +60,35 @@ class TestHTTPXTransport:
     def test_is_transport() -> None:
         """HTTPXTransport satisfies the Transport protocol."""
         assert isinstance(HTTPXTransport(), Transport)
+
+
+class TestTransportResponse:
+    """Tests for ``TransportResponse``."""
+
+    @staticmethod
+    def test_raise_for_status_error() -> None:
+        """An error status code raises HTTPStatusError."""
+        error_status_code = 404
+        error_content = b"Not Found"
+        response = TransportResponse(
+            status_code=error_status_code,
+            headers={},
+            content=error_content,
+        )
+        with pytest.raises(HTTPStatusError) as exc_info:
+            response.raise_for_status()
+        assert exc_info.value.status_code == error_status_code
+        assert exc_info.value.content == error_content
+
+    @staticmethod
+    def test_raise_for_status_ok() -> None:
+        """A success status code does not raise."""
+        response = TransportResponse(
+            status_code=200,
+            headers={},
+            content=b"{}",
+        )
+        response.raise_for_status()
 
 
 class TestListPads:
