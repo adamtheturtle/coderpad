@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json as json_module
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import httpx
 from beartype import beartype
@@ -40,13 +40,13 @@ class TransportResponse:
     headers: dict[str, str]
     content: bytes
 
-    def json(self) -> object:
+    def json(self) -> Any:  # noqa: ANN401
         """Parse the response body as JSON.
 
         Returns:
             The parsed JSON data.
         """
-        return json_module.loads(self.content)
+        return json_module.loads(s=self.content)
 
     def raise_for_status(self) -> None:
         """Raise an error if the response has an error status.
