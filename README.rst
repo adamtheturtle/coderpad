@@ -1,7 +1,7 @@
 |Build Status| |PyPI|
 
-coderpad-api-python
-===================
+coderpad-py
+===========
 
 Python library for the CoderPad Interview API.
 
@@ -10,7 +10,7 @@ Installation
 
 .. code-block:: shell
 
-   pip install coderpad-api-python
+   pip install coderpad-py
 
 This is tested on Python |minimum-python-version|\+.
 
