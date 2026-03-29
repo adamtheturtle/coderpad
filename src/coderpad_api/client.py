@@ -24,7 +24,7 @@ from coderpad_api.types import (
 
 @beartype
 class _Namespace:
-    """Base class for API namespaces."""
+    """Base class providing shared request logic."""
 
     def __init__(
         self,
