@@ -107,6 +107,22 @@ class HTTPXTransport:
         """Create a new HTTPX transport."""
         self._client = httpx.Client()
 
+    def close(self) -> None:
+        """Close the underlying HTTP client."""
+        self._client.close()
+
+    def __enter__(self) -> HTTPXTransport:
+        """Enter the context manager.
+
+        Returns:
+            This transport instance.
+        """
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        """Exit the context manager and close the client."""
+        self.close()
+
     def __call__(
         self,
         *,

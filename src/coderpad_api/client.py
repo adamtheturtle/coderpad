@@ -606,8 +606,26 @@ class CoderPadClient:
             base_url=base_url,
             headers=headers,
         )
+        self._transport = resolved_transport
         self.organization: OrganizationNamespace = OrganizationNamespace(
             transport=resolved_transport,
             base_url=base_url,
             headers=headers,
         )
+
+    def close(self) -> None:
+        """Close the underlying transport if it supports closing."""
+        if hasattr(self._transport, 'close'):
+            self._transport.close()
+
+    def __enter__(self) -> CoderPadClient:
+        """Enter the context manager.
+
+        Returns:
+            This client instance.
+        """
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        """Exit the context manager and close the transport."""
+        self.close()
