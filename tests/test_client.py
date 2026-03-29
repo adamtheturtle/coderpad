@@ -69,6 +69,8 @@ class TestCoderPadClient:
         """Closing works when the transport has no close method."""
 
         class _NoCloseTransport:
+            """A transport without a close method."""
+
             def __call__(
                 self,
                 *,
@@ -78,6 +80,7 @@ class TestCoderPadClient:
                 params: dict[str, str | int] | None = None,
                 data: dict[str, str] | None = None,
             ) -> TransportResponse:  # pragma: no cover
+                """Make a request."""
                 raise NotImplementedError
 
         client = CoderPadClient(
