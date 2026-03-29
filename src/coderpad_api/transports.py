@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json as json_module
 from dataclasses import dataclass
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, Self, runtime_checkable
 
 import httpx
 from beartype import beartype
@@ -99,8 +99,34 @@ class Transport(Protocol):
 class HTTPXTransport:
     """HTTP transport using the ``httpx`` library.
 
-    This is the default transport.
+    This is the default transport. It uses a shared
+    ``httpx.Client`` for connection pooling.
     """
+
+    def __init__(self) -> None:
+        """Create a new HTTPX transport."""
+        self._client = httpx.Client()
+
+    def close(self) -> None:
+        """Close the underlying HTTP client."""
+        self._client.close()
+
+    def __enter__(self) -> Self:
+        """Enter the context manager.
+
+        Returns:
+            This transport instance.
+        """
+        return self
+
+    def __exit__(
+        self,
+        _exc_type: type[BaseException] | None,
+        _exc_val: BaseException | None,
+        _exc_tb: object,
+    ) -> None:
+        """Exit the context manager and close the client."""
+        self.close()
 
     def __call__(
         self,
@@ -124,7 +150,7 @@ class HTTPXTransport:
             A ``TransportResponse`` populated from the httpx
             response.
         """
-        response = httpx.request(
+        response = self._client.request(
             method=method,
             url=url,
             headers=headers,

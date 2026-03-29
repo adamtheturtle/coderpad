@@ -52,6 +52,43 @@ class TestCoderPadClient:
         result = coderpad_client.pads.list()
         assert result.total >= 0
 
+    @staticmethod
+    def test_close() -> None:
+        """The client can be closed."""
+        client = CoderPadClient(api_key="test-key")
+        client.close()
+
+    @staticmethod
+    def test_context_manager() -> None:
+        """The client can be used as a context manager."""
+        with CoderPadClient(api_key="test-key") as client:
+            assert isinstance(client, CoderPadClient)
+
+    @staticmethod
+    def test_close_transport_without_close() -> None:
+        """Closing works when the transport has no close method."""
+
+        class _NoCloseTransport:
+            """A transport without a close method."""
+
+            def __call__(
+                self,
+                *,
+                method: str,
+                url: str,
+                headers: dict[str, str],
+                params: dict[str, str | int] | None = None,
+                data: dict[str, str] | None = None,
+            ) -> TransportResponse:  # pragma: no cover
+                """Make a request."""
+                raise NotImplementedError
+
+        client = CoderPadClient(
+            api_key="test-key",
+            transport=_NoCloseTransport(),
+        )
+        client.close()
+
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""
@@ -60,6 +97,18 @@ class TestHTTPXTransport:
     def test_is_transport() -> None:
         """HTTPXTransport satisfies the Transport protocol."""
         assert isinstance(HTTPXTransport(), Transport)
+
+    @staticmethod
+    def test_close() -> None:
+        """The transport can be closed."""
+        transport = HTTPXTransport()
+        transport.close()
+
+    @staticmethod
+    def test_context_manager() -> None:
+        """The transport can be used as a context manager."""
+        with HTTPXTransport() as transport:
+            assert isinstance(transport, HTTPXTransport)
 
 
 class TestTransportResponse:
