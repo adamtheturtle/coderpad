@@ -615,7 +615,7 @@ class CoderPadClient:
 
     def close(self) -> None:
         """Close the underlying transport if it supports closing."""
-        if hasattr(self._transport, 'close'):
+        if hasattr(self._transport, "close"):
             self._transport.close()
 
     def __enter__(self) -> CoderPadClient:
