@@ -308,12 +308,6 @@ report.exclude_also = [
 ]
 report.show_missing = true
 
-[tool.mypy_strict_kwargs]
-ignore_names = [
-    "coderpad_api.async_client.AsyncCoderPadClient.__aexit__",
-    "coderpad_api.transports.AsyncHTTPXTransport.__aexit__",
-]
-
 [tool.pydocstringformatter]
 write = true
 split-summary-body = false
@@ -343,6 +337,8 @@ ignore_path = [
 # Ideally we would limit the paths to the source code where we want to ignore names,
 # but Vulture does not enable this.
 ignore_names = [
+    # Async context manager dunder
+    "__aexit__",
     # pytest configuration
     "pytest_collect_file",
     "pytest_collection_modifyitems",

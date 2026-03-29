@@ -226,6 +226,7 @@ class AsyncHTTPXTransport:
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
         _exc_tb: object,
+        /,
     ) -> None:
         """Exit the async context manager and close."""
         await self.aclose()
