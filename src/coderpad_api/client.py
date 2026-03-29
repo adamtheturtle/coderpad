@@ -6,6 +6,7 @@ from typing import Self
 
 from beartype import beartype
 
+from coderpad_api.exceptions import CoderPadError
 from coderpad_api.transports import (
     HTTPXTransport,
     Transport,
@@ -64,6 +65,10 @@ class _Namespace:
 
         Returns:
             The transport response.
+
+        Raises:
+            CoderPadError: If the response has an error
+                status code.
         """
         response = self.transport(
             method=method,
@@ -72,7 +77,9 @@ class _Namespace:
             params=params,
             data=data,
         )
-        response.raise_for_status()
+        min_error_status_code = 400
+        if response.status_code >= min_error_status_code:
+            raise CoderPadError.from_response(response=response)
         return response
 
 

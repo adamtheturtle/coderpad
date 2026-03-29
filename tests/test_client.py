@@ -3,6 +3,15 @@
 import pytest
 
 from coderpad_api.client import CoderPadClient
+from coderpad_api.exceptions import (
+    AuthenticationError,
+    BadRequestError,
+    CoderPadError,
+    ForbiddenError,
+    NotFoundError,
+    RateLimitError,
+    ServerError,
+)
 from coderpad_api.transports import (
     HTTPStatusError,
     HTTPXTransport,
@@ -138,6 +147,142 @@ class TestTransportResponse:
             content=b"{}",
         )
         response.raise_for_status()
+
+
+class TestExceptionHierarchy:
+    """Tests for the custom exception hierarchy."""
+
+    @staticmethod
+    def test_bad_request() -> None:
+        """A 400 response raises BadRequestError."""
+        bad_request_status = 400
+        response = TransportResponse(
+            status_code=bad_request_status,
+            headers={},
+            content=b"Bad Request",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, BadRequestError)
+        assert exc.status_code == bad_request_status
+        assert exc.content == b"Bad Request"
+        assert exc.response is response
+
+    @staticmethod
+    def test_authentication_error() -> None:
+        """A 401 response raises AuthenticationError."""
+        response = TransportResponse(
+            status_code=401,
+            headers={},
+            content=b"Unauthorized",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, AuthenticationError)
+
+    @staticmethod
+    def test_forbidden_error() -> None:
+        """A 403 response raises ForbiddenError."""
+        response = TransportResponse(
+            status_code=403,
+            headers={},
+            content=b"Forbidden",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, ForbiddenError)
+
+    @staticmethod
+    def test_not_found_error() -> None:
+        """A 404 response raises NotFoundError."""
+        response = TransportResponse(
+            status_code=404,
+            headers={},
+            content=b"Not Found",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, NotFoundError)
+
+    @staticmethod
+    def test_rate_limit_error() -> None:
+        """A 429 response raises RateLimitError."""
+        response = TransportResponse(
+            status_code=429,
+            headers={},
+            content=b"Too Many Requests",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, RateLimitError)
+
+    @staticmethod
+    def test_server_error() -> None:
+        """A 500 response raises ServerError."""
+        response = TransportResponse(
+            status_code=500,
+            headers={},
+            content=b"Internal Server Error",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, ServerError)
+
+    @staticmethod
+    def test_unmapped_status_code() -> None:
+        """An unmapped status code raises CoderPadError."""
+        teapot_status = 418
+        response = TransportResponse(
+            status_code=teapot_status,
+            headers={},
+            content=b"I'm a teapot",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert type(exc) is CoderPadError
+        assert exc.status_code == teapot_status
+
+    @staticmethod
+    def test_all_subclasses_are_coderpad_errors() -> None:
+        """All specific exceptions are CoderPadError subclasses."""
+        response = TransportResponse(
+            status_code=404,
+            headers={},
+            content=b"Not Found",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, CoderPadError)
+
+    @staticmethod
+    def test_error_message() -> None:
+        """The exception message includes the status code."""
+        response = TransportResponse(
+            status_code=404,
+            headers={},
+            content=b"Not Found",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert exc.args[0] == "HTTP 404"
+
+    @staticmethod
+    def test_client_raises_specific_exception() -> None:
+        """The client raises specific exceptions for error responses."""
+
+        def _error_transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None = None,
+            data: dict[str, str] | None = None,
+        ) -> TransportResponse:
+            """Return a 404 response."""
+            del method, url, headers, params, data
+            return TransportResponse(
+                status_code=404,
+                headers={},
+                content=b"Not Found",
+            )
+
+        client = CoderPadClient(
+            api_key="test-key",
+            transport=_error_transport,
+        )
+        with pytest.raises(expected_exception=NotFoundError):
+            client.pads.get(pad_id="nonexistent")
 
 
 class TestListPads:
