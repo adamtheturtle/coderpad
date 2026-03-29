@@ -22,9 +22,8 @@ from coderpad_api.types import (
 )
 
 
-@beartype
-class PadsNamespace:
-    """Namespace for pad operations."""
+class _BaseNamespace:
+    """Base class for API namespaces with shared request logic."""
 
     def __init__(
         self,
@@ -33,7 +32,7 @@ class PadsNamespace:
         base_url: str,
         headers: dict[str, str],
     ) -> None:
-        """Create a new pads namespace.
+        """Create a new namespace.
 
         Args:
             transport: The HTTP transport.
@@ -72,6 +71,11 @@ class PadsNamespace:
         )
         response.raise_for_status()
         return response
+
+
+@beartype
+class PadsNamespace(_BaseNamespace):
+    """Namespace for pad operations."""
 
     def list(
         self,
@@ -253,55 +257,8 @@ class PadsNamespace:
 
 
 @beartype
-class QuestionsNamespace:
+class QuestionsNamespace(_BaseNamespace):
     """Namespace for question operations."""
-
-    def __init__(
-        self,
-        *,
-        transport: Transport,
-        base_url: str,
-        headers: dict[str, str],
-    ) -> None:
-        """Create a new questions namespace.
-
-        Args:
-            transport: The HTTP transport.
-            base_url: The base URL for the API.
-            headers: Headers to send with every request.
-        """
-        self.transport = transport
-        self.base_url = base_url
-        self.headers = headers
-
-    def _request(
-        self,
-        *,
-        method: str,
-        url: str,
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-    ) -> TransportResponse:
-        """Make an HTTP request.
-
-        Args:
-            method: The HTTP method.
-            url: The URL path.
-            params: Query parameters.
-            data: Form data.
-
-        Returns:
-            The transport response.
-        """
-        response = self.transport(
-            method=method,
-            url=self.base_url + url,
-            headers=self.headers,
-            params=params,
-            data=data,
-        )
-        response.raise_for_status()
-        return response
 
     def list(
         self,
@@ -451,55 +408,8 @@ class QuestionsNamespace:
 
 
 @beartype
-class OrganizationPadsNamespace:
+class OrganizationPadsNamespace(_BaseNamespace):
     """Namespace for organization pad operations."""
-
-    def __init__(
-        self,
-        *,
-        transport: Transport,
-        base_url: str,
-        headers: dict[str, str],
-    ) -> None:
-        """Create a new organization pads namespace.
-
-        Args:
-            transport: The HTTP transport.
-            base_url: The base URL for the API.
-            headers: Headers to send with every request.
-        """
-        self.transport = transport
-        self.base_url = base_url
-        self.headers = headers
-
-    def _request(
-        self,
-        *,
-        method: str,
-        url: str,
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-    ) -> TransportResponse:
-        """Make an HTTP request.
-
-        Args:
-            method: The HTTP method.
-            url: The URL path.
-            params: Query parameters.
-            data: Form data.
-
-        Returns:
-            The transport response.
-        """
-        response = self.transport(
-            method=method,
-            url=self.base_url + url,
-            headers=self.headers,
-            params=params,
-            data=data,
-        )
-        response.raise_for_status()
-        return response
 
     def list(
         self,
@@ -535,55 +445,8 @@ class OrganizationPadsNamespace:
 
 
 @beartype
-class OrganizationQuestionsNamespace:
+class OrganizationQuestionsNamespace(_BaseNamespace):
     """Namespace for organization question operations."""
-
-    def __init__(
-        self,
-        *,
-        transport: Transport,
-        base_url: str,
-        headers: dict[str, str],
-    ) -> None:
-        """Create a new organization questions namespace.
-
-        Args:
-            transport: The HTTP transport.
-            base_url: The base URL for the API.
-            headers: Headers to send with every request.
-        """
-        self.transport = transport
-        self.base_url = base_url
-        self.headers = headers
-
-    def _request(
-        self,
-        *,
-        method: str,
-        url: str,
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-    ) -> TransportResponse:
-        """Make an HTTP request.
-
-        Args:
-            method: The HTTP method.
-            url: The URL path.
-            params: Query parameters.
-            data: Form data.
-
-        Returns:
-            The transport response.
-        """
-        response = self.transport(
-            method=method,
-            url=self.base_url + url,
-            headers=self.headers,
-            params=params,
-            data=data,
-        )
-        response.raise_for_status()
-        return response
 
     def list(
         self,
@@ -619,7 +482,7 @@ class OrganizationQuestionsNamespace:
 
 
 @beartype
-class OrganizationNamespace:
+class OrganizationNamespace(_BaseNamespace):
     """Namespace for organization operations."""
 
     def __init__(
@@ -636,9 +499,11 @@ class OrganizationNamespace:
             base_url: The base URL for the API.
             headers: Headers to send with every request.
         """
-        self.transport = transport
-        self.base_url = base_url
-        self.headers = headers
+        super().__init__(
+            transport=transport,
+            base_url=base_url,
+            headers=headers,
+        )
         self.pads: OrganizationPadsNamespace = OrganizationPadsNamespace(
             transport=transport,
             base_url=base_url,
@@ -651,35 +516,6 @@ class OrganizationNamespace:
                 headers=headers,
             )
         )
-
-    def _request(
-        self,
-        *,
-        method: str,
-        url: str,
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-    ) -> TransportResponse:
-        """Make an HTTP request.
-
-        Args:
-            method: The HTTP method.
-            url: The URL path.
-            params: Query parameters.
-            data: Form data.
-
-        Returns:
-            The transport response.
-        """
-        response = self.transport(
-            method=method,
-            url=self.base_url + url,
-            headers=self.headers,
-            params=params,
-            data=data,
-        )
-        response.raise_for_status()
-        return response
 
     def get(self) -> Organization:
         """Retrieve organization information.
