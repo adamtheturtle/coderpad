@@ -236,6 +236,19 @@ class TestExceptionHierarchy:
         assert exc.status_code == teapot_status
 
     @staticmethod
+    def test_nonstandard_status_code() -> None:
+        """A non-standard status code raises CoderPadError."""
+        nonstandard_status = 999
+        response = TransportResponse(
+            status_code=nonstandard_status,
+            headers={},
+            content=b"Unknown",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert type(exc) is CoderPadError  # pylint: disable=unidiomatic-typecheck
+        assert exc.status_code == nonstandard_status
+
+    @staticmethod
     def test_all_subclasses_are_coderpad_errors() -> None:
         """All specific exceptions are CoderPadError subclasses."""
         response = TransportResponse(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
 from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
@@ -22,7 +23,7 @@ class CoderPadError(Exception):
     def __init_subclass__(
         cls,
         *,
-        status_code: int | None = None,
+        status_code: HTTPStatus | None = None,
         **kwargs: object,
     ) -> None:
         """Register subclass for a specific HTTP status code.
@@ -33,7 +34,7 @@ class CoderPadError(Exception):
         """
         super().__init_subclass__(**kwargs)
         if status_code is not None:
-            CoderPadError._registry[status_code] = cls
+            CoderPadError._registry[status_code.value] = cls
 
     def __init__(
         self,
@@ -77,25 +78,43 @@ class CoderPadError(Exception):
         return exc_cls(response=response)
 
 
-class BadRequestError(CoderPadError, status_code=400):
+class BadRequestError(
+    CoderPadError,
+    status_code=HTTPStatus.BAD_REQUEST,
+):
     """Raised for 400 Bad Request responses."""
 
 
-class AuthenticationError(CoderPadError, status_code=401):
+class AuthenticationError(
+    CoderPadError,
+    status_code=HTTPStatus.UNAUTHORIZED,
+):
     """Raised for 401 Unauthorized responses."""
 
 
-class ForbiddenError(CoderPadError, status_code=403):
+class ForbiddenError(
+    CoderPadError,
+    status_code=HTTPStatus.FORBIDDEN,
+):
     """Raised for 403 Forbidden responses."""
 
 
-class NotFoundError(CoderPadError, status_code=404):
+class NotFoundError(
+    CoderPadError,
+    status_code=HTTPStatus.NOT_FOUND,
+):
     """Raised for 404 Not Found responses."""
 
 
-class RateLimitError(CoderPadError, status_code=429):
+class RateLimitError(
+    CoderPadError,
+    status_code=HTTPStatus.TOO_MANY_REQUESTS,
+):
     """Raised for 429 Too Many Requests responses."""
 
 
-class ServerError(CoderPadError, status_code=500):
+class ServerError(
+    CoderPadError,
+    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+):
     """Raised for 500 Internal Server Error responses."""

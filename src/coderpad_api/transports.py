@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json as json_module
 from dataclasses import dataclass
+from http import HTTPStatus
 from typing import Any, Protocol, Self, runtime_checkable
 
 import httpx
@@ -54,8 +55,7 @@ class TransportResponse:
         Raises:
             HTTPStatusError: If the status code is 400 or above.
         """
-        min_error_status_code = 400
-        if self.status_code >= min_error_status_code:
+        if self.status_code >= HTTPStatus.BAD_REQUEST:
             raise HTTPStatusError(
                 status_code=self.status_code,
                 content=self.content,

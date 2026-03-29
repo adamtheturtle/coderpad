@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
 from typing import Self
 
 from beartype import beartype
@@ -77,8 +78,7 @@ class _Namespace:
             params=params,
             data=data,
         )
-        min_error_status_code = 400
-        if response.status_code >= min_error_status_code:
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
             raise CoderPadError.from_response(response=response)
         return response
 
