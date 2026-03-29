@@ -496,7 +496,7 @@ class TestAsyncListOrganizationPads:
     async def test_list_organization_pads_with_params(
         async_coderpad_client: AsyncCoderPadClient,
     ) -> None:
-        """Organization pads can be listed with args."""
+        """Organization pads can be listed with optional arguments."""
         result = await async_coderpad_client.organization.pads.list(
             sort=SortOrder.UPDATED_AT_ASC,
             page=1,
@@ -521,7 +521,9 @@ class TestAsyncListOrganizationQuestions:
     async def test_list_org_questions_with_params(
         async_coderpad_client: AsyncCoderPadClient,
     ) -> None:
-        """Organization questions can be listed with args."""
+        """Organization questions can be listed with optional
+        arguments.
+        """
         result = await async_coderpad_client.organization.questions.list(
             sort=SortOrder.CREATED_AT_DESC,
             page=1,
