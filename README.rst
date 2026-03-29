@@ -1,7 +1,7 @@
 |Build Status|
 
-coderpad-api-python
-===================
+coderpad-py
+===========
 
 Python library for the CoderPad Interview API.
 
