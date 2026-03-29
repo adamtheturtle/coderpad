@@ -231,7 +231,18 @@ class TestExceptionHierarchy:
             content=b"I'm a teapot",
         )
         exc = CoderPadError.from_response(response=response)
-        assert type(exc) is CoderPadError  # pylint: disable=unidiomatic-typecheck
+        assert isinstance(exc, CoderPadError)
+        assert not isinstance(
+            exc,
+            (
+                BadRequestError,
+                AuthenticationError,
+                ForbiddenError,
+                NotFoundError,
+                RateLimitError,
+                ServerError,
+            ),
+        )
         assert exc.status_code == HTTPStatus.IM_A_TEAPOT
 
     @staticmethod
@@ -244,7 +255,18 @@ class TestExceptionHierarchy:
             content=b"Unknown",
         )
         exc = CoderPadError.from_response(response=response)
-        assert type(exc) is CoderPadError  # pylint: disable=unidiomatic-typecheck
+        assert isinstance(exc, CoderPadError)
+        assert not isinstance(
+            exc,
+            (
+                BadRequestError,
+                AuthenticationError,
+                ForbiddenError,
+                NotFoundError,
+                RateLimitError,
+                ServerError,
+            ),
+        )
         assert exc.status_code == nonstandard_status
 
     @staticmethod
