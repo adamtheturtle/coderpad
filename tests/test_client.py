@@ -1,6 +1,10 @@
 """Tests for the CoderPad client."""
 
 from coderpad_api.client import CoderPadClient
+from coderpad_api.transports import (
+    HTTPXTransport,
+    Transport,
+)
 from coderpad_api.types import SortOrder
 
 
@@ -23,12 +27,35 @@ class TestCoderPadClient:
         assert client.base_url == "https://custom.example.com"
 
     @staticmethod
+    def test_custom_transport(
+        mock_coderpad_api: object,
+    ) -> None:
+        """A custom transport can be provided."""
+        del mock_coderpad_api
+        transport = HTTPXTransport()
+        client = CoderPadClient(
+            api_key="test-key",
+            transport=transport,
+        )
+        result = client.pads.list()
+        assert result.total >= 0
+
+    @staticmethod
     def test_mock_api_available(
         coderpad_client: CoderPadClient,
     ) -> None:
         """The mock API fixture provides a working mock router."""
         result = coderpad_client.pads.list()
         assert result.total >= 0
+
+
+class TestHTTPXTransport:
+    """Tests for ``HTTPXTransport``."""
+
+    @staticmethod
+    def test_is_transport() -> None:
+        """HTTPXTransport satisfies the Transport protocol."""
+        assert isinstance(HTTPXTransport(), Transport)
 
 
 class TestListPads:
