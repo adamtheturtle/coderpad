@@ -48,9 +48,9 @@ class CoderPadError(Exception):
         """
         message = f"HTTP {response.status_code}"
         super().__init__(message)
-        self.response = response
-        self.status_code = response.status_code
-        self.content = response.content
+        self.response: TransportResponse = response
+        self.status_code: int = response.status_code
+        self.content: bytes = response.content
 
     @classmethod
     def from_response(
