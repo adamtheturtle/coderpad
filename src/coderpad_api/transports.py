@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json as json_module
 from dataclasses import dataclass
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, Self, runtime_checkable
 
 import httpx
 from beartype import beartype
@@ -111,7 +111,7 @@ class HTTPXTransport:
         """Close the underlying HTTP client."""
         self._client.close()
 
-    def __enter__(self) -> HTTPXTransport:
+    def __enter__(self) -> Self:
         """Enter the context manager.
 
         Returns:

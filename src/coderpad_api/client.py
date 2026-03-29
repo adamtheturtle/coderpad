@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Self
+
 from beartype import beartype
 
 from coderpad_api.transports import (
@@ -618,7 +620,7 @@ class CoderPadClient:
         if hasattr(self._transport, "close"):
             self._transport.close()
 
-    def __enter__(self) -> CoderPadClient:
+    def __enter__(self) -> Self:
         """Enter the context manager.
 
         Returns:
