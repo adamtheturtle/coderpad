@@ -297,9 +297,9 @@ reportUnnecessaryTypeIgnoreComment = true
 typeCheckingMode = "strict"
 
 [tool.pytest]
-ini_options.xfail_strict = true
-ini_options.log_cli = true
-ini_options.asyncio_mode = "strict"
+xfail_strict = true
+log_cli = true
+asyncio_mode = "strict"
 
 [tool.coverage]
 run.branch = true
