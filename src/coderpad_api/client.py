@@ -617,8 +617,9 @@ class CoderPadClient:
 
     def close(self) -> None:
         """Close the underlying transport if it supports closing."""
-        if hasattr(self._transport, "close"):
-            self._transport.close()
+        close = getattr(self._transport, "close", None)
+        if close is not None:
+            close()
 
     def __enter__(self) -> Self:
         """Enter the context manager.
