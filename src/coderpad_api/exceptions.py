@@ -24,15 +24,13 @@ class CoderPadError(Exception):
         cls,
         *,
         status_code: HTTPStatus | None = None,
-        **kwargs: object,
     ) -> None:
         """Register subclass for a specific HTTP status code.
 
         Args:
             status_code: The HTTP status code to map.
-            **kwargs: Additional keyword arguments.
         """
-        super().__init_subclass__(**kwargs)
+        super().__init_subclass__()
         if status_code is not None:
             CoderPadError._registry[status_code.value] = cls
 
