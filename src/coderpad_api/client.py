@@ -626,6 +626,11 @@ class CoderPadClient:
         """
         return self
 
-    def __exit__(self, *args: object) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object,
+    ) -> None:
         """Exit the context manager and close the transport."""
         self.close()
