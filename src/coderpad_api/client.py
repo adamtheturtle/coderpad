@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
 from typing import Self
 
 from beartype import beartype
 
+from coderpad_api.exceptions import CoderPadError
 from coderpad_api.transports import (
     HTTPXTransport,
     Transport,
@@ -64,6 +66,10 @@ class _Namespace:
 
         Returns:
             The transport response.
+
+        Raises:
+            CoderPadError: If the response has an error
+                status code.
         """
         response = self.transport(
             method=method,
@@ -72,7 +78,8 @@ class _Namespace:
             params=params,
             data=data,
         )
-        response.raise_for_status()
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
+            raise CoderPadError.from_response(response=response)
         return response
 
 

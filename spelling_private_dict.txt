@@ -39,7 +39,9 @@ repo
 reportPrivateUsage
 respx
 str
+subclasses
 todo
 txt
+unmapped
 url
 yml
