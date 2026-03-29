@@ -608,7 +608,10 @@ class CoderPadClient:
             base_url=base_url,
             headers=headers,
         )
-        self._transport = resolved_transport
+        if isinstance(resolved_transport, HTTPXTransport):
+            self._close = resolved_transport.close
+        else:
+            self._close = lambda: None
         self.organization: OrganizationNamespace = OrganizationNamespace(
             transport=resolved_transport,
             base_url=base_url,
@@ -617,9 +620,7 @@ class CoderPadClient:
 
     def close(self) -> None:
         """Close the underlying transport if it supports closing."""
-        close = getattr(self._transport, "close", None)
-        if close is not None:
-            close()
+        self._close()
 
     def __enter__(self) -> Self:
         """Enter the context manager.
