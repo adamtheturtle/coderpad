@@ -58,6 +58,7 @@ optional-dependencies.dev = [
     "pyright==1.1.408",
     "pyroma==5.0.1",
     "pytest==9.0.2",
+    "pytest-asyncio==1.3.0",
     "pytest-cov==7.1.0",
     "pyyaml==6.0.3",
     "respx==0.22.0",
@@ -298,6 +299,7 @@ typeCheckingMode = "strict"
 [tool.pytest]
 xfail_strict = true
 log_cli = true
+asyncio_mode = "strict"
 
 [tool.coverage]
 run.branch = true
@@ -335,6 +337,8 @@ ignore_path = [
 # Ideally we would limit the paths to the source code where we want to ignore names,
 # but Vulture does not enable this.
 ignore_names = [
+    # Async context manager dunder
+    "__aexit__",
     # pytest configuration
     "pytest_collect_file",
     "pytest_collection_modifyitems",

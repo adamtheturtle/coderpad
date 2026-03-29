@@ -162,3 +162,106 @@ class HTTPXTransport:
             headers=dict(response.headers),
             content=response.content,
         )
+
+
+@runtime_checkable
+class AsyncTransport(Protocol):
+    """Protocol for async HTTP transports.
+
+    An async transport is a callable that makes an async HTTP
+    request and returns a ``TransportResponse``.
+    """
+
+    async def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+    ) -> TransportResponse:
+        """Make an async HTTP request.
+
+        Args:
+            method: The HTTP method (e.g. ``GET``, ``POST``).
+            url: The full URL to request.
+            headers: Headers to send with the request.
+            params: Query parameters.
+            data: Form data to send in the request body.
+
+        Returns:
+            A ``TransportResponse`` populated from the HTTP
+            response.
+        """
+        ...  # pylint: disable=unnecessary-ellipsis
+
+
+@beartype
+class AsyncHTTPXTransport:
+    """Async HTTP transport using the ``httpx`` library.
+
+    This is the default async transport. It uses a shared
+    ``httpx.AsyncClient`` for connection pooling.
+    """
+
+    def __init__(self) -> None:
+        """Create a new async HTTPX transport."""
+        self._client = httpx.AsyncClient()
+
+    async def aclose(self) -> None:
+        """Close the underlying async HTTP client."""
+        await self._client.aclose()
+
+    async def __aenter__(self) -> Self:
+        """Enter the async context manager.
+
+        Returns:
+            This transport instance.
+        """
+        return self
+
+    async def __aexit__(
+        self,
+        _exc_type: type[BaseException] | None,
+        _exc_val: BaseException | None,
+        _exc_tb: object,
+        /,
+    ) -> None:
+        """Exit the async context manager and close."""
+        await self.aclose()
+
+    async def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+    ) -> TransportResponse:
+        """Make an async HTTP request using ``httpx``.
+
+        Args:
+            method: The HTTP method.
+            url: The full URL.
+            headers: Request headers.
+            params: Query parameters.
+            data: Form data to send in the request body.
+
+        Returns:
+            A ``TransportResponse`` populated from the httpx
+            response.
+        """
+        response = await self._client.request(
+            method=method,
+            url=url,
+            headers=headers,
+            params=params,
+            data=data,
+        )
+        return TransportResponse(
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            content=response.content,
+        )
