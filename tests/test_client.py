@@ -232,7 +232,7 @@ class TestExceptionHierarchy:
             content=b"I'm a teapot",
         )
         exc = CoderPadError.from_response(response=response)
-        assert type(exc) is CoderPadError
+        assert type(exc) is CoderPadError  # pylint: disable=unidiomatic-typecheck
         assert exc.status_code == teapot_status
 
     @staticmethod
@@ -245,6 +245,24 @@ class TestExceptionHierarchy:
         )
         exc = CoderPadError.from_response(response=response)
         assert isinstance(exc, CoderPadError)
+
+    @staticmethod
+    def test_subclass_without_status_code() -> None:
+        """A subclass without a status_code is not registered."""
+
+        class _CustomError(CoderPadError):
+            """A custom error without a mapped status code."""
+
+        # Verify from_response never returns _CustomError for
+        # any common status code.
+        for code in (400, 401, 403, 404, 418, 429, 500):
+            response = TransportResponse(
+                status_code=code,
+                headers={},
+                content=b"",
+            )
+            exc = CoderPadError.from_response(response=response)
+            assert not isinstance(exc, _CustomError)
 
     @staticmethod
     def test_error_message() -> None:
