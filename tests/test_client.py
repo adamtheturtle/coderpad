@@ -75,7 +75,7 @@ class TestTransportResponse:
             headers={},
             content=error_content,
         )
-        with pytest.raises(HTTPStatusError) as exc_info:
+        with pytest.raises(expected_exception=HTTPStatusError) as exc_info:
             response.raise_for_status()
         assert exc_info.value.status_code == error_status_code
         assert exc_info.value.content == error_content
