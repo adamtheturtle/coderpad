@@ -283,9 +283,8 @@ class CandidateInstruction:
         """
         return cls(
             instructions=data["instructions"],
-            default_visible=data.get(  # type: ignore[call-overload]
-                "default_visible",
-                False,
+            default_visible=(
+                "default_visible" in data and data["default_visible"]
             ),
         )
 
