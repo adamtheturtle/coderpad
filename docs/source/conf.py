@@ -57,13 +57,13 @@ html_show_sphinx = False
 html_show_sourcelink = False
 html_theme_options = {
     "sidebar_hide_name": False,
-    "source_repository": "https://github.com/adamtheturtle/coderpad-api-python/",
+    "source_repository": "https://github.com/adamtheturtle/coderpad/",
     "source_branch": "main",
     "source_directory": "docs/source/",
 }
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "CODERPADAPIPYTHONdoc"
+htmlhelp_basename = "CODERPADPYdoc"
 intersphinx_mapping = {
     "python": (f"https://docs.python.org/{minimum_python_version}", None),
 }
@@ -90,5 +90,5 @@ rst_prolog = f"""
 .. |project| replace:: {project}
 .. |minimum-python-version| replace:: {minimum_python_version}
 .. |github-owner| replace:: adamtheturtle
-.. |github-repository| replace:: coderpad-api-python
+.. |github-repository| replace:: coderpad
 """
