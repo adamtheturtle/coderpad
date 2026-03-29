@@ -1,5 +1,7 @@
 """Tests for the CoderPad client."""
 
+from http import HTTPStatus
+
 import pytest
 
 from coderpad_api.client import CoderPadClient
@@ -126,23 +128,22 @@ class TestTransportResponse:
     @staticmethod
     def test_raise_for_status_error() -> None:
         """An error status code raises HTTPStatusError."""
-        error_status_code = 404
         error_content = b"Not Found"
         response = TransportResponse(
-            status_code=error_status_code,
+            status_code=HTTPStatus.NOT_FOUND,
             headers={},
             content=error_content,
         )
         with pytest.raises(expected_exception=HTTPStatusError) as exc_info:
             response.raise_for_status()
-        assert exc_info.value.status_code == error_status_code
+        assert exc_info.value.status_code == HTTPStatus.NOT_FOUND
         assert exc_info.value.content == error_content
 
     @staticmethod
     def test_raise_for_status_ok() -> None:
         """A success status code does not raise."""
         response = TransportResponse(
-            status_code=200,
+            status_code=HTTPStatus.OK,
             headers={},
             content=b"{}",
         )
@@ -155,15 +156,14 @@ class TestExceptionHierarchy:
     @staticmethod
     def test_bad_request() -> None:
         """A 400 response raises BadRequestError."""
-        bad_request_status = 400
         response = TransportResponse(
-            status_code=bad_request_status,
+            status_code=HTTPStatus.BAD_REQUEST,
             headers={},
             content=b"Bad Request",
         )
         exc = CoderPadError.from_response(response=response)
         assert isinstance(exc, BadRequestError)
-        assert exc.status_code == bad_request_status
+        assert exc.status_code == HTTPStatus.BAD_REQUEST
         assert exc.content == b"Bad Request"
         assert exc.response is response
 
@@ -171,7 +171,7 @@ class TestExceptionHierarchy:
     def test_authentication_error() -> None:
         """A 401 response raises AuthenticationError."""
         response = TransportResponse(
-            status_code=401,
+            status_code=HTTPStatus.UNAUTHORIZED,
             headers={},
             content=b"Unauthorized",
         )
@@ -182,7 +182,7 @@ class TestExceptionHierarchy:
     def test_forbidden_error() -> None:
         """A 403 response raises ForbiddenError."""
         response = TransportResponse(
-            status_code=403,
+            status_code=HTTPStatus.FORBIDDEN,
             headers={},
             content=b"Forbidden",
         )
@@ -193,7 +193,7 @@ class TestExceptionHierarchy:
     def test_not_found_error() -> None:
         """A 404 response raises NotFoundError."""
         response = TransportResponse(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             headers={},
             content=b"Not Found",
         )
@@ -204,7 +204,7 @@ class TestExceptionHierarchy:
     def test_rate_limit_error() -> None:
         """A 429 response raises RateLimitError."""
         response = TransportResponse(
-            status_code=429,
+            status_code=HTTPStatus.TOO_MANY_REQUESTS,
             headers={},
             content=b"Too Many Requests",
         )
@@ -215,7 +215,7 @@ class TestExceptionHierarchy:
     def test_server_error() -> None:
         """A 500 response raises ServerError."""
         response = TransportResponse(
-            status_code=500,
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             headers={},
             content=b"Internal Server Error",
         )
@@ -225,15 +225,14 @@ class TestExceptionHierarchy:
     @staticmethod
     def test_unmapped_status_code() -> None:
         """An unmapped status code raises CoderPadError."""
-        teapot_status = 418
         response = TransportResponse(
-            status_code=teapot_status,
+            status_code=HTTPStatus.IM_A_TEAPOT,
             headers={},
             content=b"I'm a teapot",
         )
         exc = CoderPadError.from_response(response=response)
         assert type(exc) is CoderPadError  # pylint: disable=unidiomatic-typecheck
-        assert exc.status_code == teapot_status
+        assert exc.status_code == HTTPStatus.IM_A_TEAPOT
 
     @staticmethod
     def test_nonstandard_status_code() -> None:
@@ -252,7 +251,7 @@ class TestExceptionHierarchy:
     def test_all_subclasses_are_coderpad_errors() -> None:
         """All specific exceptions are CoderPadError subclasses."""
         response = TransportResponse(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             headers={},
             content=b"Not Found",
         )
@@ -268,7 +267,15 @@ class TestExceptionHierarchy:
 
         # Verify from_response never returns _CustomError for
         # any common status code.
-        for code in (400, 401, 403, 404, 418, 429, 500):
+        for code in (
+            HTTPStatus.BAD_REQUEST,
+            HTTPStatus.UNAUTHORIZED,
+            HTTPStatus.FORBIDDEN,
+            HTTPStatus.NOT_FOUND,
+            HTTPStatus.IM_A_TEAPOT,
+            HTTPStatus.TOO_MANY_REQUESTS,
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+        ):
             response = TransportResponse(
                 status_code=code,
                 headers={},
@@ -281,7 +288,7 @@ class TestExceptionHierarchy:
     def test_error_message() -> None:
         """The exception message includes the status code."""
         response = TransportResponse(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             headers={},
             content=b"Not Found",
         )
@@ -303,7 +310,7 @@ class TestExceptionHierarchy:
             """Return a 404 response."""
             del method, url, headers, params, data
             return TransportResponse(
-                status_code=404,
+                status_code=HTTPStatus.NOT_FOUND,
                 headers={},
                 content=b"Not Found",
             )
