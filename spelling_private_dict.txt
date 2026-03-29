@@ -25,6 +25,8 @@ macOS
 metadata
 namespace
 noqa
+params
+pluggable
 plugins
 pragma
 py

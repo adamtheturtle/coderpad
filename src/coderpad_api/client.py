@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-import httpx
 from beartype import beartype
 
+from coderpad_api.transports import (
+    HTTPXTransport,
+    Transport,
+    TransportResponse,
+)
 from coderpad_api.types import (
     Organization,
     OrganizationStats,
@@ -22,13 +26,52 @@ from coderpad_api.types import (
 class PadsNamespace:
     """Namespace for pad operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
+    def __init__(
+        self,
+        *,
+        transport: Transport,
+        base_url: str,
+        headers: dict[str, str],
+    ) -> None:
         """Create a new pads namespace.
 
         Args:
-            client: The HTTP client.
+            transport: The HTTP transport.
+            base_url: The base URL for the API.
+            headers: Headers to send with every request.
         """
-        self.client = client
+        self.transport = transport
+        self.base_url = base_url
+        self.headers = headers
+
+    def _request(
+        self,
+        *,
+        method: str,
+        url: str,
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+    ) -> TransportResponse:
+        """Make an HTTP request.
+
+        Args:
+            method: The HTTP method.
+            url: The URL path.
+            params: Query parameters.
+            data: Form data.
+
+        Returns:
+            The transport response.
+        """
+        response = self.transport(
+            method=method,
+            url=self.base_url + url,
+            headers=self.headers,
+            params=params,
+            data=data,
+        )
+        response.raise_for_status()
+        return response
 
     def list(
         self,
@@ -50,11 +93,11 @@ class PadsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url="/api/pads/",
             params=params,
         )
-        response.raise_for_status()
         data = response.json()
         return PaginatedList(
             [Pad.from_dict(data=item) for item in data["pads"]],
@@ -90,11 +133,11 @@ class PadsNamespace:
             data["contents"] = contents
         if notes is not None:
             data["notes"] = notes
-        response = self.client.post(
+        response = self._request(
+            method="POST",
             url="/api/pads/",
             data=data,
         )
-        response.raise_for_status()
         return Pad.from_dict(data=response.json())
 
     def get(self, *, pad_id: str) -> Pad:
@@ -106,10 +149,10 @@ class PadsNamespace:
         Returns:
             The pad.
         """
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url=f"/api/pads/{pad_id}",
         )
-        response.raise_for_status()
         return Pad.from_dict(data=response.json())
 
     def update(
@@ -147,11 +190,11 @@ class PadsNamespace:
             data["ended"] = "true" if ended else "false"
         if deleted is not None:
             data["deleted"] = "true" if deleted else "false"
-        response = self.client.put(
+        self._request(
+            method="PUT",
             url=f"/api/pads/{pad_id}",
             data=data,
         )
-        response.raise_for_status()
 
     def get_events(
         self,
@@ -175,11 +218,11 @@ class PadsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url=f"/api/pads/{pad_id}/events",
             params=params,
         )
-        response.raise_for_status()
         data = response.json()
         return PaginatedList(
             [PadEvent.from_dict(data=item) for item in data["events"]],
@@ -200,10 +243,10 @@ class PadsNamespace:
         Returns:
             The pad environment.
         """
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url=f"/api/pad_environments/{environment_id}",
         )
-        response.raise_for_status()
         return PadEnvironment.from_dict(
             data=response.json(),
         )
@@ -213,13 +256,52 @@ class PadsNamespace:
 class QuestionsNamespace:
     """Namespace for question operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
+    def __init__(
+        self,
+        *,
+        transport: Transport,
+        base_url: str,
+        headers: dict[str, str],
+    ) -> None:
         """Create a new questions namespace.
 
         Args:
-            client: The HTTP client.
+            transport: The HTTP transport.
+            base_url: The base URL for the API.
+            headers: Headers to send with every request.
         """
-        self.client = client
+        self.transport = transport
+        self.base_url = base_url
+        self.headers = headers
+
+    def _request(
+        self,
+        *,
+        method: str,
+        url: str,
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+    ) -> TransportResponse:
+        """Make an HTTP request.
+
+        Args:
+            method: The HTTP method.
+            url: The URL path.
+            params: Query parameters.
+            data: Form data.
+
+        Returns:
+            The transport response.
+        """
+        response = self.transport(
+            method=method,
+            url=self.base_url + url,
+            headers=self.headers,
+            params=params,
+            data=data,
+        )
+        response.raise_for_status()
+        return response
 
     def list(
         self,
@@ -241,11 +323,11 @@ class QuestionsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url="/api/questions/",
             params=params,
         )
-        response.raise_for_status()
         data = response.json()
         return PaginatedList(
             [Question.from_dict(data=item) for item in data["questions"]],
@@ -285,11 +367,11 @@ class QuestionsNamespace:
             data["contents"] = contents
         if solution is not None:
             data["solution"] = solution
-        response = self.client.post(
+        response = self._request(
+            method="POST",
             url="/api/questions/",
             data=data,
         )
-        response.raise_for_status()
         return Question.from_dict(
             data=response.json(),
         )
@@ -307,10 +389,10 @@ class QuestionsNamespace:
         Returns:
             The question.
         """
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url=f"/api/questions/{question_id}",
         )
-        response.raise_for_status()
         return Question.from_dict(
             data=response.json(),
         )
@@ -346,11 +428,11 @@ class QuestionsNamespace:
             data["contents"] = contents
         if solution is not None:
             data["solution"] = solution
-        response = self.client.put(
+        self._request(
+            method="PUT",
             url=f"/api/questions/{question_id}",
             data=data,
         )
-        response.raise_for_status()
 
     def delete(
         self,
@@ -362,23 +444,62 @@ class QuestionsNamespace:
         Args:
             question_id: The id of the question.
         """
-        response = self.client.delete(
+        self._request(
+            method="DELETE",
             url=f"/api/questions/{question_id}",
         )
-        response.raise_for_status()
 
 
 @beartype
 class OrganizationPadsNamespace:
     """Namespace for organization pad operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
+    def __init__(
+        self,
+        *,
+        transport: Transport,
+        base_url: str,
+        headers: dict[str, str],
+    ) -> None:
         """Create a new organization pads namespace.
 
         Args:
-            client: The HTTP client.
+            transport: The HTTP transport.
+            base_url: The base URL for the API.
+            headers: Headers to send with every request.
         """
-        self.client = client
+        self.transport = transport
+        self.base_url = base_url
+        self.headers = headers
+
+    def _request(
+        self,
+        *,
+        method: str,
+        url: str,
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+    ) -> TransportResponse:
+        """Make an HTTP request.
+
+        Args:
+            method: The HTTP method.
+            url: The URL path.
+            params: Query parameters.
+            data: Form data.
+
+        Returns:
+            The transport response.
+        """
+        response = self.transport(
+            method=method,
+            url=self.base_url + url,
+            headers=self.headers,
+            params=params,
+            data=data,
+        )
+        response.raise_for_status()
+        return response
 
     def list(
         self,
@@ -400,11 +521,11 @@ class OrganizationPadsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url="/api/organization/pads",
             params=params,
         )
-        response.raise_for_status()
         data = response.json()
         return PaginatedList(
             [Pad.from_dict(data=item) for item in data["pads"]],
@@ -417,13 +538,52 @@ class OrganizationPadsNamespace:
 class OrganizationQuestionsNamespace:
     """Namespace for organization question operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
+    def __init__(
+        self,
+        *,
+        transport: Transport,
+        base_url: str,
+        headers: dict[str, str],
+    ) -> None:
         """Create a new organization questions namespace.
 
         Args:
-            client: The HTTP client.
+            transport: The HTTP transport.
+            base_url: The base URL for the API.
+            headers: Headers to send with every request.
         """
-        self.client = client
+        self.transport = transport
+        self.base_url = base_url
+        self.headers = headers
+
+    def _request(
+        self,
+        *,
+        method: str,
+        url: str,
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+    ) -> TransportResponse:
+        """Make an HTTP request.
+
+        Args:
+            method: The HTTP method.
+            url: The URL path.
+            params: Query parameters.
+            data: Form data.
+
+        Returns:
+            The transport response.
+        """
+        response = self.transport(
+            method=method,
+            url=self.base_url + url,
+            headers=self.headers,
+            params=params,
+            data=data,
+        )
+        response.raise_for_status()
+        return response
 
     def list(
         self,
@@ -445,11 +605,11 @@ class OrganizationQuestionsNamespace:
             params["sort"] = sort.value
         if page is not None:
             params["page"] = page
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url="/api/organization/questions",
             params=params,
         )
-        response.raise_for_status()
         data = response.json()
         return PaginatedList(
             [Question.from_dict(data=item) for item in data["questions"]],
@@ -462,19 +622,64 @@ class OrganizationQuestionsNamespace:
 class OrganizationNamespace:
     """Namespace for organization operations."""
 
-    def __init__(self, *, client: httpx.Client) -> None:
+    def __init__(
+        self,
+        *,
+        transport: Transport,
+        base_url: str,
+        headers: dict[str, str],
+    ) -> None:
         """Create a new organization namespace.
 
         Args:
-            client: The HTTP client.
+            transport: The HTTP transport.
+            base_url: The base URL for the API.
+            headers: Headers to send with every request.
         """
-        self.client = client
+        self.transport = transport
+        self.base_url = base_url
+        self.headers = headers
         self.pads: OrganizationPadsNamespace = OrganizationPadsNamespace(
-            client=client,
+            transport=transport,
+            base_url=base_url,
+            headers=headers,
         )
         self.questions: OrganizationQuestionsNamespace = (
-            OrganizationQuestionsNamespace(client=client)
+            OrganizationQuestionsNamespace(
+                transport=transport,
+                base_url=base_url,
+                headers=headers,
+            )
         )
+
+    def _request(
+        self,
+        *,
+        method: str,
+        url: str,
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+    ) -> TransportResponse:
+        """Make an HTTP request.
+
+        Args:
+            method: The HTTP method.
+            url: The URL path.
+            params: Query parameters.
+            data: Form data.
+
+        Returns:
+            The transport response.
+        """
+        response = self.transport(
+            method=method,
+            url=self.base_url + url,
+            headers=self.headers,
+            params=params,
+            data=data,
+        )
+        response.raise_for_status()
+        return response
 
     def get(self) -> Organization:
         """Retrieve organization information.
@@ -482,10 +687,10 @@ class OrganizationNamespace:
         Returns:
             The organization details.
         """
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url="/api/organization",
         )
-        response.raise_for_status()
         return Organization.from_dict(
             data=response.json(),
         )
@@ -505,16 +710,16 @@ class OrganizationNamespace:
         Returns:
             The usage statistics.
         """
-        params: dict[str, str] = {}
+        params: dict[str, str | int] = {}
         if start_time is not None:
             params["start_time"] = start_time
         if end_time is not None:
             params["end_time"] = end_time
-        response = self.client.get(
+        response = self._request(
+            method="GET",
             url="/api/organization/stats",
             params=params,
         )
-        response.raise_for_status()
         return OrganizationStats.from_dict(
             data=response.json(),
         )
@@ -525,8 +730,10 @@ class OrganizationNamespace:
         Returns:
             The quota details.
         """
-        response = self.client.get(url="/api/quota")
-        response.raise_for_status()
+        response = self._request(
+            method="GET",
+            url="/api/quota",
+        )
         return Quota.from_dict(data=response.json())
 
 
@@ -539,22 +746,31 @@ class CoderPadClient:
         *,
         api_key: str,
         base_url: str = "https://api.interview.coderpad.io",
+        transport: Transport | None = None,
     ) -> None:
         """Create a new CoderPad client.
 
         Args:
             api_key: The API key for authentication.
             base_url: The base URL for the API.
+            transport: The HTTP transport. Defaults to
+                ``HTTPXTransport()``.
         """
         self.base_url = base_url
-        http_client = httpx.Client(
+        resolved_transport = transport or HTTPXTransport()
+        headers = {"Authorization": f"Bearer {api_key}"}
+        self.pads: PadsNamespace = PadsNamespace(
+            transport=resolved_transport,
             base_url=base_url,
-            headers={"Authorization": f"Bearer {api_key}"},
+            headers=headers,
         )
-        self.pads: PadsNamespace = PadsNamespace(client=http_client)
         self.questions: QuestionsNamespace = QuestionsNamespace(
-            client=http_client,
+            transport=resolved_transport,
+            base_url=base_url,
+            headers=headers,
         )
         self.organization: OrganizationNamespace = OrganizationNamespace(
-            client=http_client,
+            transport=resolved_transport,
+            base_url=base_url,
+            headers=headers,
         )

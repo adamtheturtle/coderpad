@@ -5,6 +5,10 @@ API Reference
    :undoc-members:
    :members:
 
+.. automodule:: coderpad_api.transports
+   :undoc-members:
+   :members:
+
 .. automodule:: coderpad_api.types
    :undoc-members:
    :members:
