@@ -6,7 +6,7 @@ requires = [
 ]
 
 [project]
-name = "coderpad-api-python"
+name = "coderpad-py"
 description = "Interact with the CoderPad Interview API."
 readme = { file = "README.rst", content-type = "text/x-rst" }
 keywords = [
