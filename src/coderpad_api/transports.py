@@ -99,8 +99,13 @@ class Transport(Protocol):
 class HTTPXTransport:
     """HTTP transport using the ``httpx`` library.
 
-    This is the default transport.
+    This is the default transport. It uses a shared
+    ``httpx.Client`` for connection pooling.
     """
+
+    def __init__(self) -> None:
+        """Create a new HTTPX transport."""
+        self._client = httpx.Client()
 
     def __call__(
         self,
@@ -124,7 +129,7 @@ class HTTPXTransport:
             A ``TransportResponse`` populated from the httpx
             response.
         """
-        response = httpx.request(
+        response = self._client.request(
             method=method,
             url=url,
             headers=headers,
