@@ -1,9 +1,21 @@
 """Tests for the CoderPad types."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
+from coderpad_api._dict_types import (
+    CandidateInstructionDict,
+    CustomFileDict,
+    FileContentDict,
+    OrganizationDict,
+    OrganizationStatsDict,
+    OrganizationStatsUserDict,
+    OrganizationUserDict,
+    PadDict,
+    PadEnvironmentDict,
+    PadEventDict,
+    QuestionDict,
+    QuotaDict,
+    TeamDict,
+    TestCaseDict,
+)
 from coderpad_api.types import (
     CandidateInstruction,
     CustomFile,
@@ -20,24 +32,6 @@ from coderpad_api.types import (
     Team,
     TestCase,
 )
-
-if TYPE_CHECKING:
-    from coderpad_api._dict_types import (
-        CandidateInstructionDict,
-        CustomFileDict,
-        FileContentDict,
-        OrganizationDict,
-        OrganizationStatsDict,
-        OrganizationStatsUserDict,
-        OrganizationUserDict,
-        PadDict,
-        PadEnvironmentDict,
-        PadEventDict,
-        QuestionDict,
-        QuotaDict,
-        TeamDict,
-        TestCaseDict,
-    )
 
 
 def _team_dict() -> TeamDict:
