@@ -262,6 +262,19 @@ class PadEnvironment:
 
 @beartype
 @dataclass(frozen=True, kw_only=True)
+class QuestionFileContent:
+    """A file for a multi-file question.
+
+    Used when creating or updating questions with
+    multi-file languages.
+    """
+
+    path: str
+    contents: str
+
+
+@beartype
+@dataclass(frozen=True, kw_only=True)
 class CandidateInstruction:
     """Instructions shown to a candidate."""
 

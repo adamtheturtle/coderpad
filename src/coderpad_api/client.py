@@ -1,6 +1,9 @@
 """CoderPad Interview API client."""
 
+import json
+from collections.abc import Sequence
 from http import HTTPStatus
+from pathlib import Path
 from typing import Self
 
 from beartype import beartype
@@ -19,6 +22,7 @@ from coderpad_api.types import (
     PadEvent,
     PaginatedList,
     Question,
+    QuestionFileContent,
     Quota,
     SortOrder,
 )
@@ -53,6 +57,7 @@ class _Namespace:
         url: str,
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
+        files: (dict[str, tuple[str, bytes, str]] | None) = None,
     ) -> TransportResponse:
         """Make an HTTP request.
 
@@ -61,6 +66,7 @@ class _Namespace:
             url: The URL path.
             params: Query parameters.
             data: Form data.
+            files: Files to upload as multipart form data.
 
         Returns:
             The transport response.
@@ -75,6 +81,7 @@ class _Namespace:
             headers=self.headers,
             params=params,
             data=data,
+            files=files,
         )
         if response.status_code >= HTTPStatus.BAD_REQUEST:
             raise CoderPadError.from_response(response=response)
@@ -308,6 +315,8 @@ class QuestionsNamespace(_Namespace):
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
+        file_contents: (Sequence[QuestionFileContent] | None) = None,
+        zip_file: Path | None = None,
     ) -> Question:
         """Create a new question.
 
@@ -316,8 +325,15 @@ class QuestionsNamespace(_Namespace):
             language: Programming language for the question.
             description: Notes about the question.
             contents: Text inserted into the interview
-                session.
+                session. Cannot be combined with
+                ``file_contents``.
             solution: The solution to the question.
+            file_contents: Files for a multi-file question.
+                Cannot be combined with ``contents`` or
+                ``zip_file``.
+            zip_file: Path to a zip archive containing
+                files for a multi-file question. Cannot be
+                combined with ``file_contents``.
 
         Returns:
             The created question.
@@ -332,10 +348,30 @@ class QuestionsNamespace(_Namespace):
             data["contents"] = contents
         if solution is not None:
             data["solution"] = solution
+        if file_contents is not None:
+            data["file_contents"] = json.dumps(
+                obj=[
+                    {
+                        "path": fc.path,
+                        "contents": fc.contents,
+                    }
+                    for fc in file_contents
+                ],
+            )
+        files: dict[str, tuple[str, bytes, str]] | None = None
+        if zip_file is not None:
+            files = {
+                "zip_file": (
+                    zip_file.name,
+                    zip_file.read_bytes(),
+                    "application/zip",
+                ),
+            }
         response = self._request(
             method="POST",
             url="/api/questions/",
             data=data,
+            files=files,
         )
         return Question.from_dict(
             data=response.json(),
@@ -371,6 +407,8 @@ class QuestionsNamespace(_Namespace):
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
+        file_contents: (Sequence[QuestionFileContent] | None) = None,
+        zip_file: Path | None = None,
     ) -> None:
         """Modify an existing question.
 
@@ -379,8 +417,15 @@ class QuestionsNamespace(_Namespace):
             title: New title for the question.
             language: New programming language.
             description: New description.
-            contents: New contents.
+            contents: New contents. Cannot be combined with
+                ``file_contents``.
             solution: New solution.
+            file_contents: Files for a multi-file question.
+                Cannot be combined with ``contents`` or
+                ``zip_file``.
+            zip_file: Path to a zip archive containing
+                files for a multi-file question. Cannot be
+                combined with ``file_contents``.
         """
         data: dict[str, str] = {}
         if title is not None:
@@ -393,10 +438,30 @@ class QuestionsNamespace(_Namespace):
             data["contents"] = contents
         if solution is not None:
             data["solution"] = solution
+        if file_contents is not None:
+            data["file_contents"] = json.dumps(
+                obj=[
+                    {
+                        "path": fc.path,
+                        "contents": fc.contents,
+                    }
+                    for fc in file_contents
+                ],
+            )
+        files: dict[str, tuple[str, bytes, str]] | None = None
+        if zip_file is not None:
+            files = {
+                "zip_file": (
+                    zip_file.name,
+                    zip_file.read_bytes(),
+                    "application/zip",
+                ),
+            }
         self._request(
             method="PUT",
             url=f"/api/questions/{question_id}",
             data=data,
+            files=files,
         )
 
     def delete(
