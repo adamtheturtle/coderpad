@@ -1,7 +1,5 @@
 """Transport abstractions for the CoderPad Interview API."""
 
-from __future__ import annotations
-
 import json as json_module
 from dataclasses import dataclass
 from http import HTTPStatus
