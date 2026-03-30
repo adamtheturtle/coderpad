@@ -1,6 +1,7 @@
 """Tests for the CoderPad client."""
 
 from http import HTTPStatus
+from pathlib import Path
 
 import pytest
 
@@ -20,7 +21,7 @@ from coderpad_api.transports import (
     Transport,
     TransportResponse,
 )
-from coderpad_api.types import SortOrder
+from coderpad_api.types import QuestionFileContent, SortOrder
 
 
 class TestCoderPadClient:
@@ -90,6 +91,7 @@ class TestCoderPadClient:
                 headers: dict[str, str],
                 params: dict[str, str | int] | None = None,
                 data: dict[str, str] | None = None,
+                files: (dict[str, tuple[str, bytes, str]] | None) = None,
             ) -> TransportResponse:  # pragma: no cover
                 """Make a request."""
                 raise NotImplementedError
@@ -328,9 +330,10 @@ class TestExceptionHierarchy:
             headers: dict[str, str],
             params: dict[str, str | int] | None = None,
             data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
         ) -> TransportResponse:
             """Return a 404 response."""
-            del method, url, headers, params, data
+            del method, url, headers, params, data, files
             return TransportResponse(
                 status_code=HTTPStatus.NOT_FOUND,
                 headers={},
@@ -555,6 +558,42 @@ class TestCreateQuestion:
         )
         assert result.id
 
+    @staticmethod
+    def test_create_question_with_file_contents(
+        coderpad_client: CoderPadClient,
+    ) -> None:
+        """A question can be created with file contents."""
+        result = coderpad_client.questions.create(
+            title="Multi-file Question",
+            language="multifile_python",
+            file_contents=[
+                QuestionFileContent(
+                    path="main.py",
+                    contents="print('hello')",
+                ),
+                QuestionFileContent(
+                    path="lib/utils.py",
+                    contents="def helper(): pass",
+                ),
+            ],
+        )
+        assert result.id
+
+    @staticmethod
+    def test_create_question_with_zip_file(
+        coderpad_client: CoderPadClient,
+        tmp_path: Path,
+    ) -> None:
+        """A question can be created with a zip file."""
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(b"PK\x03\x04fake-zip")
+        result = coderpad_client.questions.create(
+            title="Zip Question",
+            language="multifile_java",
+            zip_file=zip_path,
+        )
+        assert result.id
+
 
 class TestGetQuestion:
     """Tests for ``CoderPadClient.questions.get``."""
@@ -605,6 +644,34 @@ class TestUpdateQuestion:
             description="New desc",
             contents="puts 'hi'",
             solution="puts 'answer'",
+        )
+
+    @staticmethod
+    def test_update_question_with_file_contents(
+        coderpad_client: CoderPadClient,
+    ) -> None:
+        """A question can be updated with file contents."""
+        coderpad_client.questions.update(
+            question_id="123",
+            file_contents=[
+                QuestionFileContent(
+                    path="main.py",
+                    contents="print('updated')",
+                ),
+            ],
+        )
+
+    @staticmethod
+    def test_update_question_with_zip_file(
+        coderpad_client: CoderPadClient,
+        tmp_path: Path,
+    ) -> None:
+        """A question can be updated with a zip file."""
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(b"PK\x03\x04fake-zip")
+        coderpad_client.questions.update(
+            question_id="123",
+            zip_file=zip_path,
         )
 
 
