@@ -397,6 +397,52 @@ class TestAsyncCreateQuestion:
         )
         assert result.id
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_create_file_contents_with_contents_error() -> None:
+        """Combining file_contents with contents raises ValueError."""
+        client = AsyncCoderPadClient(api_key="test-key")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'contents'",
+        ):
+            await client.questions.create(
+                title="Test",
+                language="python",
+                contents="print('hi')",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+            )
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_create_file_contents_with_zip_file_error(
+        tmp_path: Path,
+    ) -> None:
+        """Combining file_contents with zip_file raises ValueError."""
+        client = AsyncCoderPadClient(api_key="test-key")
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'zip_file'",
+        ):
+            await client.questions.create(
+                title="Test",
+                language="python",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+                zip_file=zip_path,
+            )
+
 
 class TestAsyncGetQuestion:
     """Tests for ``AsyncCoderPadClient.questions.get``."""
@@ -482,6 +528,50 @@ class TestAsyncUpdateQuestion:
             question_id="123",
             zip_file=zip_path,
         )
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_update_file_contents_with_contents_error() -> None:
+        """Combining file_contents with contents raises ValueError."""
+        client = AsyncCoderPadClient(api_key="test-key")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'contents'",
+        ):
+            await client.questions.update(
+                question_id="123",
+                contents="print('hi')",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+            )
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_update_file_contents_with_zip_file_error(
+        tmp_path: Path,
+    ) -> None:
+        """Combining file_contents with zip_file raises ValueError."""
+        client = AsyncCoderPadClient(api_key="test-key")
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'zip_file'",
+        ):
+            await client.questions.update(
+                question_id="123",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+                zip_file=zip_path,
+            )
 
 
 class TestAsyncDeleteQuestion:

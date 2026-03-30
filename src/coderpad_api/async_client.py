@@ -341,6 +341,12 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         Returns:
             The created question.
         """
+        if file_contents is not None and contents is not None:
+            msg = "Cannot combine 'file_contents' with 'contents'."
+            raise ValueError(msg)
+        if file_contents is not None and zip_file is not None:
+            msg = "Cannot combine 'file_contents' with 'zip_file'."
+            raise ValueError(msg)
         data: dict[str, str] = {
             "title": title,
             "language": language,
@@ -430,6 +436,12 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
                 files for a multi-file question. Cannot be
                 combined with ``file_contents``.
         """
+        if file_contents is not None and contents is not None:
+            msg = "Cannot combine 'file_contents' with 'contents'."
+            raise ValueError(msg)
+        if file_contents is not None and zip_file is not None:
+            msg = "Cannot combine 'file_contents' with 'zip_file'."
+            raise ValueError(msg)
         data: dict[str, str] = {}
         if title is not None:
             data["title"] = title

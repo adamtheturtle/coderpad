@@ -594,6 +594,50 @@ class TestCreateQuestion:
         )
         assert result.id
 
+    @staticmethod
+    def test_create_file_contents_with_contents_error() -> None:
+        """Combining file_contents with contents raises ValueError."""
+        client = CoderPadClient(api_key="test-key")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'contents'",
+        ):
+            client.questions.create(
+                title="Test",
+                language="python",
+                contents="print('hi')",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+            )
+
+    @staticmethod
+    def test_create_file_contents_with_zip_file_error(
+        tmp_path: Path,
+    ) -> None:
+        """Combining file_contents with zip_file raises ValueError."""
+        client = CoderPadClient(api_key="test-key")
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'zip_file'",
+        ):
+            client.questions.create(
+                title="Test",
+                language="python",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+                zip_file=zip_path,
+            )
+
 
 class TestGetQuestion:
     """Tests for ``CoderPadClient.questions.get``."""
@@ -673,6 +717,48 @@ class TestUpdateQuestion:
             question_id="123",
             zip_file=zip_path,
         )
+
+    @staticmethod
+    def test_update_file_contents_with_contents_error() -> None:
+        """Combining file_contents with contents raises ValueError."""
+        client = CoderPadClient(api_key="test-key")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'contents'",
+        ):
+            client.questions.update(
+                question_id="123",
+                contents="print('hi')",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+            )
+
+    @staticmethod
+    def test_update_file_contents_with_zip_file_error(
+        tmp_path: Path,
+    ) -> None:
+        """Combining file_contents with zip_file raises ValueError."""
+        client = CoderPadClient(api_key="test-key")
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="Cannot combine 'file_contents' with 'zip_file'",
+        ):
+            client.questions.update(
+                question_id="123",
+                file_contents=[
+                    QuestionFileContent(
+                        path="main.py",
+                        contents="print('hi')",
+                    ),
+                ],
+                zip_file=zip_path,
+            )
 
 
 class TestDeleteQuestion:
