@@ -389,7 +389,7 @@ class TestAsyncCreateQuestion:
     ) -> None:
         """A question can be created with a zip file."""
         zip_path = tmp_path / "project.zip"
-        zip_path.write_bytes(b"PK\x03\x04fake-zip")
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
         result = await async_coderpad_client.questions.create(
             title="Zip Question",
             language="multifile_java",
@@ -477,7 +477,7 @@ class TestAsyncUpdateQuestion:
     ) -> None:
         """A question can be updated with a zip file."""
         zip_path = tmp_path / "project.zip"
-        zip_path.write_bytes(b"PK\x03\x04fake-zip")
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
         await async_coderpad_client.questions.update(
             question_id="123",
             zip_file=zip_path,
