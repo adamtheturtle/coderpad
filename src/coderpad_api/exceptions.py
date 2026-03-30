@@ -1,12 +1,9 @@
 """Custom exception hierarchy for the CoderPad API."""
 
-from __future__ import annotations
-
 from http import HTTPStatus
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
-if TYPE_CHECKING:
-    from coderpad_api.transports import TransportResponse
+from coderpad_api.transports import TransportResponse
 
 
 class CoderPadError(Exception):
@@ -18,7 +15,7 @@ class CoderPadError(Exception):
         content: The response body.
     """
 
-    _registry: ClassVar[dict[int, type[CoderPadError]]] = {}
+    _registry: ClassVar[dict[int, type["CoderPadError"]]] = {}
 
     def __init_subclass__(
         cls,
@@ -56,7 +53,7 @@ class CoderPadError(Exception):
         cls,
         *,
         response: TransportResponse,
-    ) -> CoderPadError:
+    ) -> "CoderPadError":
         """Create the appropriate exception for a response.
 
         Uses the registry to find a specific exception class

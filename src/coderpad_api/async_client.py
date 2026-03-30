@@ -1,7 +1,5 @@
 """Async CoderPad Interview API client."""
 
-from __future__ import annotations
-
 from http import HTTPStatus
 from typing import Self
 
