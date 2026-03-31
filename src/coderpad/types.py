@@ -63,7 +63,7 @@ class SortOrder(enum.Enum):
 class Language(enum.Enum):
     """Programming language for pads and questions.
 
-    Single-file languages use a simple editor. Multifile and
+    Single-file languages use a simple editor. Multi-file and
     framework languages support ``file_contents`` and
     ``zip_file`` uploads.
     """
@@ -111,7 +111,7 @@ class Language(enum.Enum):
     VB = "vb"
     VERILOG = "verilog"
 
-    # Multifile / framework languages
+    # Multi-file / framework languages
     ANGULAR = "angular"
     DJANGO = "django"
     GIN = "gin"
