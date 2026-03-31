@@ -665,7 +665,7 @@ class AsyncCoderPad:
         self,
         *,
         api_key: str,
-        base_url: str = ("https://api.interview.coderpad.io"),
+        base_url: str = ("https://app.coderpad.io"),
         transport: AsyncTransport | None = None,
     ) -> None:
         """Create a new async CoderPad client.

@@ -10,7 +10,7 @@ from openapi_mock import add_openapi_to_respx
 from coderpad.async_client import AsyncCoderPad
 from coderpad.client import CoderPad
 
-_BASE_URL = "https://api.interview.coderpad.io"
+_BASE_URL = "https://app.coderpad.io"
 
 
 @pytest.fixture(name="openapi_spec")

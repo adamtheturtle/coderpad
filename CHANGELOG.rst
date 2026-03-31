@@ -5,6 +5,7 @@ Next
 ----
 
 - Removed support for Python 3.11.
+- Changed default ``base_url`` from ``https://api.interview.coderpad.io`` to ``https://app.coderpad.io``.
 
 2026.03.31.1
 ------------
