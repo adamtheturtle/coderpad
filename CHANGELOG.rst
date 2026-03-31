@@ -4,6 +4,8 @@ Changelog
 Next
 ----
 
+- Removed support for Python 3.11.
+
 2026.03.31.1
 ------------
 
