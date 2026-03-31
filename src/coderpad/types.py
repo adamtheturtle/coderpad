@@ -60,6 +60,87 @@ class SortOrder(enum.Enum):
     UPDATED_AT_DESC = "updated_at,desc"
 
 
+class Language(enum.Enum):
+    """Programming language for pads and questions.
+
+    Single-file languages use a simple editor. Multifile and
+    framework languages support ``file_contents`` and
+    ``zip_file`` uploads.
+    """
+
+    # Single-file languages
+    BASH = "bash"
+    C = "c"
+    CLOJURE = "clojure"
+    COFFEESCRIPT = "coffeescript"
+    CPP = "cpp"
+    CSHARP = "csharp"
+    DART = "dart"
+    ELIXIR = "elixir"
+    ERLANG = "erlang"
+    FSHARP = "fsharp"
+    GO = "go"
+    GSHEETS = "gsheets"
+    HACK = "hack"
+    HASKELL = "haskell"
+    HTML = "html"
+    JAVA = "java"
+    JAVASCRIPT = "javascript"
+    JULIA = "julia"
+    KOTLIN = "kotlin"
+    LUA = "lua"
+    MARKDOWN = "markdown"
+    MYSQL = "mysql"
+    OBJC = "objc"
+    OCAML = "ocaml"
+    PERL = "perl"
+    PHP = "php"
+    PLAINTEXT = "plaintext"
+    POSTGRESQL = "postgresql"
+    POWERSHELL = "powershell"
+    PYTHON = "python"
+    PYTHON3 = "python3"
+    R = "r"
+    RUBY = "ruby"
+    RUST = "rust"
+    SCALA = "scala"
+    SOLIDITY = "solidity"
+    SWIFT = "swift"
+    TCL = "tcl"
+    TYPESCRIPT = "typescript"
+    VB = "vb"
+    VERILOG = "verilog"
+
+    # Multifile / framework languages
+    ANGULAR = "angular"
+    DJANGO = "django"
+    GIN = "gin"
+    KUBERNETES = "kubernetes"
+    MULTIFILE_C = "multifile_c"
+    MULTIFILE_CPP = "multifile_cpp"
+    MULTIFILE_CSHARP = "multifile_csharp"
+    MULTIFILE_GO = "multifile_go"
+    MULTIFILE_JAVA = "multifile_java"
+    MULTIFILE_KOTLIN = "multifile_kotlin"
+    MULTIFILE_PHP = "multifile_php"
+    MULTIFILE_PYTHON = "multifile_python"
+    MULTIFILE_RUBY = "multifile_ruby"
+    MULTIFILE_RUST = "multifile_rust"
+    MULTIFILE_SCALA = "multifile_scala"
+    MULTIFILE_SWIFT = "multifile_swift"
+    MULTIFILE_TERRAFORM = "multifile_terraform"
+    MULTIFILE_TYPESCRIPT = "multifile_typescript"
+    NEXTJS = "nextjs"
+    NODEJS = "nodejs"
+    RAILS = "rails"
+    REACT = "react"
+    REACT_NATIVE_WEB = "react-native-web"
+    SPRING = "spring"
+    SVELTE = "svelte"
+    UNIVERSAL = "universal"
+    VUE = "vue"
+
+
 @beartype
 @dataclass(frozen=True, kw_only=True)
 class Team:

@@ -15,6 +15,7 @@ from coderpad.transports import (
     TransportResponse,
 )
 from coderpad.types import (
+    Language,
     Organization,
     OrganizationStats,
     Pad,
@@ -128,7 +129,7 @@ class PadsNamespace(_Namespace):
         self,
         *,
         title: str | None = None,
-        language: str | None = None,
+        language: Language | str | None = None,
         contents: str | None = None,
         notes: str | None = None,
     ) -> Pad:
@@ -147,7 +148,10 @@ class PadsNamespace(_Namespace):
         if title is not None:
             data["title"] = title
         if language is not None:
-            data["language"] = language
+            lang = (
+                language.value if isinstance(language, Language) else language
+            )
+            data["language"] = lang
         if contents is not None:
             data["contents"] = contents
         if notes is not None:
@@ -179,7 +183,7 @@ class PadsNamespace(_Namespace):
         *,
         pad_id: str,
         title: str | None = None,
-        language: str | None = None,
+        language: Language | str | None = None,
         contents: str | None = None,
         notes: str | None = None,
         ended: bool | None = None,
@@ -200,7 +204,10 @@ class PadsNamespace(_Namespace):
         if title is not None:
             data["title"] = title
         if language is not None:
-            data["language"] = language
+            lang = (
+                language.value if isinstance(language, Language) else language
+            )
+            data["language"] = lang
         if contents is not None:
             data["contents"] = contents
         if notes is not None:
@@ -311,7 +318,7 @@ class QuestionsNamespace(_Namespace):
         self,
         *,
         title: str,
-        language: str,
+        language: Language | str,
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
@@ -338,18 +345,19 @@ class QuestionsNamespace(_Namespace):
         Returns:
             The created question.
         """
+        lang = language.value if isinstance(language, Language) else language
         data: dict[str, str] = {
-            "title": title,
-            "language": language,
+            "question[title]": title,
+            "question[language]": lang,
         }
         if description is not None:
-            data["description"] = description
+            data["question[description]"] = description
         if contents is not None:
-            data["contents"] = contents
+            data["question[contents]"] = contents
         if solution is not None:
-            data["solution"] = solution
+            data["question[solution]"] = solution
         if file_contents is not None:
-            data["file_contents"] = json.dumps(
+            data["question[file_contents]"] = json.dumps(
                 obj=[
                     {
                         "path": fc.path,
@@ -361,7 +369,7 @@ class QuestionsNamespace(_Namespace):
         files: dict[str, tuple[str, bytes, str]] | None = None
         if zip_file is not None:
             files = {
-                "zip_file": (
+                "question[zip_file]": (
                     zip_file.name,
                     zip_file.read_bytes(),
                     "application/zip",
@@ -403,7 +411,7 @@ class QuestionsNamespace(_Namespace):
         *,
         question_id: str,
         title: str | None = None,
-        language: str | None = None,
+        language: Language | str | None = None,
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
@@ -429,17 +437,20 @@ class QuestionsNamespace(_Namespace):
         """
         data: dict[str, str] = {}
         if title is not None:
-            data["title"] = title
+            data["question[title]"] = title
         if language is not None:
-            data["language"] = language
+            lang = (
+                language.value if isinstance(language, Language) else language
+            )
+            data["question[language]"] = lang
         if description is not None:
-            data["description"] = description
+            data["question[description]"] = description
         if contents is not None:
-            data["contents"] = contents
+            data["question[contents]"] = contents
         if solution is not None:
-            data["solution"] = solution
+            data["question[solution]"] = solution
         if file_contents is not None:
-            data["file_contents"] = json.dumps(
+            data["question[file_contents]"] = json.dumps(
                 obj=[
                     {
                         "path": fc.path,
@@ -451,7 +462,7 @@ class QuestionsNamespace(_Namespace):
         files: dict[str, tuple[str, bytes, str]] | None = None
         if zip_file is not None:
             files = {
-                "zip_file": (
+                "question[zip_file]": (
                     zip_file.name,
                     zip_file.read_bytes(),
                     "application/zip",
@@ -667,7 +678,7 @@ class CoderPad:
         """
         self.base_url = base_url
         resolved_transport = transport or HTTPXTransport()
-        headers = {"Authorization": f"Bearer {api_key}"}
+        headers = {"Authorization": f'Token token="{api_key}"'}
         self.pads: PadsNamespace = PadsNamespace(
             transport=resolved_transport,
             base_url=base_url,

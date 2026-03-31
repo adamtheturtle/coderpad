@@ -12,7 +12,7 @@ from coderpad.transports import (
     AsyncTransport,
     TransportResponse,
 )
-from coderpad.types import QuestionFileContent, SortOrder
+from coderpad.types import Language, QuestionFileContent, SortOrder
 
 
 class TestAsyncCoderPad:
@@ -203,6 +203,18 @@ class TestAsyncCreatePad:
         result = await async_coderpad_client.pads.create()
         assert result.id
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_create_pad_with_language_enum(
+        async_coderpad_client: AsyncCoderPad,
+    ) -> None:
+        """A pad can be created with a Language enum value."""
+        result = await async_coderpad_client.pads.create(
+            title="Test Pad",
+            language=Language.PYTHON,
+        )
+        assert result.id
+
 
 class TestAsyncGetPad:
     """Tests for ``AsyncCoderPad.pads.get``."""
@@ -361,13 +373,25 @@ class TestAsyncCreateQuestion:
 
     @staticmethod
     @pytest.mark.asyncio
+    async def test_create_question_with_language_enum(
+        async_coderpad_client: AsyncCoderPad,
+    ) -> None:
+        """A question can be created with a Language enum."""
+        result = await async_coderpad_client.questions.create(
+            title="Test Question",
+            language=Language.PYTHON,
+        )
+        assert result.id
+
+    @staticmethod
+    @pytest.mark.asyncio
     async def test_create_question_with_file_contents(
         async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be created with file contents."""
         result = await async_coderpad_client.questions.create(
             title="Multi-file Question",
-            language="multifile_python",
+            language=Language.MULTIFILE_PYTHON,
             file_contents=[
                 QuestionFileContent(
                     path="main.py",
@@ -392,7 +416,7 @@ class TestAsyncCreateQuestion:
         zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
         result = await async_coderpad_client.questions.create(
             title="Zip Question",
-            language="multifile_java",
+            language=Language.MULTIFILE_JAVA,
             zip_file=zip_path,
         )
         assert result.id
