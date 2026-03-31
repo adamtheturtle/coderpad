@@ -8,13 +8,13 @@ from typing import Self
 
 from beartype import beartype
 
-from coderpad_api.exceptions import CoderPadError
-from coderpad_api.transports import (
+from coderpad.exceptions import CoderPadError
+from coderpad.transports import (
     HTTPXTransport,
     Transport,
     TransportResponse,
 )
-from coderpad_api.types import (
+from coderpad.types import (
     Organization,
     OrganizationStats,
     Pad,
@@ -647,7 +647,7 @@ class OrganizationNamespace(_Namespace):
 
 
 @beartype
-class CoderPadClient:
+class CoderPad:
     """A client for the CoderPad Interview API."""
 
     def __init__(

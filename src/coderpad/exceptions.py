@@ -3,7 +3,7 @@
 from http import HTTPStatus
 from typing import ClassVar
 
-from coderpad_api.transports import TransportResponse
+from coderpad.transports import TransportResponse
 
 
 class CoderPadError(Exception):

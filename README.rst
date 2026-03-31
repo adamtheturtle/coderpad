@@ -21,9 +21,9 @@ Getting Started
 
    """Use the CoderPad Interview API."""
 
-   from coderpad_api.client import CoderPadClient
+   from coderpad.client import CoderPad
 
-   client = CoderPadClient(api_key="your-api-key")
+   client = CoderPad(api_key="your-api-key")
    assert client.base_url == "https://api.interview.coderpad.io"
 
 Full Documentation

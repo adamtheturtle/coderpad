@@ -86,7 +86,7 @@ urls.Source = "https://github.com/adamtheturtle/coderpad-api-python"
 
 [tool.setuptools]
 zip-safe = false
-package-data.coderpad_api = [
+package-data.coderpad = [
     "py.typed",
 ]
 packages.find.where = [

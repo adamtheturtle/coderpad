@@ -1,1 +1,1 @@
-"""Tests for ``coderpad_api``."""
+"""Tests for ``coderpad``."""
