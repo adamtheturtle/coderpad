@@ -17,17 +17,14 @@ This is tested on Python |minimum-python-version|\+.
 Getting Started
 ---------------
 
-.. code-block:: python
-
-   """Use the CoderPad API."""
+.. code-block:: python3
 
    from coderpad.client import CoderPad
 
    client = CoderPad(api_key="your-api-key")
-   assert callable(client.pads.create)
-   assert callable(client.pads.list)
-   assert callable(client.pads.get)
-   assert callable(client.organization.get)
+   pad = client.pads.create(title="Interview", language="python")
+   pads = client.pads.list()
+   org = client.organization.get()
 
 Full Documentation
 ------------------
