@@ -1,14 +1,14 @@
 API Reference
 =============
 
-.. automodule:: coderpad_api.client
+.. automodule:: coderpad.client
    :undoc-members:
    :members:
 
-.. automodule:: coderpad_api.transports
+.. automodule:: coderpad.transports
    :undoc-members:
    :members:
 
-.. automodule:: coderpad_api.types
+.. automodule:: coderpad.types
    :undoc-members:
    :members:

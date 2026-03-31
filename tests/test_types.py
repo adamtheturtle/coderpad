@@ -1,6 +1,6 @@
 """Tests for the CoderPad types."""
 
-from coderpad_api._dict_types import (
+from coderpad._dict_types import (
     CandidateInstructionDict,
     CustomFileDict,
     FileContentDict,
@@ -16,7 +16,7 @@ from coderpad_api._dict_types import (
     TeamDict,
     TestCaseDict,
 )
-from coderpad_api.types import (
+from coderpad.types import (
     CandidateInstruction,
     CustomFile,
     FileContent,

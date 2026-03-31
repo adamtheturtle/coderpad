@@ -5,29 +5,29 @@ from pathlib import Path
 
 import pytest
 
-from coderpad_api.async_client import AsyncCoderPadClient
-from coderpad_api.exceptions import NotFoundError
-from coderpad_api.transports import (
+from coderpad.async_client import AsyncCoderPad
+from coderpad.exceptions import NotFoundError
+from coderpad.transports import (
     AsyncHTTPXTransport,
     AsyncTransport,
     TransportResponse,
 )
-from coderpad_api.types import QuestionFileContent, SortOrder
+from coderpad.types import QuestionFileContent, SortOrder
 
 
-class TestAsyncCoderPadClient:
-    """Tests for ``AsyncCoderPadClient``."""
+class TestAsyncCoderPad:
+    """Tests for ``AsyncCoderPad``."""
 
     @staticmethod
     def test_default_base_url() -> None:
         """The default base URL is the CoderPad Interview API."""
-        client = AsyncCoderPadClient(api_key="test-key")
+        client = AsyncCoderPad(api_key="test-key")
         assert client.base_url == "https://api.interview.coderpad.io"
 
     @staticmethod
     def test_custom_base_url() -> None:
         """A custom base URL can be provided."""
-        client = AsyncCoderPadClient(
+        client = AsyncCoderPad(
             api_key="test-key",
             base_url="https://custom.example.com",
         )
@@ -41,7 +41,7 @@ class TestAsyncCoderPadClient:
         """A custom transport can be provided."""
         del mock_coderpad_api
         transport = AsyncHTTPXTransport()
-        client = AsyncCoderPadClient(
+        client = AsyncCoderPad(
             api_key="test-key",
             transport=transport,
         )
@@ -51,7 +51,7 @@ class TestAsyncCoderPadClient:
     @staticmethod
     @pytest.mark.asyncio
     async def test_mock_api_available(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """The mock API fixture provides a working mock."""
         result = await async_coderpad_client.pads.list()
@@ -61,17 +61,17 @@ class TestAsyncCoderPadClient:
     @pytest.mark.asyncio
     async def test_aclose() -> None:
         """The client can be closed."""
-        client = AsyncCoderPadClient(api_key="test-key")
+        client = AsyncCoderPad(api_key="test-key")
         await client.aclose()
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_async_context_manager() -> None:
         """The client can be used as an async context manager."""
-        async with AsyncCoderPadClient(
+        async with AsyncCoderPad(
             api_key="test-key",
         ) as client:
-            assert isinstance(client, AsyncCoderPadClient)
+            assert isinstance(client, AsyncCoderPad)
 
     @staticmethod
     @pytest.mark.asyncio
@@ -94,7 +94,7 @@ class TestAsyncCoderPadClient:
                 """Make a request."""
                 raise NotImplementedError
 
-        client = AsyncCoderPadClient(
+        client = AsyncCoderPad(
             api_key="test-key",
             transport=_NoCloseTransport(),
         )
@@ -131,12 +131,12 @@ class TestAsyncHTTPXTransport:
 
 
 class TestAsyncListPads:
-    """Tests for ``AsyncCoderPadClient.pads.list``."""
+    """Tests for ``AsyncCoderPad.pads.list``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_pads(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Pads can be listed."""
         result = await async_coderpad_client.pads.list()
@@ -145,7 +145,7 @@ class TestAsyncListPads:
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_pads_with_sort(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Pads can be listed with a sort parameter."""
         result = await async_coderpad_client.pads.list(
@@ -156,7 +156,7 @@ class TestAsyncListPads:
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_pads_with_page(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Pads can be listed with a page parameter."""
         result = await async_coderpad_client.pads.list(
@@ -166,12 +166,12 @@ class TestAsyncListPads:
 
 
 class TestAsyncCreatePad:
-    """Tests for ``AsyncCoderPadClient.pads.create``."""
+    """Tests for ``AsyncCoderPad.pads.create``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_create_pad(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad can be created."""
         result = await async_coderpad_client.pads.create(
@@ -183,7 +183,7 @@ class TestAsyncCreatePad:
     @staticmethod
     @pytest.mark.asyncio
     async def test_create_pad_all_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad can be created with all parameters."""
         result = await async_coderpad_client.pads.create(
@@ -197,7 +197,7 @@ class TestAsyncCreatePad:
     @staticmethod
     @pytest.mark.asyncio
     async def test_create_pad_minimal(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad can be created with no parameters."""
         result = await async_coderpad_client.pads.create()
@@ -205,12 +205,12 @@ class TestAsyncCreatePad:
 
 
 class TestAsyncGetPad:
-    """Tests for ``AsyncCoderPadClient.pads.get``."""
+    """Tests for ``AsyncCoderPad.pads.get``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_pad(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad can be retrieved by id."""
         result = await async_coderpad_client.pads.get(
@@ -220,12 +220,12 @@ class TestAsyncGetPad:
 
 
 class TestAsyncUpdatePad:
-    """Tests for ``AsyncCoderPadClient.pads.update``."""
+    """Tests for ``AsyncCoderPad.pads.update``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_pad(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad can be updated."""
         await async_coderpad_client.pads.update(
@@ -236,7 +236,7 @@ class TestAsyncUpdatePad:
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_pad_no_title(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad can be updated without a title."""
         await async_coderpad_client.pads.update(
@@ -247,7 +247,7 @@ class TestAsyncUpdatePad:
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_pad_all_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad can be updated with all parameters."""
         await async_coderpad_client.pads.update(
@@ -262,12 +262,12 @@ class TestAsyncUpdatePad:
 
 
 class TestAsyncGetPadEvents:
-    """Tests for ``AsyncCoderPadClient.pads.get_events``."""
+    """Tests for ``AsyncCoderPad.pads.get_events``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_pad_events(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Pad events can be retrieved."""
         result = await async_coderpad_client.pads.get_events(
@@ -278,7 +278,7 @@ class TestAsyncGetPadEvents:
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_pad_events_with_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Pad events can be retrieved with sort and page."""
         result = await async_coderpad_client.pads.get_events(
@@ -290,12 +290,12 @@ class TestAsyncGetPadEvents:
 
 
 class TestAsyncGetPadEnvironment:
-    """Tests for ``AsyncCoderPadClient.pads.get_environment``."""
+    """Tests for ``AsyncCoderPad.pads.get_environment``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_pad_environment(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A pad environment can be retrieved."""
         result = await async_coderpad_client.pads.get_environment(
@@ -305,12 +305,12 @@ class TestAsyncGetPadEnvironment:
 
 
 class TestAsyncListQuestions:
-    """Tests for ``AsyncCoderPadClient.questions.list``."""
+    """Tests for ``AsyncCoderPad.questions.list``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_questions(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Questions can be listed."""
         result = await async_coderpad_client.questions.list()
@@ -319,7 +319,7 @@ class TestAsyncListQuestions:
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_questions_with_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Questions can be listed with sort and page."""
         result = await async_coderpad_client.questions.list(
@@ -330,12 +330,12 @@ class TestAsyncListQuestions:
 
 
 class TestAsyncCreateQuestion:
-    """Tests for ``AsyncCoderPadClient.questions.create``."""
+    """Tests for ``AsyncCoderPad.questions.create``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_create_question(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be created."""
         result = await async_coderpad_client.questions.create(
@@ -347,7 +347,7 @@ class TestAsyncCreateQuestion:
     @staticmethod
     @pytest.mark.asyncio
     async def test_create_question_all_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be created with all parameters."""
         result = await async_coderpad_client.questions.create(
@@ -362,7 +362,7 @@ class TestAsyncCreateQuestion:
     @staticmethod
     @pytest.mark.asyncio
     async def test_create_question_with_file_contents(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be created with file contents."""
         result = await async_coderpad_client.questions.create(
@@ -384,7 +384,7 @@ class TestAsyncCreateQuestion:
     @staticmethod
     @pytest.mark.asyncio
     async def test_create_question_with_zip_file(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
         tmp_path: Path,
     ) -> None:
         """A question can be created with a zip file."""
@@ -399,12 +399,12 @@ class TestAsyncCreateQuestion:
 
 
 class TestAsyncGetQuestion:
-    """Tests for ``AsyncCoderPadClient.questions.get``."""
+    """Tests for ``AsyncCoderPad.questions.get``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_question(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be retrieved by id."""
         result = await async_coderpad_client.questions.get(
@@ -414,12 +414,12 @@ class TestAsyncGetQuestion:
 
 
 class TestAsyncUpdateQuestion:
-    """Tests for ``AsyncCoderPadClient.questions.update``."""
+    """Tests for ``AsyncCoderPad.questions.update``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_question(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be updated."""
         await async_coderpad_client.questions.update(
@@ -430,7 +430,7 @@ class TestAsyncUpdateQuestion:
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_question_no_title(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be updated without a title."""
         await async_coderpad_client.questions.update(
@@ -441,7 +441,7 @@ class TestAsyncUpdateQuestion:
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_question_all_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be updated with all params."""
         await async_coderpad_client.questions.update(
@@ -456,7 +456,7 @@ class TestAsyncUpdateQuestion:
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_question_with_file_contents(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be updated with file contents."""
         await async_coderpad_client.questions.update(
@@ -472,7 +472,7 @@ class TestAsyncUpdateQuestion:
     @staticmethod
     @pytest.mark.asyncio
     async def test_update_question_with_zip_file(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
         tmp_path: Path,
     ) -> None:
         """A question can be updated with a zip file."""
@@ -485,12 +485,12 @@ class TestAsyncUpdateQuestion:
 
 
 class TestAsyncDeleteQuestion:
-    """Tests for ``AsyncCoderPadClient.questions.delete``."""
+    """Tests for ``AsyncCoderPad.questions.delete``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_delete_question(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """A question can be deleted."""
         await async_coderpad_client.questions.delete(
@@ -499,12 +499,12 @@ class TestAsyncDeleteQuestion:
 
 
 class TestAsyncGetQuota:
-    """Tests for ``AsyncCoderPadClient.organization.get_quota``."""
+    """Tests for ``AsyncCoderPad.organization.get_quota``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_quota(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Quota information can be retrieved."""
         result = await async_coderpad_client.organization.get_quota()
@@ -512,12 +512,12 @@ class TestAsyncGetQuota:
 
 
 class TestAsyncGetOrganization:
-    """Tests for ``AsyncCoderPadClient.organization.get``."""
+    """Tests for ``AsyncCoderPad.organization.get``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_organization(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Organization information can be retrieved."""
         result = await async_coderpad_client.organization.get()
@@ -525,12 +525,12 @@ class TestAsyncGetOrganization:
 
 
 class TestAsyncGetOrganizationStats:
-    """Tests for ``AsyncCoderPadClient.organization.get_stats``."""
+    """Tests for ``AsyncCoderPad.organization.get_stats``."""
 
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_organization_stats(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Organization stats can be retrieved."""
         result = await async_coderpad_client.organization.get_stats()
@@ -539,7 +539,7 @@ class TestAsyncGetOrganizationStats:
     @staticmethod
     @pytest.mark.asyncio
     async def test_get_organization_stats_with_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Organization stats can be filtered by time."""
         result = await async_coderpad_client.organization.get_stats(
@@ -555,7 +555,7 @@ class TestAsyncListOrganizationPads:
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_organization_pads(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Organization pads can be listed."""
         result = await async_coderpad_client.organization.pads.list()
@@ -564,7 +564,7 @@ class TestAsyncListOrganizationPads:
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_organization_pads_with_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Organization pads can be listed with optional arguments."""
         result = await async_coderpad_client.organization.pads.list(
@@ -580,7 +580,7 @@ class TestAsyncListOrganizationQuestions:
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_organization_questions(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Organization questions can be listed."""
         result = await async_coderpad_client.organization.questions.list()
@@ -589,7 +589,7 @@ class TestAsyncListOrganizationQuestions:
     @staticmethod
     @pytest.mark.asyncio
     async def test_list_org_questions_with_params(
-        async_coderpad_client: AsyncCoderPadClient,
+        async_coderpad_client: AsyncCoderPad,
     ) -> None:
         """Organization questions can be listed with optional
         arguments.
@@ -626,7 +626,7 @@ class TestAsyncExceptionHandling:
                 content=b"Not Found",
             )
 
-        client = AsyncCoderPadClient(
+        client = AsyncCoderPad(
             api_key="test-key",
             transport=_error_transport,
         )

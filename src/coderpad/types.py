@@ -7,7 +7,7 @@ from typing import Self, TypeVar
 
 from beartype import beartype
 
-from coderpad_api._dict_types import (
+from coderpad._dict_types import (
     CandidateInstructionDict,
     CustomFileDict,
     FileContentDict,

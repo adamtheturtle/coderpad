@@ -8,8 +8,8 @@ import pytest
 import respx
 from openapi_mock import add_openapi_to_respx
 
-from coderpad_api.async_client import AsyncCoderPadClient
-from coderpad_api.client import CoderPadClient
+from coderpad.async_client import AsyncCoderPad
+from coderpad.client import CoderPad
 
 _OPENAPI_SPEC_PATH = Path(__file__).parent.parent / "openapi.json"
 _BASE_URL = "https://api.interview.coderpad.io"
@@ -43,12 +43,12 @@ def fixture_mock_coderpad_api(
 @pytest.fixture(name="coderpad_client")
 def fixture_coderpad_client(
     mock_coderpad_api: respx.MockRouter,
-) -> CoderPadClient:
+) -> CoderPad:
     """Provide a CoderPad client configured against the mock API."""
     # We reference mock_coderpad_api to ensure the mock
     # is active.
     del mock_coderpad_api
-    return CoderPadClient(
+    return CoderPad(
         api_key="test-key",
         base_url=_BASE_URL,
     )
@@ -57,10 +57,10 @@ def fixture_coderpad_client(
 @pytest.fixture(name="async_coderpad_client")
 def fixture_async_coderpad_client(
     mock_coderpad_api: respx.MockRouter,
-) -> AsyncCoderPadClient:
+) -> AsyncCoderPad:
     """Provide an async CoderPad client against the mock API."""
     del mock_coderpad_api
-    return AsyncCoderPadClient(
+    return AsyncCoderPad(
         api_key="test-key",
         base_url=_BASE_URL,
     )

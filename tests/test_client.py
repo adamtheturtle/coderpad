@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from coderpad_api.client import CoderPadClient
-from coderpad_api.exceptions import (
+from coderpad.client import CoderPad
+from coderpad.exceptions import (
     AuthenticationError,
     BadRequestError,
     CoderPadError,
@@ -15,28 +15,28 @@ from coderpad_api.exceptions import (
     RateLimitError,
     ServerError,
 )
-from coderpad_api.transports import (
+from coderpad.transports import (
     HTTPStatusError,
     HTTPXTransport,
     Transport,
     TransportResponse,
 )
-from coderpad_api.types import QuestionFileContent, SortOrder
+from coderpad.types import QuestionFileContent, SortOrder
 
 
-class TestCoderPadClient:
-    """Tests for ``CoderPadClient``."""
+class TestCoderPad:
+    """Tests for ``CoderPad``."""
 
     @staticmethod
     def test_default_base_url() -> None:
         """The default base URL is the CoderPad Interview API."""
-        client = CoderPadClient(api_key="test-key")
+        client = CoderPad(api_key="test-key")
         assert client.base_url == "https://api.interview.coderpad.io"
 
     @staticmethod
     def test_custom_base_url() -> None:
         """A custom base URL can be provided."""
-        client = CoderPadClient(
+        client = CoderPad(
             api_key="test-key",
             base_url="https://custom.example.com",
         )
@@ -49,7 +49,7 @@ class TestCoderPadClient:
         """A custom transport can be provided."""
         del mock_coderpad_api
         transport = HTTPXTransport()
-        client = CoderPadClient(
+        client = CoderPad(
             api_key="test-key",
             transport=transport,
         )
@@ -58,7 +58,7 @@ class TestCoderPadClient:
 
     @staticmethod
     def test_mock_api_available(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """The mock API fixture provides a working mock router."""
         result = coderpad_client.pads.list()
@@ -67,14 +67,14 @@ class TestCoderPadClient:
     @staticmethod
     def test_close() -> None:
         """The client can be closed."""
-        client = CoderPadClient(api_key="test-key")
+        client = CoderPad(api_key="test-key")
         client.close()
 
     @staticmethod
     def test_context_manager() -> None:
         """The client can be used as a context manager."""
-        with CoderPadClient(api_key="test-key") as client:
-            assert isinstance(client, CoderPadClient)
+        with CoderPad(api_key="test-key") as client:
+            assert isinstance(client, CoderPad)
 
     @staticmethod
     def test_close_transport_without_close() -> None:
@@ -96,7 +96,7 @@ class TestCoderPadClient:
                 """Make a request."""
                 raise NotImplementedError
 
-        client = CoderPadClient(
+        client = CoderPad(
             api_key="test-key",
             transport=_NoCloseTransport(),
         )
@@ -340,7 +340,7 @@ class TestExceptionHierarchy:
                 content=b"Not Found",
             )
 
-        client = CoderPadClient(
+        client = CoderPad(
             api_key="test-key",
             transport=_error_transport,
         )
@@ -349,11 +349,11 @@ class TestExceptionHierarchy:
 
 
 class TestListPads:
-    """Tests for ``CoderPadClient.pads.list``."""
+    """Tests for ``CoderPad.pads.list``."""
 
     @staticmethod
     def test_list_pads(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Pads can be listed."""
         result = coderpad_client.pads.list()
@@ -361,7 +361,7 @@ class TestListPads:
 
     @staticmethod
     def test_list_pads_with_sort(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Pads can be listed with a sort parameter."""
         result = coderpad_client.pads.list(
@@ -371,7 +371,7 @@ class TestListPads:
 
     @staticmethod
     def test_list_pads_with_page(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Pads can be listed with a page parameter."""
         result = coderpad_client.pads.list(page=2)
@@ -379,11 +379,11 @@ class TestListPads:
 
 
 class TestCreatePad:
-    """Tests for ``CoderPadClient.pads.create``."""
+    """Tests for ``CoderPad.pads.create``."""
 
     @staticmethod
     def test_create_pad(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad can be created."""
         result = coderpad_client.pads.create(
@@ -394,7 +394,7 @@ class TestCreatePad:
 
     @staticmethod
     def test_create_pad_all_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad can be created with all parameters."""
         result = coderpad_client.pads.create(
@@ -407,7 +407,7 @@ class TestCreatePad:
 
     @staticmethod
     def test_create_pad_minimal(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad can be created with no parameters."""
         result = coderpad_client.pads.create()
@@ -415,11 +415,11 @@ class TestCreatePad:
 
 
 class TestGetPad:
-    """Tests for ``CoderPadClient.pads.get``."""
+    """Tests for ``CoderPad.pads.get``."""
 
     @staticmethod
     def test_get_pad(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad can be retrieved by id."""
         result = coderpad_client.pads.get(
@@ -429,11 +429,11 @@ class TestGetPad:
 
 
 class TestUpdatePad:
-    """Tests for ``CoderPadClient.pads.update``."""
+    """Tests for ``CoderPad.pads.update``."""
 
     @staticmethod
     def test_update_pad(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad can be updated."""
         coderpad_client.pads.update(
@@ -443,7 +443,7 @@ class TestUpdatePad:
 
     @staticmethod
     def test_update_pad_no_title(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad can be updated without a title."""
         coderpad_client.pads.update(
@@ -453,7 +453,7 @@ class TestUpdatePad:
 
     @staticmethod
     def test_update_pad_all_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad can be updated with all parameters."""
         coderpad_client.pads.update(
@@ -468,11 +468,11 @@ class TestUpdatePad:
 
 
 class TestGetPadEvents:
-    """Tests for ``CoderPadClient.pads.get_events``."""
+    """Tests for ``CoderPad.pads.get_events``."""
 
     @staticmethod
     def test_get_pad_events(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Pad events can be retrieved."""
         result = coderpad_client.pads.get_events(
@@ -482,7 +482,7 @@ class TestGetPadEvents:
 
     @staticmethod
     def test_get_pad_events_with_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Pad events can be retrieved with sort and page."""
         result = coderpad_client.pads.get_events(
@@ -494,11 +494,11 @@ class TestGetPadEvents:
 
 
 class TestGetPadEnvironment:
-    """Tests for ``CoderPadClient.pads.get_environment``."""
+    """Tests for ``CoderPad.pads.get_environment``."""
 
     @staticmethod
     def test_get_pad_environment(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A pad environment can be retrieved."""
         result = coderpad_client.pads.get_environment(
@@ -508,11 +508,11 @@ class TestGetPadEnvironment:
 
 
 class TestListQuestions:
-    """Tests for ``CoderPadClient.questions.list``."""
+    """Tests for ``CoderPad.questions.list``."""
 
     @staticmethod
     def test_list_questions(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Questions can be listed."""
         result = coderpad_client.questions.list()
@@ -520,7 +520,7 @@ class TestListQuestions:
 
     @staticmethod
     def test_list_questions_with_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Questions can be listed with sort and page."""
         result = coderpad_client.questions.list(
@@ -531,11 +531,11 @@ class TestListQuestions:
 
 
 class TestCreateQuestion:
-    """Tests for ``CoderPadClient.questions.create``."""
+    """Tests for ``CoderPad.questions.create``."""
 
     @staticmethod
     def test_create_question(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be created."""
         result = coderpad_client.questions.create(
@@ -546,7 +546,7 @@ class TestCreateQuestion:
 
     @staticmethod
     def test_create_question_all_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be created with all parameters."""
         result = coderpad_client.questions.create(
@@ -560,7 +560,7 @@ class TestCreateQuestion:
 
     @staticmethod
     def test_create_question_with_file_contents(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be created with file contents."""
         result = coderpad_client.questions.create(
@@ -581,7 +581,7 @@ class TestCreateQuestion:
 
     @staticmethod
     def test_create_question_with_zip_file(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
         tmp_path: Path,
     ) -> None:
         """A question can be created with a zip file."""
@@ -596,11 +596,11 @@ class TestCreateQuestion:
 
 
 class TestGetQuestion:
-    """Tests for ``CoderPadClient.questions.get``."""
+    """Tests for ``CoderPad.questions.get``."""
 
     @staticmethod
     def test_get_question(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be retrieved by id."""
         result = coderpad_client.questions.get(
@@ -610,11 +610,11 @@ class TestGetQuestion:
 
 
 class TestUpdateQuestion:
-    """Tests for ``CoderPadClient.questions.update``."""
+    """Tests for ``CoderPad.questions.update``."""
 
     @staticmethod
     def test_update_question(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be updated."""
         coderpad_client.questions.update(
@@ -624,7 +624,7 @@ class TestUpdateQuestion:
 
     @staticmethod
     def test_update_question_no_title(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be updated without a title."""
         coderpad_client.questions.update(
@@ -634,7 +634,7 @@ class TestUpdateQuestion:
 
     @staticmethod
     def test_update_question_all_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be updated with all parameters."""
         coderpad_client.questions.update(
@@ -648,7 +648,7 @@ class TestUpdateQuestion:
 
     @staticmethod
     def test_update_question_with_file_contents(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be updated with file contents."""
         coderpad_client.questions.update(
@@ -663,7 +663,7 @@ class TestUpdateQuestion:
 
     @staticmethod
     def test_update_question_with_zip_file(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
         tmp_path: Path,
     ) -> None:
         """A question can be updated with a zip file."""
@@ -676,11 +676,11 @@ class TestUpdateQuestion:
 
 
 class TestDeleteQuestion:
-    """Tests for ``CoderPadClient.questions.delete``."""
+    """Tests for ``CoderPad.questions.delete``."""
 
     @staticmethod
     def test_delete_question(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """A question can be deleted."""
         coderpad_client.questions.delete(
@@ -689,11 +689,11 @@ class TestDeleteQuestion:
 
 
 class TestGetQuota:
-    """Tests for ``CoderPadClient.organization.get_quota``."""
+    """Tests for ``CoderPad.organization.get_quota``."""
 
     @staticmethod
     def test_get_quota(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Quota information can be retrieved."""
         result = coderpad_client.organization.get_quota()
@@ -701,11 +701,11 @@ class TestGetQuota:
 
 
 class TestGetOrganization:
-    """Tests for ``CoderPadClient.organization.get``."""
+    """Tests for ``CoderPad.organization.get``."""
 
     @staticmethod
     def test_get_organization(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Organization information can be retrieved."""
         result = coderpad_client.organization.get()
@@ -713,11 +713,11 @@ class TestGetOrganization:
 
 
 class TestGetOrganizationStats:
-    """Tests for ``CoderPadClient.organization.get_stats``."""
+    """Tests for ``CoderPad.organization.get_stats``."""
 
     @staticmethod
     def test_get_organization_stats(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Organization stats can be retrieved."""
         result = coderpad_client.organization.get_stats()
@@ -725,7 +725,7 @@ class TestGetOrganizationStats:
 
     @staticmethod
     def test_get_organization_stats_with_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Organization stats can be filtered by time range."""
         result = coderpad_client.organization.get_stats(
@@ -736,11 +736,11 @@ class TestGetOrganizationStats:
 
 
 class TestListOrganizationPads:
-    """Tests for ``CoderPadClient.organization.pads.list``."""
+    """Tests for ``CoderPad.organization.pads.list``."""
 
     @staticmethod
     def test_list_organization_pads(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Organization pads can be listed."""
         result = coderpad_client.organization.pads.list()
@@ -748,7 +748,7 @@ class TestListOrganizationPads:
 
     @staticmethod
     def test_list_organization_pads_with_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Organization pads can be listed with optional arguments."""
         result = coderpad_client.organization.pads.list(
@@ -759,11 +759,11 @@ class TestListOrganizationPads:
 
 
 class TestListOrganizationQuestions:
-    """Tests for ``CoderPadClient.organization.questions.list``."""
+    """Tests for ``CoderPad.organization.questions.list``."""
 
     @staticmethod
     def test_list_organization_questions(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Organization questions can be listed."""
         result = coderpad_client.organization.questions.list()
@@ -771,7 +771,7 @@ class TestListOrganizationQuestions:
 
     @staticmethod
     def test_list_organization_questions_with_params(
-        coderpad_client: CoderPadClient,
+        coderpad_client: CoderPad,
     ) -> None:
         """Organization questions can be listed with optional
         arguments.
