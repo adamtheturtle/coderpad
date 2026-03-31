@@ -29,7 +29,7 @@ Getting Started
    pads = client.pads.list()
    assert len(pads) > 0
    org = client.organization.get()
-   assert org.name
+   assert org.organization_name
 
 Full Documentation
 ------------------
