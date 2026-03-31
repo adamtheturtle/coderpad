@@ -20,9 +20,9 @@ class TestAsyncCoderPad:
 
     @staticmethod
     def test_default_base_url() -> None:
-        """The default base URL is the CoderPad Interview API."""
+        """The default base URL is the CoderPad app."""
         client = AsyncCoderPad(api_key="test-key")
-        assert client.base_url == "https://api.interview.coderpad.io"
+        assert client.base_url == "https://app.coderpad.io"
 
     @staticmethod
     def test_custom_base_url() -> None:

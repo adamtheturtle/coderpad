@@ -15,7 +15,7 @@ from sybil.parsers.rest import (
     PythonCodeBlockParser,
 )
 
-_BASE_URL = "https://api.interview.coderpad.io"
+_BASE_URL = "https://app.coderpad.io"
 
 
 @pytest.fixture(name="mock_coderpad_api")

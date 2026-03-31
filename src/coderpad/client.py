@@ -654,7 +654,7 @@ class CoderPad:
         self,
         *,
         api_key: str,
-        base_url: str = "https://api.interview.coderpad.io",
+        base_url: str = "https://app.coderpad.io",
         transport: Transport | None = None,
     ) -> None:
         """Create a new CoderPad client.
