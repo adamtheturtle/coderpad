@@ -3,7 +3,6 @@
 import json
 from collections.abc import Generator
 from doctest import ELLIPSIS
-from pathlib import Path
 
 import pytest
 import respx
@@ -16,14 +15,16 @@ from sybil.parsers.rest import (
     PythonCodeBlockParser,
 )
 
-_OPENAPI_SPEC_PATH = Path(__file__).parent / "openapi.json"
 _BASE_URL = "https://api.interview.coderpad.io"
 
 
 @pytest.fixture(name="mock_coderpad_api")
-def fixture_mock_coderpad_api() -> Generator[respx.MockRouter]:
+def fixture_mock_coderpad_api(
+    request: pytest.FixtureRequest,
+) -> Generator[respx.MockRouter]:
     """Provide a respx mock router backed by the OpenAPI spec."""
-    spec_text = _OPENAPI_SPEC_PATH.read_text(encoding="utf-8")
+    openapi_spec_path = request.config.rootpath / "openapi.json"
+    spec_text = openapi_spec_path.read_text(encoding="utf-8")
     openapi_spec: dict[str, object] = json.loads(s=spec_text)
     with respx.mock(
         base_url=_BASE_URL,
