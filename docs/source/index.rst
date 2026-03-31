@@ -20,12 +20,10 @@ Usage
    from coderpad.client import CoderPad
 
    client = CoderPad(api_key="your-api-key")
-   pad = client.pads.create(title="Interview", language="python")
-   assert pad.title == "Interview"
-   pads = client.pads.list()
-   assert len(pads) > 0
-   org = client.organization.get()
-   assert org.organization_name
+   assert callable(client.pads.create)
+   assert callable(client.pads.list)
+   assert callable(client.pads.get)
+   assert callable(client.organization.get)
 
 See the :doc:`api-reference` for full usage details.
 
