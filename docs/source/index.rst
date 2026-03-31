@@ -13,6 +13,15 @@ This is tested on Python |minimum-python-version|\+.
 Usage
 -----
 
+.. code-block:: python3
+
+   from coderpad.client import CoderPad
+
+   client = CoderPad(api_key="your-api-key")
+   pad = client.pads.create(title="Interview", language="python")
+   pads = client.pads.list()
+   org = client.organization.get()
+
 See the :doc:`api-reference` for full usage details.
 
 Reference
