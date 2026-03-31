@@ -2,7 +2,6 @@
 
 import json
 from collections.abc import Generator
-from pathlib import Path
 
 import pytest
 import respx
@@ -11,14 +10,14 @@ from openapi_mock import add_openapi_to_respx
 from coderpad.async_client import AsyncCoderPad
 from coderpad.client import CoderPad
 
-_OPENAPI_SPEC_PATH = Path(__file__).parent.parent / "openapi.json"
 _BASE_URL = "https://api.interview.coderpad.io"
 
 
 @pytest.fixture(name="openapi_spec")
-def fixture_openapi_spec() -> dict[str, object]:
+def fixture_openapi_spec(request: pytest.FixtureRequest) -> dict[str, object]:
     """Load the OpenAPI spec from the repo."""
-    spec_text = _OPENAPI_SPEC_PATH.read_text(encoding="utf-8")
+    openapi_spec_path = request.config.rootpath / "openapi.json"
+    spec_text = openapi_spec_path.read_text(encoding="utf-8")
     result: dict[str, object] = json.loads(s=spec_text)
     return result
 
