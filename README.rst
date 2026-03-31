@@ -19,12 +19,17 @@ Getting Started
 
 .. code-block:: python
 
-   """Use the CoderPad Interview API."""
+   """Use the CoderPad API."""
 
    from coderpad.client import CoderPad
 
    client = CoderPad(api_key="your-api-key")
-   assert client.base_url == "https://api.interview.coderpad.io"
+   pad = client.pads.create(title="Interview", language="python")
+   assert pad.title == "Interview"
+   pads = client.pads.list()
+   assert len(pads) > 0
+   org = client.organization.get()
+   assert org.name
 
 Full Documentation
 ------------------
