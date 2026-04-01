@@ -21,7 +21,7 @@ from coderpad.transports import (
     Transport,
     TransportResponse,
 )
-from coderpad.types import QuestionFileContent, SortOrder
+from coderpad.types import Language, QuestionFileContent, SortOrder
 
 
 class TestCoderPad:
@@ -413,6 +413,17 @@ class TestCreatePad:
         result = coderpad_client.pads.create()
         assert result.id
 
+    @staticmethod
+    def test_create_pad_with_language_enum(
+        coderpad_client: CoderPad,
+    ) -> None:
+        """A pad can be created with a Language enum value."""
+        result = coderpad_client.pads.create(
+            title="Test Pad",
+            language=Language.PYTHON,
+        )
+        assert result.id
+
 
 class TestGetPad:
     """Tests for ``CoderPad.pads.get``."""
@@ -559,13 +570,24 @@ class TestCreateQuestion:
         assert result.id
 
     @staticmethod
+    def test_create_question_with_language_enum(
+        coderpad_client: CoderPad,
+    ) -> None:
+        """A question can be created with a Language enum."""
+        result = coderpad_client.questions.create(
+            title="Test Question",
+            language=Language.PYTHON,
+        )
+        assert result.id
+
+    @staticmethod
     def test_create_question_with_file_contents(
         coderpad_client: CoderPad,
     ) -> None:
         """A question can be created with file contents."""
         result = coderpad_client.questions.create(
             title="Multi-file Question",
-            language="multifile_python",
+            language=Language.MULTIFILE_PYTHON,
             file_contents=[
                 QuestionFileContent(
                     path="main.py",
@@ -589,7 +611,7 @@ class TestCreateQuestion:
         zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
         result = coderpad_client.questions.create(
             title="Zip Question",
-            language="multifile_java",
+            language=Language.MULTIFILE_JAVA,
             zip_file=zip_path,
         )
         assert result.id
