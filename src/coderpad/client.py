@@ -160,7 +160,7 @@ class PadsNamespace(_Namespace):
         if notes is not None:
             data["notes"] = notes
         if question_id is not None:
-            data["question_id"] = str(question_id)
+            data["question_id"] = str(object=question_id)
         response = self._request(
             method="POST",
             url="/api/pads/",

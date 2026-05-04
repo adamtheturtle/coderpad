@@ -160,7 +160,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         if notes is not None:
             data["notes"] = notes
         if question_id is not None:
-            data["question_id"] = str(question_id)
+            data["question_id"] = str(object=question_id)
         response = await self._request(
             method="POST",
             url="/api/pads/",
