@@ -4,6 +4,7 @@ from http import HTTPStatus
 from pathlib import Path
 
 import pytest
+import respx
 
 from coderpad.client import CoderPad
 from coderpad.exceptions import (
@@ -423,6 +424,17 @@ class TestCreatePad:
             language=Language.PYTHON,
         )
         assert result.id
+
+    @staticmethod
+    def test_create_pad_from_question(
+        coderpad_client: CoderPad,
+        mock_coderpad_api: respx.MockRouter,
+    ) -> None:
+        """A pad can be spawned from an existing question id."""
+        result = coderpad_client.pads.create(question_id=54321)
+        assert result.id
+        request = mock_coderpad_api.calls.last.request
+        assert b"question_id=54321" in request.content
 
 
 class TestGetPad:

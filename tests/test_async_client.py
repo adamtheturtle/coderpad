@@ -4,6 +4,7 @@ from http import HTTPStatus
 from pathlib import Path
 
 import pytest
+import respx
 
 from coderpad.async_client import AsyncCoderPad
 from coderpad.exceptions import NotFoundError
@@ -214,6 +215,18 @@ class TestAsyncCreatePad:
             language=Language.PYTHON,
         )
         assert result.id
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_create_pad_from_question(
+        async_coderpad_client: AsyncCoderPad,
+        mock_coderpad_api: respx.MockRouter,
+    ) -> None:
+        """A pad can be spawned from an existing question id."""
+        result = await async_coderpad_client.pads.create(question_id=54321)
+        assert result.id
+        request = mock_coderpad_api.calls.last.request
+        assert b"question_id=54321" in request.content
 
 
 class TestAsyncGetPad:

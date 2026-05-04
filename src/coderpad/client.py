@@ -132,6 +132,7 @@ class PadsNamespace(_Namespace):
         language: Language | str | None = None,
         contents: str | None = None,
         notes: str | None = None,
+        question_id: str | int | None = None,
     ) -> Pad:
         """Create a new pad.
 
@@ -140,6 +141,8 @@ class PadsNamespace(_Namespace):
             language: Programming language for the pad.
             contents: Initial contents of the pad editor.
             notes: Private notes for the interviewer.
+            question_id: Id of an existing question to seed
+                the pad from.
 
         Returns:
             The created pad.
@@ -156,6 +159,8 @@ class PadsNamespace(_Namespace):
             data["contents"] = contents
         if notes is not None:
             data["notes"] = notes
+        if question_id is not None:
+            data["question_id"] = str(question_id)
         response = self._request(
             method="POST",
             url="/api/pads/",
