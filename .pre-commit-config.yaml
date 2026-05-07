@@ -157,11 +157,10 @@ repos:
       - id: mypy
         name: mypy
         stages: [pre-push]
-        entry: uv run --extra=dev -m mypy
+        entry: uv run --extra=dev -m mypy --num-workers=4
         language: python
         types_or: [python, toml]
         pass_filenames: false
-        args: [--num-workers=4]
         additional_dependencies:
           - *uv_version
 
