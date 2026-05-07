@@ -161,6 +161,7 @@ repos:
         language: python
         types_or: [python, toml]
         pass_filenames: false
+        args: [--num-workers=4]
         additional_dependencies:
           - *uv_version
 
@@ -171,6 +172,7 @@ repos:
         entry: uv run --extra=dev doccmd --no-write-to-file --language=python --command="mypy"
         language: python
         types_or: [markdown, rst]
+        args: [--num-workers=4]
         additional_dependencies:
           - *uv_version
 
