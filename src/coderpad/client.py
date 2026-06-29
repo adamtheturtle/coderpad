@@ -15,6 +15,7 @@ from coderpad.transports import (
     TransportResponse,
 )
 from coderpad.types import (
+    CandidateInstruction,
     Language,
     Organization,
     OrganizationStats,
@@ -327,6 +328,7 @@ class QuestionsNamespace(_Namespace):
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
+        candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
     ) -> Question:
@@ -340,6 +342,8 @@ class QuestionsNamespace(_Namespace):
                 session. Cannot be combined with
                 ``file_contents``.
             solution: The solution to the question.
+            candidate_instructions: Progressively-revealed
+                instruction blocks shown to the candidate.
             file_contents: Files for a multi-file question.
                 Cannot be combined with ``contents`` or
                 ``zip_file``.
@@ -361,6 +365,16 @@ class QuestionsNamespace(_Namespace):
             data["question[contents]"] = contents
         if solution is not None:
             data["question[solution]"] = solution
+        if candidate_instructions is not None:
+            data["question[candidate_instructions]"] = json.dumps(
+                obj=[
+                    {
+                        "instructions": ci.instructions,
+                        "default_visible": ci.default_visible,
+                    }
+                    for ci in candidate_instructions
+                ],
+            )
         if file_contents is not None:
             data["question[file_contents]"] = json.dumps(
                 obj=[
@@ -420,6 +434,7 @@ class QuestionsNamespace(_Namespace):
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
+        candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
     ) -> None:
@@ -433,6 +448,8 @@ class QuestionsNamespace(_Namespace):
             contents: New contents. Cannot be combined with
                 ``file_contents``.
             solution: New solution.
+            candidate_instructions: Progressively-revealed
+                instruction blocks shown to the candidate.
             file_contents: Files for a multi-file question.
                 Cannot be combined with ``contents`` or
                 ``zip_file``.
@@ -454,6 +471,16 @@ class QuestionsNamespace(_Namespace):
             data["question[contents]"] = contents
         if solution is not None:
             data["question[solution]"] = solution
+        if candidate_instructions is not None:
+            data["question[candidate_instructions]"] = json.dumps(
+                obj=[
+                    {
+                        "instructions": ci.instructions,
+                        "default_visible": ci.default_visible,
+                    }
+                    for ci in candidate_instructions
+                ],
+            )
         if file_contents is not None:
             data["question[file_contents]"] = json.dumps(
                 obj=[
