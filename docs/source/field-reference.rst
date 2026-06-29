@@ -51,7 +51,7 @@ returned on read only.
      - Upload alternative to ``file_contents``.
    * - ``candidate_instructions``
      - Read only
-     - Write support tracked in `#196`_.
+     - Write support tracked in issue #196.
    * - ``test_cases``
      - Read only
      -
@@ -197,5 +197,3 @@ on read only.
    * - ``updated_at``
      - Read only
      - Server-managed timestamp.
-
-.. _#196: https://github.com/adamtheturtle/coderpad-api-python/issues/196
