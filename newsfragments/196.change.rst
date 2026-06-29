@@ -1,1 +1,0 @@
-Add a ``candidate_instructions`` parameter to ``questions.create`` and ``questions.update`` so progressively-revealed candidate instruction blocks can be authored via the API.

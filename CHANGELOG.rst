@@ -3,6 +3,11 @@ Changelog
 
 .. towncrier release notes start
 
+2026.06.29
+----------
+
+- Add a ``candidate_instructions`` parameter to ``questions.create`` and ``questions.update`` so progressively-revealed candidate instruction blocks can be authored via the API.
+
 2026.05.04
 ----------
 
