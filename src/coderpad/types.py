@@ -168,7 +168,11 @@ class Team:
 @beartype
 @dataclass(frozen=True, kw_only=True)
 class Pad:
-    """A CoderPad interview pad."""
+    """A CoderPad interview pad.
+
+    Not every field here can be written via ``create`` or ``update``.
+    See the "Writable and read-only fields" reference for the matrix.
+    """
 
     id: str
     title: str
@@ -450,7 +454,11 @@ class CustomFile:
 @beartype
 @dataclass(frozen=True, kw_only=True)
 class Question:
-    """A CoderPad question."""
+    """A CoderPad question.
+
+    Not every field here can be written via ``create`` or ``update``.
+    See the "Writable and read-only fields" reference for the matrix.
+    """
 
     id: int
     title: str
