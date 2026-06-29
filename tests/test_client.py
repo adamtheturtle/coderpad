@@ -1,7 +1,9 @@
 """Tests for the CoderPad client."""
 
+import json
 from http import HTTPStatus
 from pathlib import Path
+from urllib.parse import parse_qs
 
 import pytest
 import respx
@@ -22,7 +24,12 @@ from coderpad.transports import (
     Transport,
     TransportResponse,
 )
-from coderpad.types import Language, QuestionFileContent, SortOrder
+from coderpad.types import (
+    CandidateInstruction,
+    Language,
+    QuestionFileContent,
+    SortOrder,
+)
 
 
 class TestCoderPad:
@@ -578,6 +585,13 @@ class TestCreateQuestion:
             description="A description",
             contents="def solve(): pass",
             solution="def solve(): return 42",
+            candidate_instructions=[
+                CandidateInstruction(
+                    instructions="Part 1",
+                    default_visible=True,
+                ),
+                CandidateInstruction(instructions="Part 2"),
+            ],
         )
         assert result.id
 
@@ -627,6 +641,32 @@ class TestCreateQuestion:
             zip_file=zip_path,
         )
         assert result.id
+
+    @staticmethod
+    def test_create_question_candidate_instructions_body(
+        coderpad_client: CoderPad,
+        mock_coderpad_api: respx.MockRouter,
+    ) -> None:
+        """Candidate instructions are serialized into the form body."""
+        coderpad_client.questions.create(
+            title="Live Question",
+            language="python",
+            candidate_instructions=[
+                CandidateInstruction(
+                    instructions="Part 1",
+                    default_visible=True,
+                ),
+                CandidateInstruction(instructions="Part 2"),
+            ],
+        )
+        request = mock_coderpad_api.calls.last.request
+        sent = parse_qs(qs=request.content.decode())
+        assert json.loads(
+            s=sent["question[candidate_instructions]"][0],
+        ) == [
+            {"instructions": "Part 1", "default_visible": True},
+            {"instructions": "Part 2", "default_visible": False},
+        ]
 
 
 class TestGetQuestion:
@@ -678,6 +718,13 @@ class TestUpdateQuestion:
             description="New desc",
             contents="puts 'hi'",
             solution="puts 'answer'",
+            candidate_instructions=[
+                CandidateInstruction(
+                    instructions="Part 1",
+                    default_visible=True,
+                ),
+                CandidateInstruction(instructions="Part 2"),
+            ],
         )
 
     @staticmethod
@@ -707,6 +754,31 @@ class TestUpdateQuestion:
             question_id="123",
             zip_file=zip_path,
         )
+
+    @staticmethod
+    def test_update_question_candidate_instructions_body(
+        coderpad_client: CoderPad,
+        mock_coderpad_api: respx.MockRouter,
+    ) -> None:
+        """Candidate instructions are serialized into the form body."""
+        coderpad_client.questions.update(
+            question_id="123",
+            candidate_instructions=[
+                CandidateInstruction(
+                    instructions="Part 1",
+                    default_visible=True,
+                ),
+                CandidateInstruction(instructions="Part 2"),
+            ],
+        )
+        request = mock_coderpad_api.calls.last.request
+        sent = parse_qs(qs=request.content.decode())
+        assert json.loads(
+            s=sent["question[candidate_instructions]"][0],
+        ) == [
+            {"instructions": "Part 1", "default_visible": True},
+            {"instructions": "Part 2", "default_visible": False},
+        ]
 
 
 class TestDeleteQuestion:
