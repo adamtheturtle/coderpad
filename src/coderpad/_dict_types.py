@@ -49,12 +49,25 @@ class PadEventDict(TypedDict):
     created_at: str
 
 
+# An editor operation stored in a pad's Firebase history. The functional
+# form prevents static analysis from treating its abbreviated wire keys as
+# unused Python attributes.
+PadHistoryEntryDict = TypedDict(  # noqa: UP013
+    "PadHistoryEntryDict",
+    {
+        "a": str,
+        "o": list[int | str],
+        "t": int,
+    },
+)
+
+
 class FileContentDict(TypedDict):
     """A file within a pad environment."""
 
     path: str
     contents: str
-    history: str
+    history: NotRequired[str]
 
 
 class PadEnvironmentDict(TypedDict):

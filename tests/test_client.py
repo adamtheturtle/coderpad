@@ -537,6 +537,110 @@ class TestGetPadEnvironment:
         assert result.id
 
 
+class TestGetPadHistory:
+    """Tests for ``CoderPad.pads.get_history``."""
+
+    @staticmethod
+    def test_get_history() -> None:
+        """Editor history can be retrieved and replayed."""
+        history_url = "https://coderpad-1.firebaseio.com/history.json"
+
+        def _history_transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None = None,
+            data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        ) -> TransportResponse:
+            """Return sample Firebase history."""
+            del params, data, files
+            assert method == "GET"
+            assert url == history_url
+            assert headers == {"Accept": "application/json"}
+            return TransportResponse(
+                status_code=HTTPStatus.OK,
+                headers={},
+                content=json.dumps(
+                    obj={
+                        "entry-1": {
+                            "a": "author-1",
+                            "o": ["hi"],
+                            "t": 1,
+                        },
+                    },
+                ).encode(),
+            )
+
+        client = CoderPad(
+            api_key="test-key",
+            transport=_history_transport,
+        )
+        history = client.pads.get_history(history_url=history_url)
+        assert history.replay() == "hi"
+
+    @staticmethod
+    def test_get_empty_history() -> None:
+        """A Firebase null response becomes an empty history."""
+
+        def _empty_history_transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None = None,
+            data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        ) -> TransportResponse:
+            """Return an empty Firebase history."""
+            del method, url, headers, params, data, files
+            return TransportResponse(
+                status_code=HTTPStatus.OK,
+                headers={},
+                content=b"null",
+            )
+
+        client = CoderPad(
+            api_key="test-key",
+            transport=_empty_history_transport,
+        )
+        history = client.pads.get_history(
+            history_url="https://example.com/history.json",
+        )
+        assert not history
+
+    @staticmethod
+    def test_get_history_error() -> None:
+        """Firebase HTTP errors use the client exception hierarchy."""
+
+        def _error_transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None = None,
+            data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        ) -> TransportResponse:
+            """Return a missing history response."""
+            del method, url, headers, params, data, files
+            return TransportResponse(
+                status_code=HTTPStatus.NOT_FOUND,
+                headers={},
+                content=b"Not Found",
+            )
+
+        client = CoderPad(
+            api_key="test-key",
+            transport=_error_transport,
+        )
+        with pytest.raises(expected_exception=NotFoundError):
+            client.pads.get_history(
+                history_url="https://example.com/history.json",
+            )
+
+
 class TestListQuestions:
     """Tests for ``CoderPad.questions.list``."""
 

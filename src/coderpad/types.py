@@ -18,6 +18,7 @@ from coderpad._dict_types import (
     PadDict,
     PadEnvironmentDict,
     PadEventDict,
+    PadHistoryEntryDict,
     QuestionDict,
     QuotaDict,
     TeamDict,
@@ -270,12 +271,119 @@ class PadEvent:
 
 @beartype
 @dataclass(frozen=True, kw_only=True)
+class PadHistoryEntry:
+    """An editor operation from a pad's Firebase history.
+
+    Positive integer operations retain existing characters, negative
+    integers delete characters, and strings insert text.
+    """
+
+    id: str
+    author: str
+    operations: list[int | str]
+    timestamp: int
+
+    @classmethod
+    def from_dict(
+        cls,
+        *,
+        entry_id: str,
+        data: PadHistoryEntryDict,
+    ) -> Self:
+        """Create from a Firebase history entry.
+
+        Args:
+            entry_id: The Firebase key for the entry.
+            data: The dictionary to convert.
+
+        Returns:
+            A new instance.
+        """
+        return cls(
+            id=entry_id,
+            author=data["a"],
+            operations=data["o"],
+            timestamp=data["t"],
+        )
+
+    def apply(self, *, contents: str) -> str:
+        """Apply this operation to existing file contents.
+
+        Args:
+            contents: The contents immediately before this operation.
+
+        Returns:
+            The updated contents.
+        """
+        cursor = 0
+        updated: list[str] = []
+        for operation in self.operations:
+            if isinstance(operation, str):
+                updated.append(operation)
+            elif operation > 0:
+                updated.append(contents[cursor : cursor + operation])
+                cursor += operation
+            else:
+                cursor -= operation
+        updated.append(contents[cursor:])
+        return "".join(updated)
+
+
+@beartype
+class PadHistory(list[PadHistoryEntry]):
+    """Chronologically ordered editor history for a pad file."""
+
+    @classmethod
+    def from_dict(
+        cls,
+        *,
+        data: dict[str, PadHistoryEntryDict],
+    ) -> Self:
+        """Create from a Firebase history response.
+
+        Args:
+            data: Firebase keys mapped to editor operations.
+
+        Returns:
+            A chronologically ordered history.
+        """
+        ordered_entries = sorted(
+            data.items(),
+            key=lambda item: (item[1]["t"], item[0]),
+        )
+        history = cls()
+        for entry_id, entry in ordered_entries:
+            history.append(
+                PadHistoryEntry.from_dict(
+                    entry_id=entry_id,
+                    data=entry,
+                ),
+            )
+        return history
+
+    def replay(self, *, initial_contents: str = "") -> str:
+        """Replay all operations and return the resulting contents.
+
+        Args:
+            initial_contents: Contents before the first operation.
+
+        Returns:
+            The contents after all operations.
+        """
+        contents = initial_contents
+        for entry in self:
+            contents = entry.apply(contents=contents)
+        return contents
+
+
+@beartype
+@dataclass(frozen=True, kw_only=True)
 class FileContent:
     """A file within a pad environment."""
 
     path: str
     contents: str
-    history: str
+    history: str | None
 
     @classmethod
     def from_dict(
@@ -293,7 +401,7 @@ class FileContent:
         return cls(
             path=data["path"],
             contents=data["contents"],
-            history=data["history"],
+            history=data.get("history"),
         )
 
 
