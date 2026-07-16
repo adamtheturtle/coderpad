@@ -22,6 +22,7 @@ from coderpad.types import (
     Pad,
     PadEnvironment,
     PadEvent,
+    PadHistory,
     PaginatedList,
     Question,
     QuestionFileContent,
@@ -283,6 +284,35 @@ class AsyncPadsNamespace(_AsyncNamespace):
         return PadEnvironment.from_dict(
             data=response.json(),
         )
+
+    async def get_history(self, *, history_url: str) -> PadHistory:
+        """Retrieve editor history from a Firebase history URL.
+
+        The URL is available as ``FileContent.history``. The CoderPad
+        API key is deliberately not sent to the Firebase host.
+
+        Args:
+            history_url: The history URL returned for a file in a pad
+                environment.
+
+        Returns:
+            The chronologically ordered editor history. An empty
+            history is returned when Firebase responds with ``null``.
+        """
+        response = await self.transport(
+            method="GET",
+            url=history_url,
+            headers={"Accept": "application/json"},
+            params=None,
+            data=None,
+            files=None,
+        )
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
+            raise CoderPadError.from_response(response=response)
+        data = response.json()
+        if data is None:
+            return PadHistory()
+        return PadHistory.from_dict(data=data)
 
 
 @beartype

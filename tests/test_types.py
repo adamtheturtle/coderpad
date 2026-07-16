@@ -11,6 +11,7 @@ from coderpad._dict_types import (
     PadDict,
     PadEnvironmentDict,
     PadEventDict,
+    PadHistoryEntryDict,
     QuestionDict,
     QuotaDict,
     TeamDict,
@@ -27,6 +28,8 @@ from coderpad.types import (
     Pad,
     PadEnvironment,
     PadEvent,
+    PadHistory,
+    PadHistoryEntry,
     Question,
     Quota,
     Team,
@@ -54,6 +57,15 @@ def _pad_event_dict() -> PadEventDict:
 def _file_content_dict() -> FileContentDict:
     """Sample FileContentDict."""
     return {"path": "main.py", "contents": "print(1)", "history": "v1"}
+
+
+def _pad_history_entry_dict() -> PadHistoryEntryDict:
+    """Sample PadHistoryEntryDict."""
+    return {
+        "a": "author-1",
+        "o": [1, "X", -2],
+        "t": 1_700_000_000_000,
+    }
 
 
 def _pad_environment_dict() -> PadEnvironmentDict:
@@ -228,6 +240,66 @@ class TestFileContent:
         assert result.path == data["path"]
         assert result.contents == data["contents"]
         assert result.history == "v1"
+
+    @staticmethod
+    def test_from_dict_without_history() -> None:
+        """A FileContent can omit its optional history URL."""
+        data: FileContentDict = {
+            "path": "main.py",
+            "contents": "print(1)",
+        }
+        result = FileContent.from_dict(data=data)
+        assert result.history is None
+
+
+class TestPadHistoryEntry:
+    """Tests for ``PadHistoryEntry``."""
+
+    @staticmethod
+    def test_from_dict() -> None:
+        """A history entry can be created from a dictionary."""
+        data = _pad_history_entry_dict()
+        result = PadHistoryEntry.from_dict(
+            entry_id="entry-1",
+            data=data,
+        )
+        assert result.id == "entry-1"
+        assert result.author == data["a"]
+        assert result.operations == data["o"]
+        assert result.timestamp == data["t"]
+
+    @staticmethod
+    def test_apply() -> None:
+        """Text operations can be applied to existing contents."""
+        entry = PadHistoryEntry.from_dict(
+            entry_id="entry-1",
+            data=_pad_history_entry_dict(),
+        )
+        assert entry.apply(contents="abcd") == "aXd"
+
+
+class TestPadHistory:
+    """Tests for ``PadHistory``."""
+
+    @staticmethod
+    def test_from_dict_orders_and_replays_entries() -> None:
+        """History entries are ordered and can be replayed."""
+        history = PadHistory.from_dict(
+            data={
+                "later": {
+                    "a": "author-1",
+                    "o": [2, "!"],
+                    "t": 2,
+                },
+                "earlier": {
+                    "a": "author-1",
+                    "o": [1, "i"],
+                    "t": 1,
+                },
+            },
+        )
+        assert [entry.id for entry in history] == ["earlier", "later"]
+        assert history.replay(initial_contents="h") == "hi!"
 
 
 class TestPadEnvironment:
