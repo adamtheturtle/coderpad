@@ -1,7 +1,8 @@
 """Fixtures for CoderPad API tests."""
 
 import json
-from collections.abc import Generator
+from collections.abc import Callable, Generator
+from http import HTTPStatus
 
 import pytest
 import respx
@@ -9,8 +10,68 @@ from openapi_mock import add_openapi_to_respx
 
 from coderpad.async_client import AsyncCoderPad
 from coderpad.client import CoderPad
+from coderpad.transports import TransportResponse
 
 _BASE_URL = "https://app.coderpad.io"
+_LIVE_VARIANT_ORGANIZATION_ID = 42
+
+
+@pytest.fixture(name="live_variant_organization_id")
+def fixture_live_variant_organization_id() -> int:
+    """Organization id used by synthetic live-variant fixtures."""
+    return _LIVE_VARIANT_ORGANIZATION_ID
+
+
+@pytest.fixture(name="live_variant_response")
+def fixture_live_variant_response() -> Callable[
+    ...,
+    TransportResponse,
+]:
+    """Return synthetic examples of empirically observed API variants."""
+
+    def live_variant_response(*, url: str) -> TransportResponse:
+        """Build a synthetic live-variant response for ``url``."""
+        if url.endswith("/api/pad_environments/binary"):
+            payload: dict[str, object] = {
+                "status": "OK",
+                "id": 1,
+                "pad_id": 2,
+                "question_id": None,
+                "example_question_id": None,
+                "language": "python",
+                "file_contents": [
+                    {
+                        "path": "image.png",
+                        "contents": None,
+                        "history": "https://example.com/history.json",
+                        "binary": True,
+                    },
+                ],
+                "created_at": "2026-07-16T00:00:00Z",
+                "updated_at": "2026-07-16T00:00:00Z",
+            }
+        elif url.endswith("/api/organization"):
+            payload = {
+                "status": "OK",
+                "id": _LIVE_VARIANT_ORGANIZATION_ID,
+                "organization_name": "Example Organization",
+                "user_count": 0,
+                "users": [],
+                "organization_default_language": "python",
+                "single_sign_on_supported": False,
+                "teams": [],
+                "child_organizations": [],
+            }
+        else:  # pragma: no cover
+            msg = f"Unexpected test URL: {url}"
+            raise AssertionError(msg)
+        return TransportResponse(
+            status_code=HTTPStatus.OK,
+            headers={},
+            content=json.dumps(obj=payload).encode(),
+        )
+
+    return live_variant_response
 
 
 @pytest.fixture(name="openapi_spec")

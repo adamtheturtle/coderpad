@@ -1,6 +1,7 @@
 """Tests for the CoderPad client."""
 
 import json
+from collections.abc import Callable
 from http import HTTPStatus
 from pathlib import Path
 from urllib.parse import parse_qs
@@ -30,7 +31,6 @@ from coderpad.types import (
     QuestionFileContent,
     SortOrder,
 )
-from tests import LIVE_VARIANT_ORGANIZATION_ID, live_variant_response
 
 
 class TestCoderPad:
@@ -538,7 +538,10 @@ class TestGetPadEnvironment:
         assert result.id
 
     @staticmethod
-    def test_live_response_variants() -> None:
+    def test_live_response_variants(
+        live_variant_organization_id: int,
+        live_variant_response: Callable[..., TransportResponse],
+    ) -> None:
         """Undocumented environment and organization variants are
         supported.
         """
@@ -564,7 +567,7 @@ class TestGetPadEnvironment:
         assert environment.file_contents[0].binary is True
 
         organization = client.organization.get()
-        assert organization.id == LIVE_VARIANT_ORGANIZATION_ID
+        assert organization.id == live_variant_organization_id
         assert organization.single_sign_in_url is None
 
 
