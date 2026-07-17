@@ -2,6 +2,7 @@
 
 from coderpad._dict_types import (
     CandidateInstructionDict,
+    CustomDatabaseDict,
     CustomFileDict,
     FileContentDict,
     OrganizationDict,
@@ -12,6 +13,7 @@ from coderpad._dict_types import (
     PadEnvironmentDict,
     PadEventDict,
     PadHistoryEntryDict,
+    PadInterviewerNotificationDict,
     QuestionDict,
     QuotaDict,
     TeamDict,
@@ -19,6 +21,7 @@ from coderpad._dict_types import (
 )
 from coderpad.types import (
     CandidateInstruction,
+    CustomDatabase,
     CustomFile,
     FileContent,
     Organization,
@@ -30,6 +33,7 @@ from coderpad.types import (
     PadEvent,
     PadHistory,
     PadHistoryEntry,
+    PadInterviewerNotification,
     Question,
     Quota,
     Team,
@@ -54,9 +58,30 @@ def _pad_event_dict() -> PadEventDict:
     }
 
 
+def _pad_interviewer_notification_dict() -> PadInterviewerNotificationDict:
+    """Sample PadInterviewerNotificationDict."""
+    return {
+        "id": 11,
+        "title": "Interview signal",
+        "message": "Consider asking a follow-up question.",
+        "priority": "normal",
+        "request_id": "request-1",
+        "auto_dismissed": False,
+        "dismissed_at": None,
+        "useful": None,
+        "created_at": "2023-01-01T00:00:00Z",
+        "updated_at": "2023-01-01T00:00:00Z",
+    }
+
+
 def _file_content_dict() -> FileContentDict:
     """Sample FileContentDict."""
-    return {"path": "main.py", "contents": "print(1)", "history": "v1"}
+    return {
+        "path": "main.py",
+        "contents": "print(1)",
+        "history": "v1",
+        "binary": False,
+    }
 
 
 def _pad_history_entry_dict() -> PadHistoryEntryDict:
@@ -108,6 +133,33 @@ def _custom_file_dict() -> CustomFileDict:
     }
 
 
+def _custom_database_dict() -> CustomDatabaseDict:
+    """Sample CustomDatabaseDict."""
+    return {
+        "id": 12,
+        "title": "Products",
+        "description": "Product catalog",
+        "language": "postgresql",
+        "schema": "CREATE TABLE products (id integer);",
+        "schema_json": {
+            "arrangement": "horizontal",
+            "tables": [
+                {
+                    "name": "products",
+                    "columns": [
+                        {
+                            "name": "id",
+                            "type": "integer",
+                            "pk": True,
+                            "nn": True,
+                        },
+                    ],
+                },
+            ],
+        },
+    }
+
+
 def _pad_dict() -> PadDict:
     """Sample PadDict."""
     return {
@@ -134,6 +186,10 @@ def _pad_dict() -> PadDict:
         "pad_environment_ids": [10],
         "active_environment_id": 10,
         "team": _team_dict(),
+        "restrict_interviewer_access": True,
+        "pad_interviewer_notifications": [
+            _pad_interviewer_notification_dict(),
+        ],
     }
 
 
@@ -165,6 +221,7 @@ def _question_dict() -> QuestionDict:
         "public_take_home_setting_id": _PUBLIC_TAKE_HOME_SETTING_ID,
         "contents_for_test_cases": "test code",
         "test_cases": [_test_case_dict()],
+        "custom_database": _custom_database_dict(),
     }
 
 
@@ -211,6 +268,37 @@ class TestPad:
         assert result.pad_environment_ids == data["pad_environment_ids"]
         assert result.active_environment_id == data["active_environment_id"]
         assert result.team.id == data["team"]["id"]
+        assert result.restrict_interviewer_access is True
+        assert len(result.pad_interviewer_notifications) == 1
+
+    @staticmethod
+    def test_from_dict_without_empirically_observed_fields() -> None:
+        """A Pad remains compatible with published response fields."""
+        data = _pad_dict()
+        del data["restrict_interviewer_access"]
+        del data["pad_interviewer_notifications"]
+        result = Pad.from_dict(data=data)
+        assert result.restrict_interviewer_access is None
+        assert not result.pad_interviewer_notifications
+
+
+class TestPadInterviewerNotification:
+    """Tests for ``PadInterviewerNotification``."""
+
+    @staticmethod
+    def test_from_dict() -> None:
+        """An interviewer notification can be created from a
+        dictionary.
+        """
+        data = _pad_interviewer_notification_dict()
+        result = PadInterviewerNotification.from_dict(data=data)
+        assert result.id == data["id"]
+        assert result.title == data["title"]
+        assert result.priority == data["priority"]
+        assert result.request_id == data["request_id"]
+        assert result.auto_dismissed == data["auto_dismissed"]
+        assert result.dismissed_at is None
+        assert result.useful is None
 
 
 class TestPadEvent:
@@ -240,6 +328,7 @@ class TestFileContent:
         assert result.path == data["path"]
         assert result.contents == data["contents"]
         assert result.history == "v1"
+        assert result.binary is False
 
     @staticmethod
     def test_from_dict_without_history() -> None:
@@ -250,6 +339,19 @@ class TestFileContent:
         }
         result = FileContent.from_dict(data=data)
         assert result.history is None
+        assert result.binary is False
+
+    @staticmethod
+    def test_from_dict_for_binary_file() -> None:
+        """A binary FileContent can have no text contents."""
+        data: FileContentDict = {
+            "path": "image.png",
+            "contents": None,
+            "binary": True,
+        }
+        result = FileContent.from_dict(data=data)
+        assert result.contents is None
+        assert result.binary is True
 
 
 class TestPadHistoryEntry:
@@ -396,6 +498,34 @@ class TestQuestion:
         assert result.contents_for_test_cases == "test code"
         assert result.test_cases is not None
         assert len(result.test_cases) == 1
+        assert result.custom_database is not None
+        assert result.custom_database.title == "Products"
+        assert result.custom_database.schema_json.tables[0].columns[0].pk
+
+    @staticmethod
+    def test_from_dict_without_custom_database() -> None:
+        """A Question can omit its empirically observed custom
+        database.
+        """
+        data = _question_dict()
+        del data["custom_database"]
+        result = Question.from_dict(data=data)
+        assert result.custom_database is None
+
+
+class TestCustomDatabase:
+    """Tests for ``CustomDatabase``."""
+
+    @staticmethod
+    def test_from_dict() -> None:
+        """A custom database can be created from a dictionary."""
+        data = _custom_database_dict()
+        result = CustomDatabase.from_dict(data=data)
+        assert result.id == data["id"]
+        assert result.schema == data["schema"]
+        assert result.schema_json.arrangement == "horizontal"
+        assert result.schema_json.tables[0].name == "products"
+        assert result.schema_json.tables[0].columns[0].nn
 
 
 class TestOrganizationUser:
@@ -460,6 +590,7 @@ class TestOrganization:
     def test_from_dict() -> None:
         """An Organization can be created from a dictionary."""
         data: OrganizationDict = {
+            "id": 123,
             "organization_name": "Acme",
             "user_count": 5,
             "users": [
@@ -469,6 +600,7 @@ class TestOrganization:
             "single_sign_on_supported": True,
             "single_sign_in_url": "https://sso.example.com",
             "teams": [_team_dict()],
+            "child_organizations": [{"id": 456, "name": "Subsidiary"}],
         }
         result = Organization.from_dict(data=data)
         assert result.organization_name == data["organization_name"]
@@ -483,6 +615,24 @@ class TestOrganization:
         )
         assert result.single_sign_in_url == data["single_sign_in_url"]
         assert len(result.teams) == len(data["teams"])
+        assert result.id == data["id"]
+        assert result.child_organizations == data["child_organizations"]
+
+    @staticmethod
+    def test_from_dict_without_sso_url_or_observed_fields() -> None:
+        """An Organization can omit conditional and observed fields."""
+        data: OrganizationDict = {
+            "organization_name": "Acme",
+            "user_count": 0,
+            "users": [],
+            "organization_default_language": "python",
+            "single_sign_on_supported": False,
+            "teams": [],
+        }
+        result = Organization.from_dict(data=data)
+        assert result.single_sign_in_url is None
+        assert result.id is None
+        assert not result.child_organizations
 
 
 class TestOrganizationStats:

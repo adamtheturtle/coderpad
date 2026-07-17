@@ -30,6 +30,7 @@ from coderpad.types import (
     QuestionFileContent,
     SortOrder,
 )
+from tests import LIVE_VARIANT_ORGANIZATION_ID, live_variant_response
 
 
 class TestCoderPad:
@@ -535,6 +536,36 @@ class TestGetPadEnvironment:
             environment_id="123",
         )
         assert result.id
+
+    @staticmethod
+    def test_live_response_variants() -> None:
+        """Undocumented environment and organization variants are
+        supported.
+        """
+
+        def _transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None = None,
+            data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        ) -> TransportResponse:
+            """Return synthetic live-response variants."""
+            del method, headers, params, data, files
+            return live_variant_response(url=url)
+
+        client = CoderPad(api_key="test-key", transport=_transport)
+        environment = client.pads.get_environment(
+            environment_id="binary",
+        )
+        assert environment.file_contents[0].contents is None
+        assert environment.file_contents[0].binary is True
+
+        organization = client.organization.get()
+        assert organization.id == LIVE_VARIANT_ORGANIZATION_ID
+        assert organization.single_sign_in_url is None
 
 
 class TestGetPadHistory:

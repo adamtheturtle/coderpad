@@ -10,6 +10,21 @@ class TeamDict(TypedDict):
     name: str
 
 
+class PadInterviewerNotificationDict(TypedDict):
+    """An interviewer notification associated with a pad."""
+
+    id: int
+    title: str
+    message: str
+    priority: str
+    request_id: str
+    auto_dismissed: bool
+    dismissed_at: str | None
+    useful: bool | None
+    created_at: str
+    updated_at: str
+
+
 class PadDict(TypedDict):
     """A CoderPad interview pad."""
 
@@ -36,6 +51,10 @@ class PadDict(TypedDict):
     pad_environment_ids: list[int]
     active_environment_id: int | None
     team: TeamDict
+    restrict_interviewer_access: NotRequired[bool]
+    pad_interviewer_notifications: NotRequired[
+        list[PadInterviewerNotificationDict]
+    ]
 
 
 class PadEventDict(TypedDict):
@@ -66,8 +85,9 @@ class FileContentDict(TypedDict):
     """A file within a pad environment."""
 
     path: str
-    contents: str
+    contents: str | None
     history: NotRequired[str]
+    binary: NotRequired[bool]
 
 
 class PadEnvironmentDict(TypedDict):
@@ -109,6 +129,40 @@ class CustomFileDict(TypedDict):
     filesize: str
 
 
+class CustomDatabaseColumnDict(TypedDict):
+    """A column in a question's custom database schema."""
+
+    name: str
+    type: str
+    pk: bool
+    nn: bool
+
+
+class CustomDatabaseTableDict(TypedDict):
+    """A table in a question's custom database schema."""
+
+    name: str
+    columns: list[CustomDatabaseColumnDict]
+
+
+class CustomDatabaseSchemaDict(TypedDict):
+    """The structured schema for a question's custom database."""
+
+    arrangement: str
+    tables: list[CustomDatabaseTableDict]
+
+
+class CustomDatabaseDict(TypedDict):
+    """A custom database attached to a question."""
+
+    id: int
+    title: str
+    description: str
+    language: str
+    schema: str
+    schema_json: CustomDatabaseSchemaDict
+
+
 class QuestionDict(TypedDict):
     """A CoderPad question."""
 
@@ -134,6 +188,7 @@ class QuestionDict(TypedDict):
     public_take_home_setting_id: NotRequired[int]
     contents_for_test_cases: NotRequired[str]
     test_cases: NotRequired[list[TestCaseDict]]
+    custom_database: NotRequired[CustomDatabaseDict]
 
 
 class OrganizationUserDict(TypedDict):
@@ -170,8 +225,10 @@ class OrganizationDict(TypedDict):
     users: list[OrganizationUserDict]
     organization_default_language: str
     single_sign_on_supported: bool
-    single_sign_in_url: str
+    single_sign_in_url: NotRequired[str]
     teams: list[TeamDict]
+    id: NotRequired[int]
+    child_organizations: NotRequired[list[dict[str, object]]]
 
 
 class OrganizationStatsDict(TypedDict):
