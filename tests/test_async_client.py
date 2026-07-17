@@ -1,6 +1,7 @@
 """Tests for the async CoderPad client."""
 
 import json
+from collections.abc import Callable
 from http import HTTPStatus
 from pathlib import Path
 from urllib.parse import parse_qs
@@ -334,6 +335,40 @@ class TestAsyncGetPadEnvironment:
             environment_id="123",
         )
         assert result.id
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_live_response_variants(
+        live_variant_organization_id: int,
+        live_variant_response: Callable[..., TransportResponse],
+    ) -> None:
+        """Undocumented environment and organization variants are
+        supported.
+        """
+
+        async def _transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None = None,
+            data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        ) -> TransportResponse:
+            """Return synthetic live-response variants."""
+            del method, headers, params, data, files
+            return live_variant_response(url=url)
+
+        client = AsyncCoderPad(api_key="test-key", transport=_transport)
+        environment = await client.pads.get_environment(
+            environment_id="binary",
+        )
+        assert environment.file_contents[0].contents is None
+        assert environment.file_contents[0].binary is True
+
+        organization = await client.organization.get()
+        assert organization.id == live_variant_organization_id
+        assert organization.single_sign_in_url is None
 
 
 class TestAsyncGetPadHistory:

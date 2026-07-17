@@ -2,13 +2,17 @@
 
 import enum
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Self, TypeVar
 
 from beartype import beartype
 
 from coderpad._dict_types import (
     CandidateInstructionDict,
+    CustomDatabaseColumnDict,
+    CustomDatabaseDict,
+    CustomDatabaseSchemaDict,
+    CustomDatabaseTableDict,
     CustomFileDict,
     FileContentDict,
     OrganizationDict,
@@ -19,6 +23,7 @@ from coderpad._dict_types import (
     PadEnvironmentDict,
     PadEventDict,
     PadHistoryEntryDict,
+    PadInterviewerNotificationDict,
     QuestionDict,
     QuotaDict,
     TeamDict,
@@ -168,6 +173,58 @@ class Team:
 
 @beartype
 @dataclass(frozen=True, kw_only=True)
+class PadInterviewerNotification:
+    """An interviewer notification associated with a pad.
+
+    This structure is empirically observed in live API responses and is not
+    currently described by the published CoderPad API specification.
+    """
+
+    id: int
+    title: str
+    message: str
+    priority: str
+    request_id: str
+    auto_dismissed: bool
+    dismissed_at: str | None
+    useful: bool | None
+    created_at: str
+    updated_at: str
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: PadInterviewerNotificationDict,
+    ) -> Self:
+        """Create from an API response dictionary.
+
+        Args:
+            data: The dictionary to convert.
+
+        Returns:
+            A new instance.
+        """
+        return cls(
+            id=data["id"],
+            title=data["title"],
+            message=data["message"],
+            priority=data["priority"],
+            request_id=data["request_id"],
+            auto_dismissed=data["auto_dismissed"],
+            dismissed_at=data.get("dismissed_at"),
+            useful=data.get("useful"),
+            created_at=data["created_at"],
+            updated_at=data["updated_at"],
+        )
+
+
+def _empty_pad_interviewer_notifications() -> list[PadInterviewerNotification]:
+    """Return an empty, precisely typed notification list."""
+    return []
+
+
+@beartype
+@dataclass(frozen=True, kw_only=True)
 class Pad:
     """A CoderPad interview pad."""
 
@@ -194,6 +251,10 @@ class Pad:
     active_environment_id: int | None
     team: Team
     history: str | None = None
+    restrict_interviewer_access: bool | None = None
+    pad_interviewer_notifications: list[PadInterviewerNotification] = field(
+        default_factory=_empty_pad_interviewer_notifications,
+    )
 
     @classmethod
     def from_dict(cls, data: PadDict) -> Self:
@@ -205,6 +266,15 @@ class Pad:
         Returns:
             A new instance.
         """
+        raw_notifications = data.get("pad_interviewer_notifications")
+        notifications = (
+            [
+                PadInterviewerNotification.from_dict(data=item)
+                for item in raw_notifications
+            ]
+            if raw_notifications is not None
+            else _empty_pad_interviewer_notifications()
+        )
         return cls(
             id=data["id"],
             title=data["title"],
@@ -231,6 +301,10 @@ class Pad:
             ),
             team=Team.from_dict(data=data["team"]),
             history=data.get("history"),
+            restrict_interviewer_access=data.get(
+                "restrict_interviewer_access",
+            ),
+            pad_interviewer_notifications=notifications,
         )
 
 
@@ -379,11 +453,17 @@ class PadHistory(list[PadHistoryEntry]):
 @beartype
 @dataclass(frozen=True, kw_only=True)
 class FileContent:
-    """A file within a pad environment."""
+    """A file within a pad environment.
+
+    Binary files are empirically observed with ``binary`` set to ``True`` and
+    ``contents`` set to ``None``; these fields are not fully described by the
+    published API specification.
+    """
 
     path: str
-    contents: str
+    contents: str | None
     history: str | None
+    binary: bool = False
 
     @classmethod
     def from_dict(
@@ -398,10 +478,12 @@ class FileContent:
         Returns:
             A new instance.
         """
+        raw_binary = data.get("binary")
         return cls(
             path=data["path"],
             contents=data["contents"],
             history=data.get("history"),
+            binary=raw_binary if raw_binary is not None else False,
         )
 
 
@@ -557,6 +639,138 @@ class CustomFile:
 
 @beartype
 @dataclass(frozen=True, kw_only=True)
+class CustomDatabaseColumn:
+    """A column in a question's custom database schema."""
+
+    name: str
+    type: str
+    pk: bool
+    nn: bool
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: CustomDatabaseColumnDict,
+    ) -> Self:
+        """Create from an API response dictionary.
+
+        Args:
+            data: The dictionary to convert.
+
+        Returns:
+            A new instance.
+        """
+        return cls(
+            name=data["name"],
+            type=data["type"],
+            pk=data["pk"],
+            nn=data["nn"],
+        )
+
+
+@beartype
+@dataclass(frozen=True, kw_only=True)
+class CustomDatabaseTable:
+    """A table in a question's custom database schema."""
+
+    name: str
+    columns: list[CustomDatabaseColumn]
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: CustomDatabaseTableDict,
+    ) -> Self:
+        """Create from an API response dictionary.
+
+        Args:
+            data: The dictionary to convert.
+
+        Returns:
+            A new instance.
+        """
+        return cls(
+            name=data["name"],
+            columns=[
+                CustomDatabaseColumn.from_dict(data=item)
+                for item in data["columns"]
+            ],
+        )
+
+
+@beartype
+@dataclass(frozen=True, kw_only=True)
+class CustomDatabaseSchema:
+    """The structured schema for a question's custom database."""
+
+    arrangement: str
+    tables: list[CustomDatabaseTable]
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: CustomDatabaseSchemaDict,
+    ) -> Self:
+        """Create from an API response dictionary.
+
+        Args:
+            data: The dictionary to convert.
+
+        Returns:
+            A new instance.
+        """
+        return cls(
+            arrangement=data["arrangement"],
+            tables=[
+                CustomDatabaseTable.from_dict(data=item)
+                for item in data["tables"]
+            ],
+        )
+
+
+@beartype
+@dataclass(frozen=True, kw_only=True)
+class CustomDatabase:
+    """A custom database attached to a question.
+
+    This structure is empirically observed in live API responses and is not
+    currently described by the published CoderPad API specification.
+    """
+
+    id: int
+    title: str
+    description: str
+    language: str
+    schema: str
+    schema_json: CustomDatabaseSchema
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: CustomDatabaseDict,
+    ) -> Self:
+        """Create from an API response dictionary.
+
+        Args:
+            data: The dictionary to convert.
+
+        Returns:
+            A new instance.
+        """
+        return cls(
+            id=data["id"],
+            title=data["title"],
+            description=data["description"],
+            language=data["language"],
+            schema=data["schema"],
+            schema_json=CustomDatabaseSchema.from_dict(
+                data=data["schema_json"],
+            ),
+        )
+
+
+@beartype
+@dataclass(frozen=True, kw_only=True)
 class Question:
     """A CoderPad question."""
 
@@ -582,6 +796,7 @@ class Question:
     public_take_home_setting_id: int | None = None
     contents_for_test_cases: str | None = None
     test_cases: list[TestCase] | None = None
+    custom_database: CustomDatabase | None = None
 
     @classmethod
     def from_dict(
@@ -597,6 +812,7 @@ class Question:
             A new instance.
         """
         raw_test_cases = data.get("test_cases")
+        raw_custom_database = data.get("custom_database")
         return cls(
             id=data["id"],
             title=data["title"],
@@ -633,6 +849,11 @@ class Question:
                 TestCase.from_dict(data=item) for item in raw_test_cases
             ]
             if raw_test_cases is not None
+            else None,
+            custom_database=CustomDatabase.from_dict(
+                data=raw_custom_database,
+            )
+            if raw_custom_database is not None
             else None,
         )
 
@@ -728,18 +949,32 @@ class Quota:
         )
 
 
+def _empty_child_organizations() -> list[dict[str, object]]:
+    """Return an empty list for a response structure not yet typed."""
+    return []
+
+
 @beartype
 @dataclass(frozen=True, kw_only=True)
 class Organization:
-    """Organization information."""
+    """Organization information.
+
+    ``id`` and ``child_organizations`` are empirically observed fields that
+    are not currently described by the published API specification. Child
+    organizations remain raw mappings until their non-empty shape is known.
+    """
 
     organization_name: str
     user_count: int
     users: list[OrganizationUser]
     organization_default_language: str
     single_sign_on_supported: bool
-    single_sign_in_url: str
     teams: list[Team]
+    single_sign_in_url: str | None = None
+    id: int | None = None
+    child_organizations: list[dict[str, object]] = field(
+        default_factory=_empty_child_organizations,
+    )
 
     @classmethod
     def from_dict(
@@ -754,6 +989,7 @@ class Organization:
         Returns:
             A new instance.
         """
+        raw_child_organizations = data.get("child_organizations")
         return cls(
             organization_name=data["organization_name"],
             user_count=data["user_count"],
@@ -764,8 +1000,14 @@ class Organization:
                 "organization_default_language"
             ],
             single_sign_on_supported=data["single_sign_on_supported"],
-            single_sign_in_url=data["single_sign_in_url"],
             teams=[Team.from_dict(data=item) for item in data["teams"]],
+            single_sign_in_url=data.get("single_sign_in_url"),
+            id=data.get("id"),
+            child_organizations=(
+                raw_child_organizations
+                if raw_child_organizations is not None
+                else _empty_child_organizations()
+            ),
         )
 
 
