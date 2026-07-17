@@ -273,7 +273,7 @@ class Pad:
                 for item in raw_notifications
             ]
             if raw_notifications is not None
-            else []
+            else _empty_pad_interviewer_notifications()
         )
         return cls(
             id=data["id"],
@@ -1006,7 +1006,7 @@ class Organization:
             child_organizations=(
                 raw_child_organizations
                 if raw_child_organizations is not None
-                else []
+                else _empty_child_organizations()
             ),
         )
 
