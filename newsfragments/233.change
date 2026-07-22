@@ -1,0 +1,2 @@
+Add ``ai_assist_custom_system_prompt`` to ``questions.update`` so AI Assist
+system prompts can be synchronized for existing questions.

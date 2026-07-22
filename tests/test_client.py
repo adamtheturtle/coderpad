@@ -861,6 +861,7 @@ class TestUpdateQuestion:
             description="New desc",
             contents="puts 'hi'",
             solution="puts 'answer'",
+            ai_assist_custom_system_prompt="Only provide hints.",
             candidate_instructions=[
                 CandidateInstruction(
                     instructions="Part 1",
@@ -921,6 +922,22 @@ class TestUpdateQuestion:
         ) == [
             {"instructions": "Part 1", "default_visible": True},
             {"instructions": "Part 2", "default_visible": False},
+        ]
+
+    @staticmethod
+    def test_update_question_ai_assist_system_prompt_body(
+        coderpad_client: CoderPad,
+        mock_coderpad_api: respx.MockRouter,
+    ) -> None:
+        """AI Assist's system prompt is serialized into the form body."""
+        coderpad_client.questions.update(
+            question_id="123",
+            ai_assist_custom_system_prompt="Only provide hints.",
+        )
+        request = mock_coderpad_api.calls.last.request
+        sent = parse_qs(qs=request.content.decode())
+        assert sent["question[ai_assist_custom_system_prompt]"] == [
+            "Only provide hints.",
         ]
 
 
