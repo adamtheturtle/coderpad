@@ -1,2 +1,0 @@
-Add an ``ai_assist_custom_system_prompt`` parameter to ``questions.create``
-to configure AI Assist's system prompt for a question.

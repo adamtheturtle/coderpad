@@ -3,6 +3,16 @@ Changelog
 
 .. towncrier release notes start
 
+2026.07.22
+----------
+
+- Add synchronous and asynchronous support for retrieving and replaying per-file pad editor history.
+
+- Support empirically observed API response variants for binary files, organization metadata, pad interviewer notifications, and question custom databases.
+
+- Add an ``ai_assist_custom_system_prompt`` parameter to ``questions.create``
+  to configure AI Assist's system prompt for a question.
+
 2026.06.29
 ----------
 
