@@ -3,6 +3,12 @@ Changelog
 
 .. towncrier release notes start
 
+2026.07.22.1
+------------
+
+- Add ``ai_assist_custom_system_prompt`` to ``questions.update`` so AI Assist
+  system prompts can be synchronized for existing questions.
+
 2026.07.22
 ----------
 
