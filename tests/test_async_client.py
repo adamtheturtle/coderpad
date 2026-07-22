@@ -530,6 +530,7 @@ class TestAsyncCreateQuestion:
             description="A description",
             contents="def solve(): pass",
             solution="def solve(): return 42",
+            ai_assist_custom_system_prompt="Only provide hints.",
             candidate_instructions=[
                 CandidateInstruction(
                     instructions="Part 1",
@@ -600,6 +601,7 @@ class TestAsyncCreateQuestion:
         await async_coderpad_client.questions.create(
             title="Live Question",
             language="python",
+            ai_assist_custom_system_prompt="Only provide hints.",
             candidate_instructions=[
                 CandidateInstruction(
                     instructions="Part 1",
@@ -610,6 +612,9 @@ class TestAsyncCreateQuestion:
         )
         request = mock_coderpad_api.calls.last.request
         sent = parse_qs(qs=request.content.decode())
+        assert sent["question[ai_assist_custom_system_prompt]"] == [
+            "Only provide hints.",
+        ]
         assert json.loads(
             s=sent["question[candidate_instructions]"][0],
         ) == [

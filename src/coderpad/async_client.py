@@ -360,6 +360,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         description: str | None = None,
         contents: str | None = None,
         solution: str | None = None,
+        ai_assist_custom_system_prompt: str | None = None,
         candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
@@ -375,6 +376,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
                 session. Cannot be combined with
                 ``file_contents``.
             solution: The solution to the question.
+            ai_assist_custom_system_prompt: Custom system prompt for AI Assist.
             candidate_instructions: Progressively-revealed
                 instruction blocks shown to the candidate.
             file_contents: Files for a multi-file question.
@@ -398,6 +400,10 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             data["question[contents]"] = contents
         if solution is not None:
             data["question[solution]"] = solution
+        if ai_assist_custom_system_prompt is not None:
+            data["question[ai_assist_custom_system_prompt]"] = (
+                ai_assist_custom_system_prompt
+            )
         if candidate_instructions is not None:
             data["question[candidate_instructions]"] = json.dumps(
                 obj=[
