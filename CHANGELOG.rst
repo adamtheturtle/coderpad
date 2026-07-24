@@ -3,6 +3,12 @@ Changelog
 
 .. towncrier release notes start
 
+2026.07.24
+----------
+
+- Expose the optional ``ai_assist_custom_system_prompt`` field on question
+  responses so custom AI Assist prompts can be read and synchronized.
+
 2026.07.22.1
 ------------
 
