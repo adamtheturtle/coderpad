@@ -1,6 +1,9 @@
 """Tests for asynchronous CoderPad Screen support."""
 
-# ruff: noqa: PLR2004
+# ruff: noqa: PLR0911, PLR2004
+
+import json as json_module
+from http import HTTPStatus
 
 import pytest
 
@@ -9,15 +12,14 @@ from coderpad.exceptions import AuthenticationError
 from coderpad.screen_types import ScreenInvitation
 from coderpad.transports import TransportResponse
 
-from .test_screen import _ScreenTransport
-
 
 class _AsyncScreenTransport:
-    """Asynchronously adapt the shared recording transport."""
+    """Record asynchronous Screen requests."""
 
-    def __init__(self, sync: _ScreenTransport) -> None:
-        """Create an asynchronous transport adapter."""
-        self.sync = sync
+    def __init__(self, *, error: bool = False) -> None:
+        """Create a recording transport."""
+        self.calls: list[dict[str, object]] = []
+        self.error = error
 
     async def __call__(
         self,
@@ -30,16 +32,74 @@ class _AsyncScreenTransport:
         files: dict[str, tuple[str, bytes, str]] | None = None,
         json: object | None = None,
     ) -> TransportResponse:
-        """Forward to the synchronous recording transport."""
-        return self.sync(
-            method=method,
-            url=url,
-            headers=headers,
-            params=params,
-            data=data,
-            files=files,
-            json=json,
+        """Return a response selected by the request path."""
+        del data, files
+        self.calls.append(
+            {
+                "method": method,
+                "url": url,
+                "headers": headers,
+                "params": params or {},
+                "json": json,
+            },
         )
+        if self.error:
+            return _response(
+                {"code": "Unauthorized", "message": "Invalid API key"},
+                status=HTTPStatus.UNAUTHORIZED,
+            )
+        if url.endswith("/campaigns"):
+            return _response([{"id": 7, "name": "Backend"}])
+        if url.endswith("/campaigns/7/actions/send"):
+            return _response({"id": 11, "test_url": "https://test.example"})
+        if url.endswith("/tests"):
+            return _response(
+                {
+                    "tests": [
+                        {
+                            "id": 11,
+                            "status": "completed",
+                            "report": dict[str, object](),
+                        },
+                    ],
+                    "pagination": {"total": 2},
+                },
+            )
+        if url.endswith("/tests/11/report"):
+            return TransportResponse(
+                status_code=HTTPStatus.OK,
+                headers={"content-type": "application/pdf"},
+                content=b"%PDF report",
+            )
+        if url.endswith("/tests/11"):
+            return _response(
+                {
+                    "id": 11,
+                    "status": "completed",
+                    "report": dict[str, object](),
+                },
+            )
+        if url.endswith("/webhook") and method == "GET":
+            return _response({"url": "https://example.com/hook"})
+        return TransportResponse(
+            status_code=HTTPStatus.NO_CONTENT,
+            headers={},
+            content=b"",
+        )
+
+
+def _response(
+    value: object,
+    /,
+    *,
+    status: HTTPStatus = HTTPStatus.OK,
+) -> TransportResponse:
+    """Create a JSON transport response."""
+    return TransportResponse(
+        status_code=status,
+        headers={"content-type": "application/json"},
+        content=json_module.dumps(obj=value).encode(),
+    )
 
 
 def _client(transport: _AsyncScreenTransport, /) -> AsyncCoderPad:
@@ -47,15 +107,16 @@ def _client(transport: _AsyncScreenTransport, /) -> AsyncCoderPad:
     return AsyncCoderPad(
         api_key="interview-key",
         screen_api_key="screen-key",
-        transport=transport,
+        screen_transport=transport,
     )
 
 
 @pytest.mark.asyncio
 async def test_async_screen_matches_sync_surface() -> None:
     """The asynchronous namespaces expose equivalent operations."""
-    recorder = _ScreenTransport()
-    screen = _client(_AsyncScreenTransport(sync=recorder)).screen
+    recorder = _AsyncScreenTransport()
+    client = _client(recorder)
+    screen = client.screen
     campaigns = await screen.campaigns.list()
     invitation = await screen.campaigns.send_invitation(
         campaign_id=7,
@@ -87,12 +148,13 @@ async def test_async_screen_matches_sync_surface() -> None:
         "include_rank": "false",
     }
     assert webhook.url == "https://example.com/hook"
+    await client.aclose()
 
 
 @pytest.mark.asyncio
 async def test_async_screen_errors_use_existing_hierarchy() -> None:
     """Async Screen failures map to the shared exception hierarchy."""
-    recorder = _ScreenTransport(error=True)
-    screen = _client(_AsyncScreenTransport(sync=recorder)).screen
+    recorder = _AsyncScreenTransport(error=True)
+    screen = _client(recorder).screen
     with pytest.raises(expected_exception=AuthenticationError):
         await screen.campaigns.list()

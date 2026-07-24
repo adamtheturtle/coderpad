@@ -14,7 +14,7 @@ from coderpad.screen_types import (
     ScreenTestsPage,
     ScreenWebhook,
 )
-from coderpad.transports import Transport, TransportResponse
+from coderpad.transports import JSONTransport, TransportResponse
 
 SCREEN_US_BASE_URL = "https://www.codingame.com"
 SCREEN_EU_BASE_URL = "https://www.codingame.eu"
@@ -28,14 +28,14 @@ class _ScreenNamespace:
     def __init__(
         self,
         *,
-        transport: Transport,
+        transport: JSONTransport,
         api_key: str,
         base_url: str,
     ) -> None:
         """Create shared Screen request state."""
-        self.transport = transport
-        self.base_url = base_url.rstrip("/")
-        self.headers = {"API-Key": api_key}
+        self.transport: JSONTransport = transport
+        self.base_url: str = base_url.rstrip("/")
+        self.headers: dict[str, str] = {"API-Key": api_key}
 
     def _request(
         self,
@@ -65,11 +65,8 @@ class ScreenCampaignsNamespace(_ScreenNamespace):
     def list(self) -> builtins.list[ScreenCampaign]:
         """List assessment campaigns."""
         response = self._request(method="GET", path="/campaigns")
-        return [
-            ScreenCampaign.from_dict(data=item)
-            for item in response.json()
-            if isinstance(item, dict)
-        ]
+        raw_campaigns: object = response.json()
+        return ScreenCampaign.list_from_value(value=raw_campaigns)
 
     def send_invitation(
         self,
@@ -135,7 +132,9 @@ class ScreenTestsNamespace(_ScreenNamespace):
         with_community_stats: bool = False,
     ) -> ScreenTest:
         """Retrieve one test session."""
-        params = {"withCommunityStats": "true"} if with_community_stats else {}
+        params: dict[str, str | int] = (
+            {"withCommunityStats": "true"} if with_community_stats else {}
+        )
         response = self._request(
             method="GET",
             path=f"/tests/{test_id}",
@@ -209,7 +208,7 @@ class ScreenNamespace(_ScreenNamespace):
     def __init__(
         self,
         *,
-        transport: Transport,
+        transport: JSONTransport,
         api_key: str,
         base_url: str,
     ) -> None:
@@ -219,17 +218,17 @@ class ScreenNamespace(_ScreenNamespace):
             api_key=api_key,
             base_url=base_url,
         )
-        self.campaigns = ScreenCampaignsNamespace(
+        self.campaigns: ScreenCampaignsNamespace = ScreenCampaignsNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
         )
-        self.tests = ScreenTestsNamespace(
+        self.tests: ScreenTestsNamespace = ScreenTestsNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
         )
-        self.webhook = ScreenWebhookNamespace(
+        self.webhook: ScreenWebhookNamespace = ScreenWebhookNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,

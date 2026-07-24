@@ -9,7 +9,7 @@ import pytest
 
 from coderpad import SCREEN_EU_BASE_URL, CoderPad
 from coderpad.exceptions import AuthenticationError
-from coderpad.screen_types import ScreenInvitation
+from coderpad.screen_types import ScreenCampaign, ScreenInvitation, ScreenTest
 from coderpad.transports import TransportResponse
 
 _TEST = {
@@ -40,7 +40,7 @@ _TEST = {
 }
 
 
-class _ScreenTransport:
+class ScreenTransportStub:
     """Record requests and return representative Screen responses."""
 
     def __init__(self, *, error: bool = False) -> None:
@@ -132,7 +132,7 @@ def _response(
 
 
 def _client(
-    transport: _ScreenTransport,
+    transport: ScreenTransportStub,
     /,
     *,
     base_url: str = SCREEN_EU_BASE_URL,
@@ -142,13 +142,13 @@ def _client(
         api_key="interview-key",
         screen_api_key="screen-key",
         screen_base_url=base_url,
-        transport=transport,
+        screen_transport=transport,
     )
 
 
 def test_campaigns_and_invitation() -> None:
     """Campaigns and invitations use Screen authentication and JSON."""
-    transport = _ScreenTransport()
+    transport = ScreenTransportStub()
     client = _client(transport)
     campaigns = client.screen.campaigns.list()
     invitation = ScreenInvitation(candidate_email="ada@example.com")
@@ -164,11 +164,20 @@ def test_campaigns_and_invitation() -> None:
     assert transport.calls[0]["headers"] == {"API-Key": "screen-key"}
     assert transport.calls[1]["json"] == {"candidate_email": "ada@example.com"}
     assert f"{transport.calls[0]['url']}".startswith(SCREEN_EU_BASE_URL)
+    client.close()
+
+
+def test_required_integer_fields_are_validated() -> None:
+    """Required integer fields reject malformed API values."""
+    with pytest.raises(expected_exception=TypeError):
+        ScreenCampaign.from_dict(data={"id": "not-an-integer", "name": "Bad"})
+    assert not ScreenCampaign(id=1, name="Empty").languages
+    assert ScreenTest.from_dict(data={"id": 1}).report is None
 
 
 def test_tests_filters_pagination_and_decoding() -> None:
     """Test list filters, pagination, and nested models are preserved."""
-    transport = _ScreenTransport()
+    transport = ScreenTransportStub()
     page = _client(transport).screen.tests.list(
         campaign_id=7,
         status="completed",
@@ -223,7 +232,7 @@ def test_tests_filters_pagination_and_decoding() -> None:
 
 def test_get_actions_report_and_webhook() -> None:
     """Test retrieval, mutations, PDF bytes, and webhook operations."""
-    transport = _ScreenTransport()
+    transport = ScreenTransportStub()
     screen = _client(transport).screen
     test = screen.tests.get(test_id=11, with_community_stats=True)
     screen.tests.cancel(test_id=11)
@@ -247,4 +256,4 @@ def test_get_actions_report_and_webhook() -> None:
 def test_screen_errors_use_existing_hierarchy() -> None:
     """Screen HTTP failures map to the shared exception hierarchy."""
     with pytest.raises(expected_exception=AuthenticationError):
-        _client(_ScreenTransport(error=True)).screen.campaigns.list()
+        _client(ScreenTransportStub(error=True)).screen.campaigns.list()

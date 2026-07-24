@@ -77,7 +77,6 @@ class Transport(Protocol):
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
-        json: object | None = None,
     ) -> TransportResponse:
         """Make an HTTP request.
 
@@ -90,12 +89,30 @@ class Transport(Protocol):
             files: Files to upload as multipart form data.
                 Each key is the field name, and the value is
                 a ``(filename, content, content_type)`` tuple.
-            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the HTTP
             response.
         """
+        ...  # pylint: disable=unnecessary-ellipsis
+
+
+@runtime_checkable
+class JSONTransport(Protocol):
+    """Protocol for transports supporting JSON request bodies."""
+
+    def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
+    ) -> TransportResponse:
+        """Make an HTTP request with an optional JSON body."""
         ...  # pylint: disable=unnecessary-ellipsis
 
 
@@ -191,7 +208,6 @@ class AsyncTransport(Protocol):
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
-        json: object | None = None,
     ) -> TransportResponse:
         """Make an async HTTP request.
 
@@ -204,12 +220,30 @@ class AsyncTransport(Protocol):
             files: Files to upload as multipart form data.
                 Each key is the field name, and the value is
                 a ``(filename, content, content_type)`` tuple.
-            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the HTTP
             response.
         """
+        ...  # pylint: disable=unnecessary-ellipsis
+
+
+@runtime_checkable
+class AsyncJSONTransport(Protocol):
+    """Protocol for async transports supporting JSON request bodies."""
+
+    async def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
+    ) -> TransportResponse:
+        """Make an async HTTP request with an optional JSON body."""
         ...  # pylint: disable=unnecessary-ellipsis
 
 

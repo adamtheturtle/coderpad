@@ -15,7 +15,7 @@ from coderpad.screen_types import (
     ScreenTestsPage,
     ScreenWebhook,
 )
-from coderpad.transports import AsyncTransport, TransportResponse
+from coderpad.transports import AsyncJSONTransport, TransportResponse
 
 _SCREEN_PREFIX = "/assessment/api/v1.1"
 
@@ -27,14 +27,14 @@ class _AsyncScreenNamespace:
     def __init__(
         self,
         *,
-        transport: AsyncTransport,
+        transport: AsyncJSONTransport,
         api_key: str,
         base_url: str = SCREEN_US_BASE_URL,
     ) -> None:
         """Create shared asynchronous Screen request state."""
-        self.transport = transport
-        self.base_url = base_url.rstrip("/")
-        self.headers = {"API-Key": api_key}
+        self.transport: AsyncJSONTransport = transport
+        self.base_url: str = base_url.rstrip("/")
+        self.headers: dict[str, str] = {"API-Key": api_key}
 
     async def _request(
         self,
@@ -64,11 +64,8 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
     async def list(self) -> builtins.list[ScreenCampaign]:
         """List assessment campaigns."""
         response = await self._request(method="GET", path="/campaigns")
-        return [
-            ScreenCampaign.from_dict(data=item)
-            for item in response.json()
-            if isinstance(item, dict)
-        ]
+        raw_campaigns: object = response.json()
+        return ScreenCampaign.list_from_value(value=raw_campaigns)
 
     async def send_invitation(
         self,
@@ -138,7 +135,9 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
         with_community_stats: bool = False,
     ) -> ScreenTest:
         """Retrieve one test session."""
-        params = {"withCommunityStats": "true"} if with_community_stats else {}
+        params: dict[str, str | int] = (
+            {"withCommunityStats": "true"} if with_community_stats else {}
+        )
         response = await self._request(
             method="GET",
             path=f"/tests/{test_id}",
@@ -219,7 +218,7 @@ class AsyncScreenNamespace(_AsyncScreenNamespace):
     def __init__(
         self,
         *,
-        transport: AsyncTransport,
+        transport: AsyncJSONTransport,
         api_key: str,
         base_url: str = SCREEN_US_BASE_URL,
     ) -> None:
@@ -229,18 +228,22 @@ class AsyncScreenNamespace(_AsyncScreenNamespace):
             api_key=api_key,
             base_url=base_url,
         )
-        self.campaigns = AsyncScreenCampaignsNamespace(
+        self.campaigns: AsyncScreenCampaignsNamespace = (
+            AsyncScreenCampaignsNamespace(
+                transport=transport,
+                api_key=api_key,
+                base_url=base_url,
+            )
+        )
+        self.tests: AsyncScreenTestsNamespace = AsyncScreenTestsNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
         )
-        self.tests = AsyncScreenTestsNamespace(
-            transport=transport,
-            api_key=api_key,
-            base_url=base_url,
-        )
-        self.webhook = AsyncScreenWebhookNamespace(
-            transport=transport,
-            api_key=api_key,
-            base_url=base_url,
+        self.webhook: AsyncScreenWebhookNamespace = (
+            AsyncScreenWebhookNamespace(
+                transport=transport,
+                api_key=api_key,
+                base_url=base_url,
+            )
         )

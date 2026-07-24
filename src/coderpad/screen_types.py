@@ -1,16 +1,44 @@
 """Types for the CoderPad Screen API."""
 
 from dataclasses import dataclass, field
-from typing import Self
+from typing import Self, TypeGuard
 
 from beartype import beartype
 
 
+def _is_object_list(value: object, /) -> TypeGuard[list[object]]:
+    """Return whether an API value is a list."""
+    return isinstance(value, list)
+
+
+def _is_object_mapping(
+    value: object,
+    /,
+) -> TypeGuard[dict[object, object]]:
+    """Return whether an API value is a mapping."""
+    return isinstance(value, dict)
+
+
+def _objects(value: object, /) -> list[object]:
+    """Return an object list from an API value."""
+    return value if _is_object_list(value) else []
+
+
+def _mapping(value: object, /) -> dict[str, object] | None:
+    """Return a string-keyed mapping from an API value."""
+    if not _is_object_mapping(value):
+        return None
+    return {key: item for key, item in value.items() if isinstance(key, str)}
+
+
 def _strings(value: object, /) -> list[str]:
     """Return a string list from an API value."""
-    if not isinstance(value, list):
-        return []
-    return [item for item in value if isinstance(item, str)]
+    return [item for item in _objects(value) if isinstance(item, str)]
+
+
+def _empty_strings() -> list[str]:
+    """Create an empty string list."""
+    return []
 
 
 def _optional_int(value: object, /) -> int | None:
@@ -20,6 +48,14 @@ def _optional_int(value: object, /) -> int | None:
         if isinstance(value, int) and not isinstance(value, bool)
         else None
     )
+
+
+def _required_int(value: object, /) -> int:
+    """Return a required integer API value."""
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    msg = "Expected an integer API value"
+    raise TypeError(msg)
 
 
 def _optional_float(value: object, /) -> float | None:
@@ -39,15 +75,24 @@ class ScreenCampaign:
 
     id: int
     name: str
-    languages: list[str] = field(default_factory=list)
+    languages: list[str] = field(default_factory=_empty_strings)
     pinned: bool = False
     archived: bool = False
+
+    @classmethod
+    def list_from_value(cls, value: object) -> list[Self]:
+        """Create campaigns from an API response value."""
+        return [
+            cls.from_dict(data=mapping)
+            for item in _objects(value)
+            if (mapping := _mapping(item)) is not None
+        ]
 
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> Self:
         """Create a campaign from an API response."""
         return cls(
-            id=int(data["id"]),
+            id=_required_int(data["id"]),
             name=f"{data['name']}",
             languages=_strings(data.get("languages")),
             pinned=data.get("pinned") is True,
@@ -113,7 +158,7 @@ class ScreenTestQuestion:
     def from_dict(cls, data: dict[str, object]) -> Self:
         """Create a question from an API response."""
         return cls(
-            id=int(data["id"]),
+            id=_required_int(data["id"]),
             last_activity_time=_optional_int(data.get("last_activity_time")),
         )
 
@@ -151,14 +196,14 @@ class ScreenTechnologyResult:
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> Self:
         """Create a technology result from an API response."""
-        raw_skills = data.get("skills")
+        typed_skills = _mapping(data.get("skills"))
         skills = (
             {
-                name: ScreenSkillResult.from_dict(data=value)
-                for name, value in raw_skills.items()
-                if isinstance(name, str) and isinstance(value, dict)
+                name: ScreenSkillResult.from_dict(data=mapped)
+                for name, raw_value in typed_skills.items()
+                if (mapped := _mapping(raw_value)) is not None
             }
-            if isinstance(raw_skills, dict)
+            if typed_skills is not None
             else {}
         )
         return cls(
@@ -188,21 +233,22 @@ class ScreenReport:
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> Self:
         """Create a report from an API response."""
-        raw_technologies = data.get("technologies")
+        typed_technologies = _mapping(data.get("technologies"))
         technologies = (
             {
-                name: ScreenTechnologyResult.from_dict(data=value)
-                for name, value in raw_technologies.items()
-                if isinstance(name, str) and isinstance(value, dict)
+                name: ScreenTechnologyResult.from_dict(data=mapped)
+                for name, raw_value in typed_technologies.items()
+                if (mapped := _mapping(raw_value)) is not None
             }
-            if isinstance(raw_technologies, dict)
+            if typed_technologies is not None
             else {}
         )
-        raw_community_stats = data.get("community_stats")
+        raw_community_stats: object = data.get("community_stats")
+        community_items = _objects(raw_community_stats)
         community_stats = (
             [
                 item
-                for item in raw_community_stats
+                for item in community_items
                 if isinstance(item, int) and not isinstance(item, bool)
             ]
             if isinstance(raw_community_stats, list)
@@ -244,10 +290,10 @@ class ScreenTest:
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> Self:
         """Create a test session from an API response."""
-        raw_report = data.get("report")
-        raw_questions = data.get("questions")
+        raw_report = _mapping(data.get("report"))
+        typed_questions = _objects(data.get("questions"))
         return cls(
-            id=int(data["id"]),
+            id=_required_int(data["id"]),
             status=f"{data.get('status', 'unknown')}",
             campaign_id=_optional_int(data.get("campaign_id")),
             candidate_name=_optional_str(data.get("candidate_name")),
@@ -260,15 +306,13 @@ class ScreenTest:
             url=_optional_str(data.get("url")),
             test_url=_optional_str(data.get("test_url")),
             report=ScreenReport.from_dict(data=raw_report)
-            if isinstance(raw_report, dict)
+            if raw_report is not None
             else None,
             questions=[
-                ScreenTestQuestion.from_dict(data=item)
-                for item in raw_questions
-                if isinstance(item, dict)
-            ]
-            if isinstance(raw_questions, list)
-            else [],
+                ScreenTestQuestion.from_dict(data=mapping)
+                for item in typed_questions
+                if (mapping := _mapping(item)) is not None
+            ],
         )
 
 
@@ -306,18 +350,16 @@ class ScreenTestsPage:
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> Self:
         """Create a tests page from an API response."""
-        raw_tests = data.get("tests")
-        raw_pagination = data.get("pagination")
+        typed_tests = _objects(data.get("tests"))
+        raw_pagination = _mapping(data.get("pagination"))
         return cls(
             tests=[
-                ScreenTest.from_dict(data=item)
-                for item in raw_tests
-                if isinstance(item, dict)
-            ]
-            if isinstance(raw_tests, list)
-            else [],
+                ScreenTest.from_dict(data=mapping)
+                for item in typed_tests
+                if (mapping := _mapping(item)) is not None
+            ],
             pagination=ScreenPagination.from_dict(data=raw_pagination)
-            if isinstance(raw_pagination, dict)
+            if raw_pagination is not None
             else None,
         )
 
