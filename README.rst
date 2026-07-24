@@ -32,6 +32,22 @@ Getting Started
        sys.stdout.write(listed_pad.title)
    org = client.organization.get()
    sys.stdout.write(org.organization_name)
+   for user in client.organization.users.list():
+       sys.stdout.write(user.email)
+
+The organization users endpoint also supports server-side email filtering:
+
+.. code-block:: python
+
+   """Filter organization users by email."""
+
+   from coderpad.client import CoderPad
+
+   client = CoderPad(api_key="your-api-key")
+   users = client.organization.users.list(email="person@example.com")
+
+The equivalent asynchronous operation is
+``await client.organization.users.list(email="person@example.com")``.
 
 Full Documentation
 ------------------
