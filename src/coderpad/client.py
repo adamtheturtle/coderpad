@@ -10,6 +10,7 @@ from typing import Self
 from beartype import beartype
 
 from coderpad.exceptions import CoderPadError
+from coderpad.screen import SCREEN_US_BASE_URL, ScreenNamespace
 from coderpad.transports import (
     HTTPXTransport,
     Transport,
@@ -778,6 +779,8 @@ class CoderPad:
         *,
         api_key: str,
         base_url: str = "https://app.coderpad.io",
+        screen_api_key: str | None = None,
+        screen_base_url: str = SCREEN_US_BASE_URL,
         transport: Transport | None = None,
     ) -> None:
         """Create a new CoderPad client.
@@ -785,6 +788,8 @@ class CoderPad:
         Args:
             api_key: The API key for authentication.
             base_url: The base URL for the API.
+            screen_api_key: The independent Screen API key.
+            screen_base_url: The US, EU, or custom Screen base URL.
             transport: The HTTP transport. Defaults to
                 ``HTTPXTransport()``.
         """
@@ -800,6 +805,11 @@ class CoderPad:
             transport=resolved_transport,
             base_url=base_url,
             headers=headers,
+        )
+        self.screen: ScreenNamespace = ScreenNamespace(
+            transport=resolved_transport,
+            api_key=screen_api_key or "",
+            base_url=screen_base_url,
         )
         if isinstance(resolved_transport, HTTPXTransport):
             self._close = resolved_transport.close

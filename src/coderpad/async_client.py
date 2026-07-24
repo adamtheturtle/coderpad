@@ -9,7 +9,9 @@ from typing import Self
 
 from beartype import beartype
 
+from coderpad.async_screen import AsyncScreenNamespace
 from coderpad.exceptions import CoderPadError
+from coderpad.screen import SCREEN_US_BASE_URL
 from coderpad.transports import (
     AsyncHTTPXTransport,
     AsyncTransport,
@@ -791,6 +793,8 @@ class AsyncCoderPad:
         *,
         api_key: str,
         base_url: str = ("https://app.coderpad.io"),
+        screen_api_key: str | None = None,
+        screen_base_url: str = SCREEN_US_BASE_URL,
         transport: AsyncTransport | None = None,
     ) -> None:
         """Create a new async CoderPad client.
@@ -798,6 +802,8 @@ class AsyncCoderPad:
         Args:
             api_key: The API key for authentication.
             base_url: The base URL for the API.
+            screen_api_key: The independent Screen API key.
+            screen_base_url: The US, EU, or custom Screen base URL.
             transport: The async HTTP transport. Defaults
                 to ``AsyncHTTPXTransport()``.
         """
@@ -813,6 +819,11 @@ class AsyncCoderPad:
             transport=resolved_transport,
             base_url=base_url,
             headers=headers,
+        )
+        self.screen: AsyncScreenNamespace = AsyncScreenNamespace(
+            transport=resolved_transport,
+            api_key=screen_api_key or "",
+            base_url=screen_base_url,
         )
         if isinstance(
             resolved_transport,

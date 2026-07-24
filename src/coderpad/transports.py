@@ -77,6 +77,7 @@ class Transport(Protocol):
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
     ) -> TransportResponse:
         """Make an HTTP request.
 
@@ -89,6 +90,7 @@ class Transport(Protocol):
             files: Files to upload as multipart form data.
                 Each key is the field name, and the value is
                 a ``(filename, content, content_type)`` tuple.
+            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the HTTP
@@ -139,6 +141,7 @@ class HTTPXTransport:
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
     ) -> TransportResponse:
         """Make an HTTP request using ``httpx``.
 
@@ -149,6 +152,7 @@ class HTTPXTransport:
             params: Query parameters.
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
+            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the httpx
@@ -161,6 +165,7 @@ class HTTPXTransport:
             params=params,
             data=data,
             files=files,
+            json=json,
         )
         return TransportResponse(
             status_code=response.status_code,
@@ -186,6 +191,7 @@ class AsyncTransport(Protocol):
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
     ) -> TransportResponse:
         """Make an async HTTP request.
 
@@ -198,6 +204,7 @@ class AsyncTransport(Protocol):
             files: Files to upload as multipart form data.
                 Each key is the field name, and the value is
                 a ``(filename, content, content_type)`` tuple.
+            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the HTTP
@@ -249,6 +256,7 @@ class AsyncHTTPXTransport:
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
     ) -> TransportResponse:
         """Make an async HTTP request using ``httpx``.
 
@@ -259,6 +267,7 @@ class AsyncHTTPXTransport:
             params: Query parameters.
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
+            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the httpx
@@ -271,6 +280,7 @@ class AsyncHTTPXTransport:
             params=params,
             data=data,
             files=files,
+            json=json,
         )
         return TransportResponse(
             status_code=response.status_code,
