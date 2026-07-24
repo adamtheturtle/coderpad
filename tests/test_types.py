@@ -222,6 +222,7 @@ def _question_dict() -> QuestionDict:
         "contents_for_test_cases": "test code",
         "test_cases": [_test_case_dict()],
         "custom_database": _custom_database_dict(),
+        "ai_assist_custom_system_prompt": "Only provide hints.",
     }
 
 
@@ -501,6 +502,23 @@ class TestQuestion:
         assert result.custom_database is not None
         assert result.custom_database.title == "Products"
         assert result.custom_database.schema_json.tables[0].columns[0].pk
+        assert result.ai_assist_custom_system_prompt == "Only provide hints."
+
+    @staticmethod
+    def test_from_dict_with_null_ai_assist_custom_system_prompt() -> None:
+        """A Question can have no custom AI Assist system prompt."""
+        data = _question_dict()
+        data["ai_assist_custom_system_prompt"] = None
+        result = Question.from_dict(data=data)
+        assert result.ai_assist_custom_system_prompt is None
+
+    @staticmethod
+    def test_from_dict_without_ai_assist_custom_system_prompt() -> None:
+        """A Question can omit its custom AI Assist system prompt."""
+        data = _question_dict()
+        del data["ai_assist_custom_system_prompt"]
+        result = Question.from_dict(data=data)
+        assert result.ai_assist_custom_system_prompt is None
 
     @staticmethod
     def test_from_dict_without_custom_database() -> None:

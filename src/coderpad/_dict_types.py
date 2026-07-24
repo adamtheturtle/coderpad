@@ -189,6 +189,7 @@ class QuestionDict(TypedDict):
     contents_for_test_cases: NotRequired[str]
     test_cases: NotRequired[list[TestCaseDict]]
     custom_database: NotRequired[CustomDatabaseDict]
+    ai_assist_custom_system_prompt: NotRequired[str | None]
 
 
 class OrganizationUserDict(TypedDict):

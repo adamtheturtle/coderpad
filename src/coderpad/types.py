@@ -797,6 +797,7 @@ class Question:
     contents_for_test_cases: str | None = None
     test_cases: list[TestCase] | None = None
     custom_database: CustomDatabase | None = None
+    ai_assist_custom_system_prompt: str | None = None
 
     @classmethod
     def from_dict(
@@ -855,6 +856,9 @@ class Question:
             )
             if raw_custom_database is not None
             else None,
+            ai_assist_custom_system_prompt=data.get(
+                "ai_assist_custom_system_prompt",
+            ),
         )
 
 

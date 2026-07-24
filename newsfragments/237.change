@@ -1,0 +1,2 @@
+Expose the optional ``ai_assist_custom_system_prompt`` field on question
+responses so custom AI Assist prompts can be read and synchronized.
