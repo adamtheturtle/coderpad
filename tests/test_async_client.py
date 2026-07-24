@@ -356,8 +356,8 @@ class TestAsyncGetPadEnvironment:
             files: (dict[str, tuple[str, bytes, str]] | None) = None,
         ) -> TransportResponse:
             """Return synthetic live-response variants."""
-            del method, headers, params, data, files
-            return live_variant_response(url=url)
+            del headers, params, data, files
+            return live_variant_response(method=method, url=url)
 
         client = AsyncCoderPad(api_key="test-key", transport=_transport)
         environment = await client.pads.get_environment(
@@ -369,6 +369,19 @@ class TestAsyncGetPadEnvironment:
         organization = await client.organization.get()
         assert organization.id == live_variant_organization_id
         assert organization.single_sign_in_url is None
+
+        questions = [
+            await client.questions.get(question_id="custom"),
+            (await client.questions.list())[0],
+            await client.questions.create(
+                title="FizzBuzz",
+                language="python",
+            ),
+        ]
+        assert all(
+            question.ai_assist_custom_system_prompt == "Only provide hints."
+            for question in questions
+        )
 
 
 class TestAsyncGetPadHistory:
@@ -489,6 +502,9 @@ class TestAsyncListQuestions:
         """Questions can be listed."""
         result = await async_coderpad_client.questions.list()
         assert result.total >= 0
+        assert (
+            result[0].ai_assist_custom_system_prompt == "Only provide hints."
+        )
 
     @staticmethod
     @pytest.mark.asyncio
@@ -517,6 +533,7 @@ class TestAsyncCreateQuestion:
             language="python",
         )
         assert result.id
+        assert result.ai_assist_custom_system_prompt == "Only provide hints."
 
     @staticmethod
     @pytest.mark.asyncio
@@ -636,6 +653,7 @@ class TestAsyncGetQuestion:
             question_id="123",
         )
         assert result.id
+        assert result.ai_assist_custom_system_prompt == "Only provide hints."
 
 
 class TestAsyncUpdateQuestion:
@@ -861,6 +879,9 @@ class TestAsyncListOrganizationQuestions:
         """Organization questions can be listed."""
         result = await async_coderpad_client.organization.questions.list()
         assert result.total >= 0
+        assert (
+            result[0].ai_assist_custom_system_prompt == "Only provide hints."
+        )
 
     @staticmethod
     @pytest.mark.asyncio

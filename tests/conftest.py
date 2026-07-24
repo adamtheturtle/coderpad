@@ -14,6 +14,7 @@ from coderpad.transports import TransportResponse
 
 _BASE_URL = "https://app.coderpad.io"
 _LIVE_VARIANT_ORGANIZATION_ID = 42
+_AI_ASSIST_CUSTOM_SYSTEM_PROMPT = "Only provide hints."
 
 
 @pytest.fixture(name="live_variant_organization_id")
@@ -29,7 +30,7 @@ def fixture_live_variant_response() -> Callable[
 ]:
     """Return synthetic examples of empirically observed API variants."""
 
-    def live_variant_response(*, url: str) -> TransportResponse:
+    def live_variant_response(*, method: str, url: str) -> TransportResponse:
         """Build a synthetic live-variant response for ``url``."""
         if url.endswith("/api/pad_environments/binary"):
             payload: dict[str, object] = {
@@ -62,6 +63,17 @@ def fixture_live_variant_response() -> Callable[
                 "teams": [],
                 "child_organizations": [],
             }
+        elif url.endswith("/api/questions/custom") or (
+            method == "POST" and url.endswith("/api/questions/")
+        ):
+            payload = _question_payload()
+        elif method == "GET" and url.endswith("/api/questions/"):
+            payload = {
+                "status": "OK",
+                "questions": [_question_payload()],
+                "next_page": None,
+                "total": 1,
+            }
         else:  # pragma: no cover
             msg = f"Unexpected test URL: {url}"
             raise AssertionError(msg)
@@ -72,6 +84,32 @@ def fixture_live_variant_response() -> Callable[
         )
 
     return live_variant_response
+
+
+def _question_payload() -> dict[str, object]:
+    """Return a question with an empirically observed AI Assist prompt."""
+    return {
+        "id": 42,
+        "title": "FizzBuzz",
+        "owner_email": "owner@example.com",
+        "language": "python",
+        "description": "Write FizzBuzz",
+        "candidate_instructions": [],
+        "contents": "def fizzbuzz(): ...",
+        "shared": False,
+        "used": 3,
+        "take_home": False,
+        "test_cases_enabled": False,
+        "solution": None,
+        "pad_type": "standard",
+        "is_draft": False,
+        "author_name": "Author",
+        "organization_name": "Org",
+        "custom_files": [],
+        "created_at": "2026-07-16T00:00:00Z",
+        "updated_at": "2026-07-16T00:00:00Z",
+        "ai_assist_custom_system_prompt": _AI_ASSIST_CUSTOM_SYSTEM_PROMPT,
+    }
 
 
 @pytest.fixture(name="openapi_spec")

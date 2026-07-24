@@ -556,8 +556,8 @@ class TestGetPadEnvironment:
             files: (dict[str, tuple[str, bytes, str]] | None) = None,
         ) -> TransportResponse:
             """Return synthetic live-response variants."""
-            del method, headers, params, data, files
-            return live_variant_response(url=url)
+            del headers, params, data, files
+            return live_variant_response(method=method, url=url)
 
         client = CoderPad(api_key="test-key", transport=_transport)
         environment = client.pads.get_environment(
@@ -569,6 +569,16 @@ class TestGetPadEnvironment:
         organization = client.organization.get()
         assert organization.id == live_variant_organization_id
         assert organization.single_sign_in_url is None
+
+        questions = [
+            client.questions.get(question_id="custom"),
+            client.questions.list()[0],
+            client.questions.create(title="FizzBuzz", language="python"),
+        ]
+        assert all(
+            question.ai_assist_custom_system_prompt == "Only provide hints."
+            for question in questions
+        )
 
 
 class TestGetPadHistory:
@@ -685,6 +695,9 @@ class TestListQuestions:
         """Questions can be listed."""
         result = coderpad_client.questions.list()
         assert result.total >= 0
+        assert (
+            result[0].ai_assist_custom_system_prompt == "Only provide hints."
+        )
 
     @staticmethod
     def test_list_questions_with_params(
@@ -711,6 +724,7 @@ class TestCreateQuestion:
             language="python",
         )
         assert result.id
+        assert result.ai_assist_custom_system_prompt == "Only provide hints."
 
     @staticmethod
     def test_create_question_all_params(
@@ -824,6 +838,7 @@ class TestGetQuestion:
             question_id="123",
         )
         assert result.id
+        assert result.ai_assist_custom_system_prompt == "Only provide hints."
 
 
 class TestUpdateQuestion:
@@ -1034,6 +1049,9 @@ class TestListOrganizationQuestions:
         """Organization questions can be listed."""
         result = coderpad_client.organization.questions.list()
         assert result.total >= 0
+        assert (
+            result[0].ai_assist_custom_system_prompt == "Only provide hints."
+        )
 
     @staticmethod
     def test_list_organization_questions_with_params(
