@@ -2,7 +2,7 @@
 
 # ruff: noqa: PLR0911, PLR2004
 
-import json
+import json as json_module
 from http import HTTPStatus
 
 import pytest
@@ -127,7 +127,7 @@ def _response(
     return TransportResponse(
         status_code=status,
         headers={"content-type": "application/json"},
-        content=json.dumps(obj=value).encode(),
+        content=json_module.dumps(obj=value).encode(),
     )
 
 

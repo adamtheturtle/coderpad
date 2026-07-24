@@ -5,6 +5,7 @@
 import pytest
 
 from coderpad import AsyncCoderPad
+from coderpad.exceptions import AuthenticationError
 from coderpad.screen_types import ScreenInvitation
 from coderpad.transports import TransportResponse
 
@@ -65,7 +66,12 @@ async def test_async_screen_matches_sync_surface() -> None:
     await screen.tests.cancel(test_id=11)
     await screen.tests.resend(test_id=11)
     await screen.tests.delete(test_id=11)
-    report = await screen.tests.report(test_id=11)
+    report = await screen.tests.report(
+        test_id=11,
+        report_type="full",
+        anonymous=True,
+        include_rank=False,
+    )
     webhook = await screen.webhook.get()
     await screen.webhook.set(url="https://example.com/hook")
     await screen.webhook.delete()
@@ -75,4 +81,18 @@ async def test_async_screen_matches_sync_surface() -> None:
     assert page.pagination.total == 2
     assert test.report is not None
     assert report == b"%PDF report"
+    assert recorder.calls[7]["params"] == {
+        "report_type": "full",
+        "anonymous": "true",
+        "include_rank": "false",
+    }
     assert webhook.url == "https://example.com/hook"
+
+
+@pytest.mark.asyncio
+async def test_async_screen_errors_use_existing_hierarchy() -> None:
+    """Async Screen failures map to the shared exception hierarchy."""
+    recorder = _ScreenTransport(error=True)
+    screen = _client(_AsyncScreenTransport(sync=recorder)).screen
+    with pytest.raises(expected_exception=AuthenticationError):
+        await screen.campaigns.list()
