@@ -5,6 +5,10 @@ API Reference
    :undoc-members:
    :members:
 
+.. automodule:: coderpad.async_client
+   :undoc-members:
+   :members:
+
 .. automodule:: coderpad.transports
    :undoc-members:
    :members:

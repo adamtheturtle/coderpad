@@ -1,5 +1,6 @@
 """CoderPad Interview API client."""
 
+import builtins
 import json
 from collections.abc import Sequence
 from http import HTTPStatus
@@ -19,6 +20,7 @@ from coderpad.types import (
     Language,
     Organization,
     OrganizationStats,
+    OrganizationUser,
     Pad,
     PadEnvironment,
     PadEvent,
@@ -640,6 +642,37 @@ class OrganizationQuestionsNamespace(_Namespace):
 
 
 @beartype
+class OrganizationUsersNamespace(_Namespace):
+    """Namespace for organization user operations."""
+
+    def list(
+        self,
+        *,
+        email: str | None = None,
+    ) -> builtins.list[OrganizationUser]:
+        """Retrieve users in the organization.
+
+        Args:
+            email: Return only the user with this email address.
+
+        Returns:
+            The organization users matching the filter.
+        """
+        params: dict[str, str | int] = {}
+        if email is not None:
+            params["email"] = email
+        response = self._request(
+            method="GET",
+            url="/api/organization/users",
+            params=params,
+        )
+        return [
+            OrganizationUser.from_dict(data=item)
+            for item in response.json()["users"]
+        ]
+
+
+@beartype
 class OrganizationNamespace(_Namespace):
     """Namespace for organization operations."""
 
@@ -673,6 +706,11 @@ class OrganizationNamespace(_Namespace):
                 base_url=base_url,
                 headers=headers,
             )
+        )
+        self.users: OrganizationUsersNamespace = OrganizationUsersNamespace(
+            transport=transport,
+            base_url=base_url,
+            headers=headers,
         )
 
     def get(self) -> Organization:

@@ -19,6 +19,7 @@ from coderpad.transports import (
 from coderpad.types import (
     CandidateInstruction,
     Language,
+    OrganizationUser,
     QuestionFileContent,
     SortOrder,
 )
@@ -896,6 +897,90 @@ class TestAsyncListOrganizationQuestions:
             page=1,
         )
         assert result.total >= 0
+
+
+class TestAsyncListOrganizationUsers:
+    """Tests for ``AsyncCoderPad.organization.users.list``."""
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_list_organization_users(
+        async_coderpad_client: AsyncCoderPad,
+    ) -> None:
+        """Organization users can be listed and decoded."""
+        result = await async_coderpad_client.organization.users.list()
+        assert result
+        assert all(isinstance(item, OrganizationUser) for item in result)
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_list_organization_users_with_email(
+        async_coderpad_client: AsyncCoderPad,
+        mock_coderpad_api: respx.MockRouter,
+    ) -> None:
+        """Organization users can be filtered by email."""
+        email = "buddy@company.io"
+        result = await async_coderpad_client.organization.users.list(
+            email=email,
+        )
+        request = mock_coderpad_api.calls.last.request
+        assert request.url.params["email"] == email
+        assert all(isinstance(item, OrganizationUser) for item in result)
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_list_organization_users_empty() -> None:
+        """An empty organization user response decodes to an empty
+        list.
+        """
+
+        async def _empty_transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: (dict[str, str | int] | None) = None,
+            data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        ) -> TransportResponse:
+            """Return an empty successful user response."""
+            del method, url, headers, params, data, files
+            return TransportResponse(
+                status_code=HTTPStatus.OK,
+                headers={},
+                content=b'{"status": "OK", "users": []}',
+            )
+
+        client = AsyncCoderPad(api_key="test-key", transport=_empty_transport)
+        assert await client.organization.users.list() == []
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_list_organization_users_maps_http_errors() -> None:
+        """Organization user HTTP failures use the client error
+        hierarchy.
+        """
+
+        async def _error_transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: (dict[str, str | int] | None) = None,
+            data: dict[str, str] | None = None,
+            files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        ) -> TransportResponse:
+            """Return a not-found user response."""
+            del method, url, headers, params, data, files
+            return TransportResponse(
+                status_code=HTTPStatus.NOT_FOUND,
+                headers={},
+                content=b"Not Found",
+            )
+
+        client = AsyncCoderPad(api_key="test-key", transport=_error_transport)
+        with pytest.raises(expected_exception=NotFoundError):
+            await client.organization.users.list()
 
 
 class TestAsyncExceptionHandling:

@@ -1,5 +1,6 @@
 """Async CoderPad Interview API client."""
 
+import builtins
 import json
 from collections.abc import Sequence
 from http import HTTPStatus
@@ -19,6 +20,7 @@ from coderpad.types import (
     Language,
     Organization,
     OrganizationStats,
+    OrganizationUser,
     Pad,
     PadEnvironment,
     PadEvent,
@@ -648,6 +650,37 @@ class AsyncOrganizationQuestionsNamespace(
 
 
 @beartype
+class AsyncOrganizationUsersNamespace(_AsyncNamespace):
+    """Namespace for async organization user operations."""
+
+    async def list(
+        self,
+        *,
+        email: str | None = None,
+    ) -> builtins.list[OrganizationUser]:
+        """Retrieve users in the organization.
+
+        Args:
+            email: Return only the user with this email address.
+
+        Returns:
+            The organization users matching the filter.
+        """
+        params: dict[str, str | int] = {}
+        if email is not None:
+            params["email"] = email
+        response = await self._request(
+            method="GET",
+            url="/api/organization/users",
+            params=params,
+        )
+        return [
+            OrganizationUser.from_dict(data=item)
+            for item in response.json()["users"]
+        ]
+
+
+@beartype
 class AsyncOrganizationNamespace(_AsyncNamespace):
     """Namespace for async organization operations."""
 
@@ -679,6 +712,13 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
         )
         self.questions: AsyncOrganizationQuestionsNamespace = (
             AsyncOrganizationQuestionsNamespace(
+                transport=transport,
+                base_url=base_url,
+                headers=headers,
+            )
+        )
+        self.users: AsyncOrganizationUsersNamespace = (
+            AsyncOrganizationUsersNamespace(
                 transport=transport,
                 base_url=base_url,
                 headers=headers,
