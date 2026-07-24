@@ -25,6 +25,7 @@ linting
 macOS
 metadata
 namespace
+namespaces
 noqa
 params
 pluggable
@@ -45,4 +46,6 @@ todo
 txt
 unmapped
 url
+webhook
+webhooks
 yml

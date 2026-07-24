@@ -97,6 +97,25 @@ class Transport(Protocol):
         ...  # pylint: disable=unnecessary-ellipsis
 
 
+@runtime_checkable
+class JSONTransport(Protocol):
+    """Protocol for transports supporting JSON request bodies."""
+
+    def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
+    ) -> TransportResponse:
+        """Make an HTTP request with an optional JSON body."""
+        ...  # pylint: disable=unnecessary-ellipsis
+
+
 @beartype
 class HTTPXTransport:
     """HTTP transport using the ``httpx`` library.
@@ -139,6 +158,7 @@ class HTTPXTransport:
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
     ) -> TransportResponse:
         """Make an HTTP request using ``httpx``.
 
@@ -149,6 +169,7 @@ class HTTPXTransport:
             params: Query parameters.
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
+            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the httpx
@@ -161,6 +182,7 @@ class HTTPXTransport:
             params=params,
             data=data,
             files=files,
+            json=json,
         )
         return TransportResponse(
             status_code=response.status_code,
@@ -203,6 +225,25 @@ class AsyncTransport(Protocol):
             A ``TransportResponse`` populated from the HTTP
             response.
         """
+        ...  # pylint: disable=unnecessary-ellipsis
+
+
+@runtime_checkable
+class AsyncJSONTransport(Protocol):
+    """Protocol for async transports supporting JSON request bodies."""
+
+    async def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
+    ) -> TransportResponse:
+        """Make an async HTTP request with an optional JSON body."""
         ...  # pylint: disable=unnecessary-ellipsis
 
 
@@ -249,6 +290,7 @@ class AsyncHTTPXTransport:
         params: dict[str, str | int] | None = None,
         data: dict[str, str] | None = None,
         files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        json: object | None = None,
     ) -> TransportResponse:
         """Make an async HTTP request using ``httpx``.
 
@@ -259,6 +301,7 @@ class AsyncHTTPXTransport:
             params: Query parameters.
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
+            json: A JSON-compatible request body.
 
         Returns:
             A ``TransportResponse`` populated from the httpx
@@ -271,6 +314,7 @@ class AsyncHTTPXTransport:
             params=params,
             data=data,
             files=files,
+            json=json,
         )
         return TransportResponse(
             status_code=response.status_code,
