@@ -341,6 +341,20 @@ class TestPadEvent:
         assert result.user_email == data["user_email"]
         assert result.created_at == data["created_at"]
 
+    @staticmethod
+    def test_model_validate_without_optional_fields() -> None:
+        """Pydantic parsing accepts omitted nullable response fields."""
+        result = PadEvent.model_validate(
+            obj={
+                "message": "Pad started",
+                "kind": "start",
+                "created_at": "2023-01-01T00:00:00Z",
+            },
+        )
+        assert result.metadata is None
+        assert result.user_name is None
+        assert result.user_email is None
+
 
 class TestFileContent:
     """Tests for ``FileContent``."""
@@ -458,6 +472,14 @@ class TestCandidateInstruction:
         assert result.instructions == data["instructions"]
         assert result.default_visible is True
 
+    @staticmethod
+    def test_model_validate_normalizes_null_visibility() -> None:
+        """Pydantic parsing retains legacy null visibility handling."""
+        result = CandidateInstruction.model_validate(
+            obj={"instructions": "Do the thing", "default_visible": None},
+        )
+        assert result.default_visible is False
+
 
 class TestTestCase:
     """Tests for ``TestCase``."""
@@ -527,6 +549,32 @@ class TestQuestion:
         assert result.custom_database.title == "Products"
         assert result.custom_database.schema_json.tables[0].columns[0].pk
         assert result.ai_assist_custom_system_prompt == "Only provide hints."
+
+    @staticmethod
+    def test_model_validate_without_optional_fields() -> None:
+        """Pydantic parsing accepts omitted nullable response fields."""
+        payload: dict[str, object] = dict(_question_dict())
+        for field_name in (
+            "language",
+            "description",
+            "contents",
+            "solution",
+            "public_take_home_setting_id",
+            "contents_for_test_cases",
+            "test_cases",
+            "custom_database",
+            "ai_assist_custom_system_prompt",
+        ):
+            payload.pop(field_name)
+        payload["candidate_instructions"] = [
+            {"instructions": "Do the thing", "default_visible": None},
+        ]
+
+        result = Question.model_validate(obj=payload)
+
+        assert result.language is None
+        assert result.solution is None
+        assert result.candidate_instructions[0].default_visible is False
 
     @staticmethod
     def test_from_dict_with_null_ai_assist_custom_system_prompt() -> None:

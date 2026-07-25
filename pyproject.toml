@@ -313,6 +313,8 @@ ignore_names = [
     "__aexit__",
     # pytest fixtures - we name fixtures like this for this purpose
     "_fixture_*",
+    # Pydantic invokes field validators declaratively.
+    "_none_is_not_visible",
     # Language enum members (public API)
     "ANGULAR",
     # Sphinx

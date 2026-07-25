@@ -4,7 +4,7 @@ import enum
 from collections.abc import Iterable
 from typing import ClassVar, Self, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from coderpad._dict_types import (
     CandidateInstructionDict,
@@ -190,8 +190,8 @@ class PadInterviewerNotification(_APIModel):
     priority: str
     request_id: str
     auto_dismissed: bool
-    dismissed_at: str | None
-    useful: bool | None
+    dismissed_at: str | None = None
+    useful: bool | None = None
     created_at: str
     updated_at: str
 
@@ -234,23 +234,23 @@ class Pad(_APIModel):
     title: str
     state: str
     owner_email: str
-    language: str | None
+    language: str | None = None
     private: bool
     execution_enabled: bool
-    contents: str | None
+    contents: str | None = None
     participants: list[str]
     events: str
-    notes: str | None
+    notes: str | None = None
     created_at: str
     updated_at: str
-    ended_at: str | None
+    ended_at: str | None = None
     url: str
     playback: str
-    drawing: str | None
+    drawing: str | None = None
     type: str
     question_ids: list[int]
     pad_environment_ids: list[int]
-    active_environment_id: int | None
+    active_environment_id: int | None = None
     team: Team
     history: str | None = None
     restrict_interviewer_access: bool | None = None
@@ -315,9 +315,9 @@ class PadEvent(_APIModel):
 
     message: str
     kind: str
-    metadata: str | None
-    user_name: str | None
-    user_email: str | None
+    metadata: str | None = None
+    user_name: str | None = None
+    user_email: str | None = None
     created_at: str
 
     @classmethod
@@ -457,7 +457,7 @@ class FileContent(_APIModel):
 
     path: str
     contents: str | None
-    history: str | None
+    history: str | None = None
     binary: bool = False
 
     @classmethod
@@ -487,8 +487,8 @@ class PadEnvironment(_APIModel):
 
     id: int
     pad_id: int
-    question_id: int | None
-    example_question_id: int | None
+    question_id: int | None = None
+    example_question_id: int | None = None
     language: str
     file_contents: list[FileContent]
     created_at: str
@@ -540,6 +540,12 @@ class CandidateInstruction(_APIModel):
 
     instructions: str
     default_visible: bool = False
+
+    @field_validator("default_visible", mode="before")
+    @classmethod
+    def _none_is_not_visible(cls, value: object) -> object:
+        """Normalize a null API value to the legacy false default."""
+        return False if value is None else value
 
     @classmethod
     def from_dict(
@@ -752,15 +758,15 @@ class Question(_APIModel):
     id: int
     title: str
     owner_email: str
-    language: str | None
-    description: str | None
+    language: str | None = None
+    description: str | None = None
     candidate_instructions: list[CandidateInstruction]
-    contents: str | None
+    contents: str | None = None
     shared: bool
     used: int
     take_home: bool
     test_cases_enabled: bool
-    solution: str | None
+    solution: str | None = None
     pad_type: str
     is_draft: bool
     author_name: str
