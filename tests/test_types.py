@@ -251,8 +251,15 @@ class TestTeam:
         assert team.model_dump() == {"id": "team-1", "name": "Backend"}
         with pytest.raises(expected_exception=ValidationError):
             Team.model_validate(obj={"id": 1, "name": "Backend"})
-        with pytest.raises(expected_exception=ValidationError):
-            setattr(team, "name", "Frontend")  # noqa: B010
+        with (
+            pytest.MonkeyPatch.context() as monkeypatch,
+            pytest.raises(expected_exception=ValidationError),
+        ):
+            monkeypatch.setattr(
+                target=team,
+                name="name",
+                value="Frontend",
+            )
 
 
 class TestPad:
@@ -557,7 +564,7 @@ class TestCustomDatabase:
         data = _custom_database_dict()
         result = CustomDatabase.from_dict(data=data)
         assert result.id == data["id"]
-        assert result.schema == data["schema"]
+        assert result.schema == data["schema"]  # pylint: disable=comparison-with-callable
         assert result.schema_json.arrangement == "horizontal"
         assert result.schema_json.tables[0].name == "products"
         assert result.schema_json.tables[0].columns[0].nn
