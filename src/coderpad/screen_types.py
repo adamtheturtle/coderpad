@@ -60,7 +60,11 @@ def _required_int(value: object, /) -> int:
 
 def _optional_float(value: object, /) -> float | None:
     """Return a numeric API value when present."""
-    return float(value) if isinstance(value, int | float) else None
+    return (
+        float(value)
+        if isinstance(value, int | float) and not isinstance(value, bool)
+        else None
+    )
 
 
 def _optional_str(value: object, /) -> str | None:
@@ -294,7 +298,7 @@ class ScreenTest:
         typed_questions = _objects(data.get("questions"))
         return cls(
             id=_required_int(data["id"]),
-            status=f"{data.get('status', 'unknown')}",
+            status=_optional_str(data.get("status")) or "unknown",
             campaign_id=_optional_int(data.get("campaign_id")),
             candidate_name=_optional_str(data.get("candidate_name")),
             candidate_email=_optional_str(data.get("candidate_email")),

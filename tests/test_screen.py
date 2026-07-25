@@ -9,7 +9,12 @@ import pytest
 
 from coderpad import SCREEN_EU_BASE_URL, CoderPad
 from coderpad.exceptions import AuthenticationError
-from coderpad.screen_types import ScreenCampaign, ScreenInvitation, ScreenTest
+from coderpad.screen_types import (
+    ScreenCampaign,
+    ScreenInvitation,
+    ScreenReport,
+    ScreenTest,
+)
 from coderpad.transports import TransportResponse
 
 _TEST = {
@@ -173,6 +178,13 @@ def test_required_integer_fields_are_validated() -> None:
         ScreenCampaign.from_dict(data={"id": "not-an-integer", "name": "Bad"})
     assert not ScreenCampaign(id=1, name="Empty").languages
     assert ScreenTest.from_dict(data={"id": 1}).report is None
+
+
+def test_malformed_optional_values_use_defaults() -> None:
+    """Malformed optional API values do not leak into typed models."""
+    assert ScreenReport.from_dict(data={"score": True}).score is None
+    test = ScreenTest.from_dict(data={"id": 1, "status": None})
+    assert test.status == "unknown"
 
 
 def test_tests_filters_pagination_and_decoding() -> None:
