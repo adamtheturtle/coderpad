@@ -77,7 +77,7 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
         response = await self._request(
             method="POST",
             path=f"/campaigns/{campaign_id}/actions/send",
-            json=invitation.to_dict(),
+            json=invitation.model_dump(exclude_none=True),
         )
         return ScreenInvitationResult.from_dict(data=response.json())
 

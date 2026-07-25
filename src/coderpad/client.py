@@ -262,7 +262,7 @@ class PadsNamespace(_Namespace):
         )
         data = response.json()
         return PaginatedList(
-            [PadEvent.from_dict(data=item) for item in data["events"]],
+            [PadEvent.model_validate(obj=item) for item in data["events"]],
             total=data["total"],
             next_page=data.get("next_page"),
         )
@@ -349,7 +349,7 @@ class QuestionsNamespace(_Namespace):
         )
         data = response.json()
         return PaginatedList(
-            [Question.from_dict(data=item) for item in data["questions"]],
+            [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
         )
@@ -440,9 +440,7 @@ class QuestionsNamespace(_Namespace):
             data=data,
             files=files,
         )
-        return Question.from_dict(
-            data=response.json(),
-        )
+        return Question.model_validate(obj=response.json())
 
     def get(
         self,
@@ -461,9 +459,7 @@ class QuestionsNamespace(_Namespace):
             method="GET",
             url=f"/api/questions/{question_id}",
         )
-        return Question.from_dict(
-            data=response.json(),
-        )
+        return Question.model_validate(obj=response.json())
 
     def update(
         self,
@@ -637,7 +633,7 @@ class OrganizationQuestionsNamespace(_Namespace):
         )
         data = response.json()
         return PaginatedList(
-            [Question.from_dict(data=item) for item in data["questions"]],
+            [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
         )
@@ -669,7 +665,7 @@ class OrganizationUsersNamespace(_Namespace):
             params=params,
         )
         return [
-            OrganizationUser.from_dict(data=item)
+            OrganizationUser.model_validate(obj=item)
             for item in response.json()["users"]
         ]
 
@@ -768,7 +764,7 @@ class OrganizationNamespace(_Namespace):
             method="GET",
             url="/api/quota",
         )
-        return Quota.from_dict(data=response.json())
+        return Quota.model_validate(obj=response.json())
 
 
 @beartype

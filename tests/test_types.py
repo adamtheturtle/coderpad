@@ -1,5 +1,8 @@
 """Tests for the CoderPad types."""
 
+import pytest
+from pydantic import ValidationError
+
 from coderpad._dict_types import (
     CandidateInstructionDict,
     CustomDatabaseDict,
@@ -237,6 +240,27 @@ class TestTeam:
         assert result.id == data["id"]
         assert result.name == data["name"]
 
+    @staticmethod
+    def test_pydantic_validation_and_serialization() -> None:
+        """Models validate strictly, ignore new API fields, and
+        serialize.
+        """
+        team = Team.model_validate(
+            obj={"id": "team-1", "name": "Backend", "future_field": True},
+        )
+        assert team.model_dump() == {"id": "team-1", "name": "Backend"}
+        with pytest.raises(expected_exception=ValidationError):
+            Team.model_validate(obj={"id": 1, "name": "Backend"})
+        with (
+            pytest.MonkeyPatch.context() as monkeypatch,
+            pytest.raises(expected_exception=ValidationError),
+        ):
+            monkeypatch.setattr(
+                target=team,
+                name="name",
+                value="Frontend",
+            )
+
 
 class TestPad:
     """Tests for ``Pad``."""
@@ -316,6 +340,20 @@ class TestPadEvent:
         assert result.user_name == data["user_name"]
         assert result.user_email == data["user_email"]
         assert result.created_at == data["created_at"]
+
+    @staticmethod
+    def test_model_validate_without_optional_fields() -> None:
+        """Pydantic parsing accepts omitted optional response fields."""
+        result = PadEvent.model_validate(
+            obj={
+                "message": "Pad started",
+                "kind": "start",
+                "created_at": "2023-01-01T00:00:00Z",
+            },
+        )
+        assert result.metadata is None
+        assert result.user_name is None
+        assert result.user_email is None
 
 
 class TestFileContent:
@@ -434,6 +472,14 @@ class TestCandidateInstruction:
         assert result.instructions == data["instructions"]
         assert result.default_visible is True
 
+    @staticmethod
+    def test_model_validate_normalizes_null_visibility() -> None:
+        """Pydantic parsing retains legacy null visibility handling."""
+        result = CandidateInstruction.model_validate(
+            obj={"instructions": "Do the thing", "default_visible": None},
+        )
+        assert result.default_visible is False
+
 
 class TestTestCase:
     """Tests for ``TestCase``."""
@@ -505,6 +551,32 @@ class TestQuestion:
         assert result.ai_assist_custom_system_prompt == "Only provide hints."
 
     @staticmethod
+    def test_model_validate_without_optional_fields() -> None:
+        """Pydantic parsing accepts omitted optional response fields."""
+        payload: dict[str, object] = dict(_question_dict())
+        for field_name in (
+            "language",
+            "description",
+            "contents",
+            "solution",
+            "public_take_home_setting_id",
+            "contents_for_test_cases",
+            "test_cases",
+            "custom_database",
+            "ai_assist_custom_system_prompt",
+        ):
+            payload.pop(field_name)
+        payload["candidate_instructions"] = [
+            {"instructions": "Do the thing", "default_visible": None},
+        ]
+
+        result = Question.model_validate(obj=payload)
+
+        assert result.language is None
+        assert result.solution is None
+        assert result.candidate_instructions[0].default_visible is False
+
+    @staticmethod
     def test_from_dict_with_null_ai_assist_custom_system_prompt() -> None:
         """A Question can have no custom AI Assist system prompt."""
         data = _question_dict()
@@ -540,7 +612,7 @@ class TestCustomDatabase:
         data = _custom_database_dict()
         result = CustomDatabase.from_dict(data=data)
         assert result.id == data["id"]
-        assert result.schema == data["schema"]
+        assert result.schema == data["schema"]  # pylint: disable=comparison-with-callable
         assert result.schema_json.arrangement == "horizontal"
         assert result.schema_json.tables[0].name == "products"
         assert result.schema_json.tables[0].columns[0].nn

@@ -1,0 +1,4 @@
+API resource types are now strict, frozen Pydantic v2 models.  Responses are
+validated with ``model_validate`` and request models support
+``model_dump``.  Beartype continues to provide runtime type checking
+alongside Pydantic.

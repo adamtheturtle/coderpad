@@ -35,6 +35,7 @@ dynamic = [
 dependencies = [
     "beartype>=0.22.9",
     "httpx>=0.28.0",
+    "pydantic>=2.12.0",
 ]
 optional-dependencies.dev = [
     "actionlint-py==1.7.12.24",
@@ -315,6 +316,8 @@ ignore_names = [
     "__aexit__",
     # pytest fixtures - we name fixtures like this for this purpose
     "_fixture_*",
+    # Pydantic invokes field validators declaratively.
+    "_none_is_not_visible",
     # Language enum members (public API)
     "ANGULAR",
     # Sphinx
@@ -359,6 +362,8 @@ ignore_names = [
     "LUA",
     "MARKDOWN",
     "master_doc",
+    # Pydantic consumes this declarative class configuration.
+    "model_config",
     "MULTIFILE_*",
     "MYSQL",
     "NEXTJS",
@@ -383,16 +388,21 @@ ignore_names = [
     "RAILS",
     "REACT",
     "REACT_NATIVE_WEB",
+    # Public Pydantic fields are consumed through model serialization.
+    "recruiter_email",
     "rst_prolog",
     "RUBY",
     "RUST",
     "SCALA",
+    "send_invitation_email",
+    "send_notification_email_on_bounce",
     "SOLIDITY",
     "source_suffix",
     "spelling_word_list_filename",
     "SPRING",
     "SVELTE",
     "SWIFT",
+    "tags",
     "TCL",
     "templates_path",
     "towncrier_draft_autoversion_mode",

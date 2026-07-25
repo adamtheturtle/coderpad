@@ -1,5 +1,7 @@
 Args
+Pydantic
 Ubuntu
+ValidationError
 aclose
 api
 async
@@ -32,6 +34,7 @@ pluggable
 plugins
 pragma
 py
+pydantic
 pyright
 pytest
 readme
