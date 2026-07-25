@@ -1,5 +1,8 @@
 """Tests for the CoderPad types."""
 
+import pytest
+from pydantic import ValidationError
+
 from coderpad._dict_types import (
     CandidateInstructionDict,
     CustomDatabaseDict,
@@ -236,6 +239,20 @@ class TestTeam:
         result = Team.from_dict(data=data)
         assert result.id == data["id"]
         assert result.name == data["name"]
+
+    @staticmethod
+    def test_pydantic_validation_and_serialization() -> None:
+        """Models validate strictly, ignore new API fields, and
+        serialize.
+        """
+        team = Team.model_validate(
+            obj={"id": "team-1", "name": "Backend", "future_field": True},
+        )
+        assert team.model_dump() == {"id": "team-1", "name": "Backend"}
+        with pytest.raises(expected_exception=ValidationError):
+            Team.model_validate(obj={"id": 1, "name": "Backend"})
+        with pytest.raises(expected_exception=ValidationError):
+            setattr(team, "name", "Frontend")  # noqa: B010
 
 
 class TestPad:

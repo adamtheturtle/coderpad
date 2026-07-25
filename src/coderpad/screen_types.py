@@ -1,9 +1,18 @@
 """Types for the CoderPad Screen API."""
 
-from dataclasses import dataclass, field
-from typing import Self, TypeGuard
+from typing import ClassVar, Self, TypeGuard
 
-from beartype import beartype
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class _APIModel(BaseModel):
+    """Base model shared by CoderPad Screen API resources."""
+
+    model_config: ClassVar[ConfigDict] = ConfigDict(
+        frozen=True,
+        extra="ignore",
+        strict=True,
+    )
 
 
 def _is_object_list(value: object, /) -> TypeGuard[list[object]]:
@@ -72,14 +81,12 @@ def _optional_str(value: object, /) -> str | None:
     return value if isinstance(value, str) else None
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenCampaign:
+class ScreenCampaign(_APIModel):
     """A reusable Screen assessment campaign."""
 
     id: int
     name: str
-    languages: list[str] = field(default_factory=_empty_strings)
+    languages: list[str] = Field(default_factory=_empty_strings)
     pinned: bool = False
     archived: bool = False
 
@@ -104,9 +111,7 @@ class ScreenCampaign:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenInvitation:
+class ScreenInvitation(_APIModel):
     """An invitation to a Screen campaign."""
 
     candidate_email: str | None = None
@@ -116,26 +121,8 @@ class ScreenInvitation:
     send_invitation_email: bool | None = None
     send_notification_email_on_bounce: bool | None = None
 
-    def to_dict(self) -> dict[str, str | bool]:
-        """Create the JSON request body, omitting unset fields."""
-        values: dict[str, str | bool | None] = {
-            "candidate_email": self.candidate_email,
-            "candidate_name": self.candidate_name,
-            "recruiter_email": self.recruiter_email,
-            "tags": self.tags,
-            "send_invitation_email": self.send_invitation_email,
-            "send_notification_email_on_bounce": (
-                self.send_notification_email_on_bounce
-            ),
-        }
-        return {
-            key: value for key, value in values.items() if value is not None
-        }
 
-
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenInvitationResult:
+class ScreenInvitationResult(_APIModel):
     """The result of creating a Screen test invitation."""
 
     id: int | None
@@ -150,9 +137,7 @@ class ScreenInvitationResult:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenTestQuestion:
+class ScreenTestQuestion(_APIModel):
     """A question included in a Screen test."""
 
     id: int
@@ -167,9 +152,7 @@ class ScreenTestQuestion:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenSkillResult:
+class ScreenSkillResult(_APIModel):
     """A scored skill within a Screen report."""
 
     points: int | None
@@ -186,9 +169,7 @@ class ScreenSkillResult:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenTechnologyResult:
+class ScreenTechnologyResult(_APIModel):
     """A scored technology within a Screen report."""
 
     points: int | None
@@ -219,9 +200,7 @@ class ScreenTechnologyResult:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenReport:
+class ScreenReport(_APIModel):
     """A candidate's scored Screen report."""
 
     duration: int | None
@@ -271,9 +250,7 @@ class ScreenReport:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenTest:
+class ScreenTest(_APIModel):
     """A candidate's Screen test session."""
 
     id: int
@@ -320,9 +297,7 @@ class ScreenTest:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenPagination:
+class ScreenPagination(_APIModel):
     """Offset pagination metadata returned by Screen."""
 
     start: int | None
@@ -343,9 +318,7 @@ class ScreenPagination:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenTestsPage:
+class ScreenTestsPage(_APIModel):
     """One page of Screen test sessions."""
 
     tests: list[ScreenTest]
@@ -368,9 +341,7 @@ class ScreenTestsPage:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class ScreenWebhook:
+class ScreenWebhook(_APIModel):
     """The configured Screen webhook."""
 
     url: str | None

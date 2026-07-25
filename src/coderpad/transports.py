@@ -6,7 +6,6 @@ from http import HTTPStatus
 from typing import Any, Protocol, Self, runtime_checkable
 
 import httpx
-from beartype import beartype
 
 
 class HTTPStatusError(Exception):
@@ -30,7 +29,6 @@ class HTTPStatusError(Exception):
         self.content = content
 
 
-@beartype
 @dataclass(frozen=True, kw_only=True)
 class TransportResponse:
     """A response from a transport."""
@@ -116,7 +114,6 @@ class JSONTransport(Protocol):
         ...  # pylint: disable=unnecessary-ellipsis
 
 
-@beartype
 class HTTPXTransport:
     """HTTP transport using the ``httpx`` library.
 
@@ -247,7 +244,6 @@ class AsyncJSONTransport(Protocol):
         ...  # pylint: disable=unnecessary-ellipsis
 
 
-@beartype
 class AsyncHTTPXTransport:
     """Async HTTP transport using the ``httpx`` library.
 

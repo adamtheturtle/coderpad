@@ -7,8 +7,6 @@ from http import HTTPStatus
 from pathlib import Path
 from typing import Self
 
-from beartype import beartype
-
 from coderpad.async_screen import AsyncScreenNamespace
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL
@@ -36,7 +34,6 @@ from coderpad.types import (
 )
 
 
-@beartype
 class _AsyncNamespace:
     """Base class providing shared async request logic."""
 
@@ -96,7 +93,6 @@ class _AsyncNamespace:
         return response
 
 
-@beartype
 class AsyncPadsNamespace(_AsyncNamespace):
     """Namespace for async pad operations."""
 
@@ -264,7 +260,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         )
         data = response.json()
         return PaginatedList(
-            [PadEvent.from_dict(data=item) for item in data["events"]],
+            [PadEvent.model_validate(obj=item) for item in data["events"]],
             total=data["total"],
             next_page=data.get("next_page"),
         )
@@ -320,7 +316,6 @@ class AsyncPadsNamespace(_AsyncNamespace):
         return PadHistory.from_dict(data=data)
 
 
-@beartype
 class AsyncQuestionsNamespace(_AsyncNamespace):
     """Namespace for async question operations."""
 
@@ -352,7 +347,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         )
         data = response.json()
         return PaginatedList(
-            [Question.from_dict(data=item) for item in data["questions"]],
+            [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
         )
@@ -444,9 +439,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             data=data,
             files=files,
         )
-        return Question.from_dict(
-            data=response.json(),
-        )
+        return Question.model_validate(obj=response.json())
 
     async def get(
         self,
@@ -465,9 +458,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             method="GET",
             url=f"/api/questions/{question_id}",
         )
-        return Question.from_dict(
-            data=response.json(),
-        )
+        return Question.model_validate(obj=response.json())
 
     async def update(
         self,
@@ -573,7 +564,6 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         )
 
 
-@beartype
 class AsyncOrganizationPadsNamespace(_AsyncNamespace):
     """Namespace for async organization pad operations."""
 
@@ -610,7 +600,6 @@ class AsyncOrganizationPadsNamespace(_AsyncNamespace):
         )
 
 
-@beartype
 class AsyncOrganizationQuestionsNamespace(
     _AsyncNamespace,
 ):
@@ -646,13 +635,12 @@ class AsyncOrganizationQuestionsNamespace(
         )
         data = response.json()
         return PaginatedList(
-            [Question.from_dict(data=item) for item in data["questions"]],
+            [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
         )
 
 
-@beartype
 class AsyncOrganizationUsersNamespace(_AsyncNamespace):
     """Namespace for async organization user operations."""
 
@@ -678,12 +666,11 @@ class AsyncOrganizationUsersNamespace(_AsyncNamespace):
             params=params,
         )
         return [
-            OrganizationUser.from_dict(data=item)
+            OrganizationUser.model_validate(obj=item)
             for item in response.json()["users"]
         ]
 
 
-@beartype
 class AsyncOrganizationNamespace(_AsyncNamespace):
     """Namespace for async organization operations."""
 
@@ -782,10 +769,9 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
             method="GET",
             url="/api/quota",
         )
-        return Quota.from_dict(data=response.json())
+        return Quota.model_validate(obj=response.json())
 
 
-@beartype
 class AsyncCoderPad:
     """An async client for the CoderPad Interview API."""
 

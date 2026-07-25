@@ -3,8 +3,6 @@
 import builtins
 from http import HTTPStatus
 
-from beartype import beartype
-
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL
 from coderpad.screen_types import (
@@ -20,7 +18,6 @@ from coderpad.transports import AsyncJSONTransport, TransportResponse
 _SCREEN_PREFIX = "/assessment/api/v1.1"
 
 
-@beartype
 class _AsyncScreenNamespace:
     """Shared asynchronous Screen request handling."""
 
@@ -57,7 +54,6 @@ class _AsyncScreenNamespace:
         return response
 
 
-@beartype
 class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
     """Asynchronous Screen campaign operations."""
 
@@ -77,12 +73,11 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
         response = await self._request(
             method="POST",
             path=f"/campaigns/{campaign_id}/actions/send",
-            json=invitation.to_dict(),
+            json=invitation.model_dump(exclude_none=True),
         )
         return ScreenInvitationResult.from_dict(data=response.json())
 
 
-@beartype
 class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
     """Asynchronous Screen test-session operations."""
 
@@ -193,7 +188,6 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
         return response.content
 
 
-@beartype
 class AsyncScreenWebhookNamespace(_AsyncScreenNamespace):
     """Asynchronous Screen webhook operations."""
 
@@ -211,7 +205,6 @@ class AsyncScreenWebhookNamespace(_AsyncScreenNamespace):
         await self._request(method="DELETE", path="/webhook")
 
 
-@beartype
 class AsyncScreenNamespace(_AsyncScreenNamespace):
     """Root namespace for the asynchronous Screen API."""
 

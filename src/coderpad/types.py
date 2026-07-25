@@ -2,10 +2,9 @@
 
 import enum
 from collections.abc import Iterable
-from dataclasses import dataclass, field
-from typing import Self, TypeVar
+from typing import ClassVar, Self, TypeVar
 
-from beartype import beartype
+from pydantic import BaseModel, ConfigDict, Field
 
 from coderpad._dict_types import (
     CandidateInstructionDict,
@@ -33,7 +32,16 @@ from coderpad._dict_types import (
 _T = TypeVar("_T")
 
 
-@beartype
+class _APIModel(BaseModel):
+    """Base model shared by CoderPad API resources."""
+
+    model_config: ClassVar[ConfigDict] = ConfigDict(
+        frozen=True,
+        extra="ignore",
+        strict=True,
+    )
+
+
 class PaginatedList(list[_T]):
     """A list with pagination metadata from the API response."""
 
@@ -147,9 +155,7 @@ class Language(enum.Enum):
     VUE = "vue"
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class Team:
+class Team(_APIModel):
     """A team within an organization."""
 
     id: str
@@ -171,9 +177,7 @@ class Team:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class PadInterviewerNotification:
+class PadInterviewerNotification(_APIModel):
     """An interviewer notification associated with a pad.
 
     This structure is empirically observed in live API responses and is not
@@ -223,9 +227,7 @@ def _empty_pad_interviewer_notifications() -> list[PadInterviewerNotification]:
     return []
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class Pad:
+class Pad(_APIModel):
     """A CoderPad interview pad."""
 
     id: str
@@ -252,7 +254,7 @@ class Pad:
     team: Team
     history: str | None = None
     restrict_interviewer_access: bool | None = None
-    pad_interviewer_notifications: list[PadInterviewerNotification] = field(
+    pad_interviewer_notifications: list[PadInterviewerNotification] = Field(
         default_factory=_empty_pad_interviewer_notifications,
     )
 
@@ -308,9 +310,7 @@ class Pad:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class PadEvent:
+class PadEvent(_APIModel):
     """An event associated with a pad."""
 
     message: str
@@ -343,9 +343,7 @@ class PadEvent:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class PadHistoryEntry:
+class PadHistoryEntry(_APIModel):
     """An editor operation from a pad's Firebase history.
 
     Positive integer operations retain existing characters, negative
@@ -403,7 +401,6 @@ class PadHistoryEntry:
         return "".join(updated)
 
 
-@beartype
 class PadHistory(list[PadHistoryEntry]):
     """Chronologically ordered editor history for a pad file."""
 
@@ -450,9 +447,7 @@ class PadHistory(list[PadHistoryEntry]):
         return contents
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class FileContent:
+class FileContent(_APIModel):
     """A file within a pad environment.
 
     Binary files are empirically observed with ``binary`` set to ``True`` and
@@ -487,9 +482,7 @@ class FileContent:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class PadEnvironment:
+class PadEnvironment(_APIModel):
     """A pad environment."""
 
     id: int
@@ -531,9 +524,7 @@ class PadEnvironment:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class QuestionFileContent:
+class QuestionFileContent(_APIModel):
     """A file for a multi-file question.
 
     Used when creating or updating questions with
@@ -544,9 +535,7 @@ class QuestionFileContent:
     contents: str
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class CandidateInstruction:
+class CandidateInstruction(_APIModel):
     """Instructions shown to a candidate."""
 
     instructions: str
@@ -573,9 +562,7 @@ class CandidateInstruction:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class TestCase:
+class TestCase(_APIModel):
     """A test case for a question."""
 
     id: int
@@ -604,9 +591,7 @@ class TestCase:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class CustomFile:
+class CustomFile(_APIModel):
     """A custom file attached to a question."""
 
     id: str
@@ -637,9 +622,7 @@ class CustomFile:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class CustomDatabaseColumn:
+class CustomDatabaseColumn(_APIModel):
     """A column in a question's custom database schema."""
 
     name: str
@@ -668,9 +651,7 @@ class CustomDatabaseColumn:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class CustomDatabaseTable:
+class CustomDatabaseTable(_APIModel):
     """A table in a question's custom database schema."""
 
     name: str
@@ -698,9 +679,7 @@ class CustomDatabaseTable:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class CustomDatabaseSchema:
+class CustomDatabaseSchema(_APIModel):
     """The structured schema for a question's custom database."""
 
     arrangement: str
@@ -728,9 +707,7 @@ class CustomDatabaseSchema:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class CustomDatabase:
+class CustomDatabase(_APIModel):
     """A custom database attached to a question.
 
     This structure is empirically observed in live API responses and is not
@@ -741,8 +718,8 @@ class CustomDatabase:
     title: str
     description: str
     language: str
-    schema: str
-    schema_json: CustomDatabaseSchema
+    schema: str  # type: ignore[assignment]  # pyright: ignore[reportIncompatibleMethodOverride]
+    schema_json: CustomDatabaseSchema  # type: ignore[assignment]  # pyright: ignore[reportIncompatibleMethodOverride]
 
     @classmethod
     def from_dict(
@@ -769,9 +746,7 @@ class CustomDatabase:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class Question:
+class Question(_APIModel):
     """A CoderPad question."""
 
     id: int
@@ -862,9 +837,7 @@ class Question:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class OrganizationUser:
+class OrganizationUser(_APIModel):
     """A user within an organization."""
 
     email: str
@@ -891,9 +864,7 @@ class OrganizationUser:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class OrganizationStatsUser:
+class OrganizationStatsUser(_APIModel):
     """A user's pad usage statistics."""
 
     email: str
@@ -920,9 +891,7 @@ class OrganizationStatsUser:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class Quota:
+class Quota(_APIModel):
     """Quota information."""
 
     trial_expires_at: str
@@ -958,9 +927,7 @@ def _empty_child_organizations() -> list[dict[str, object]]:
     return []
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class Organization:
+class Organization(_APIModel):
     """Organization information.
 
     ``id`` and ``child_organizations`` are empirically observed fields that
@@ -976,7 +943,7 @@ class Organization:
     teams: list[Team]
     single_sign_in_url: str | None = None
     id: int | None = None
-    child_organizations: list[dict[str, object]] = field(
+    child_organizations: list[dict[str, object]] = Field(
         default_factory=_empty_child_organizations,
     )
 
@@ -1015,9 +982,7 @@ class Organization:
         )
 
 
-@beartype
-@dataclass(frozen=True, kw_only=True)
-class OrganizationStats:
+class OrganizationStats(_APIModel):
     """Organization usage statistics."""
 
     start_time: str
