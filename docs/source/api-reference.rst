@@ -20,6 +20,7 @@ API Reference
 .. automodule:: coderpad.screen_types
    :undoc-members:
    :members:
+   :exclude-members: __init__, model_config
 
 .. automodule:: coderpad.transports
    :undoc-members:
@@ -28,3 +29,4 @@ API Reference
 .. automodule:: coderpad.types
    :undoc-members:
    :members:
+   :exclude-members: __init__, model_config
