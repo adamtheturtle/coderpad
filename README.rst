@@ -49,6 +49,31 @@ The organization users endpoint also supports server-side email filtering:
 The equivalent asynchronous operation is
 ``await client.organization.users.list(email="person@example.com")``.
 
+CoderPad Screen
+---------------
+
+Screen uses a separate API key and host from Interview:
+
+.. code-block:: python
+
+   """List Screen campaigns and candidate tests."""
+
+   from coderpad import CoderPad
+
+   client = CoderPad(
+       api_key="your-interview-api-key",
+       screen_api_key="your-screen-api-key",
+   )
+   campaigns = client.screen.campaigns.list()
+   page = client.screen.tests.list(campaign_id=campaigns[0].id, limit=50)
+   assert page.pagination is not None
+
+Screen test listings use offset pagination. While
+``page.pagination.has_more_items`` is true, request the next page with
+``start=page.pagination.next_start``. Use ``SCREEN_EU_BASE_URL`` as
+``screen_base_url`` for EU-hosted organizations. All Screen operations have
+equivalent methods on ``AsyncCoderPad``.
+
 Full Documentation
 ------------------
 

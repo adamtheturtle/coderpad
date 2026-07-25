@@ -9,9 +9,12 @@ from typing import Self
 
 from beartype import beartype
 
+from coderpad.async_screen import AsyncScreenNamespace
 from coderpad.exceptions import CoderPadError
+from coderpad.screen import SCREEN_US_BASE_URL
 from coderpad.transports import (
     AsyncHTTPXTransport,
+    AsyncJSONTransport,
     AsyncTransport,
     TransportResponse,
 )
@@ -791,18 +794,25 @@ class AsyncCoderPad:
         *,
         api_key: str,
         base_url: str = ("https://app.coderpad.io"),
+        screen_api_key: str | None = None,
+        screen_base_url: str = SCREEN_US_BASE_URL,
         transport: AsyncTransport | None = None,
+        screen_transport: AsyncJSONTransport | None = None,
     ) -> None:
         """Create a new async CoderPad client.
 
         Args:
             api_key: The API key for authentication.
             base_url: The base URL for the API.
+            screen_api_key: The independent Screen API key.
+            screen_base_url: The US, EU, or custom Screen base URL.
             transport: The async HTTP transport. Defaults
                 to ``AsyncHTTPXTransport()``.
+            screen_transport: The independent Screen HTTP transport.
         """
         self.base_url = base_url
         resolved_transport = transport or AsyncHTTPXTransport()
+        resolved_screen_transport = screen_transport or AsyncHTTPXTransport()
         headers = {"Authorization": f'Token token="{api_key}"'}
         self.pads: AsyncPadsNamespace = AsyncPadsNamespace(
             transport=resolved_transport,
@@ -813,6 +823,11 @@ class AsyncCoderPad:
             transport=resolved_transport,
             base_url=base_url,
             headers=headers,
+        )
+        self.screen: AsyncScreenNamespace = AsyncScreenNamespace(
+            transport=resolved_screen_transport,
+            api_key=screen_api_key or "",
+            base_url=screen_base_url,
         )
         if isinstance(
             resolved_transport,
@@ -825,6 +840,14 @@ class AsyncCoderPad:
                 """No-op close for transports without aclose."""
 
             self._aclose = _noop
+        if isinstance(resolved_screen_transport, AsyncHTTPXTransport):
+            self._screen_aclose = resolved_screen_transport.aclose
+        else:
+
+            async def _screen_noop() -> None:
+                """No-op close for Screen transports without aclose."""
+
+            self._screen_aclose = _screen_noop
         self.organization: AsyncOrganizationNamespace = (
             AsyncOrganizationNamespace(
                 transport=resolved_transport,
@@ -836,6 +859,7 @@ class AsyncCoderPad:
     async def aclose(self) -> None:
         """Close the underlying transport."""
         await self._aclose()
+        await self._screen_aclose()
 
     async def __aenter__(self) -> Self:
         """Enter the async context manager.

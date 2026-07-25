@@ -34,6 +34,25 @@ def fixture_mock_coderpad_api(
             spec=openapi_spec,
             base_url=_BASE_URL,
         )
+        mock_router.get(
+            url="https://www.codingame.com/assessment/api/v1.1/campaigns",
+        ).respond(
+            json=[{"id": 1, "name": "Example campaign"}],
+        )
+        mock_router.get(
+            url="https://www.codingame.com/assessment/api/v1.1/tests",
+        ).respond(
+            json={
+                "tests": [],
+                "pagination": {
+                    "start": 0,
+                    "limit": 50,
+                    "total": 0,
+                    "has_more_items": False,
+                    "next_start": None,
+                },
+            },
+        )
         yield mock_router
 
 
