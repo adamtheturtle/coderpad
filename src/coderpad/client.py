@@ -7,6 +7,8 @@ from http import HTTPStatus
 from pathlib import Path
 from typing import Self
 
+from beartype import beartype
+
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL, ScreenNamespace
 from coderpad.transports import (
@@ -33,6 +35,7 @@ from coderpad.types import (
 )
 
 
+@beartype
 class _Namespace:
     """Base class providing shared request logic."""
 
@@ -92,6 +95,7 @@ class _Namespace:
         return response
 
 
+@beartype
 class PadsNamespace(_Namespace):
     """Namespace for pad operations."""
 
@@ -314,6 +318,7 @@ class PadsNamespace(_Namespace):
         return PadHistory.from_dict(data=data)
 
 
+@beartype
 class QuestionsNamespace(_Namespace):
     """Namespace for question operations."""
 
@@ -560,6 +565,7 @@ class QuestionsNamespace(_Namespace):
         )
 
 
+@beartype
 class OrganizationPadsNamespace(_Namespace):
     """Namespace for organization pad operations."""
 
@@ -596,6 +602,7 @@ class OrganizationPadsNamespace(_Namespace):
         )
 
 
+@beartype
 class OrganizationQuestionsNamespace(_Namespace):
     """Namespace for organization question operations."""
 
@@ -632,6 +639,7 @@ class OrganizationQuestionsNamespace(_Namespace):
         )
 
 
+@beartype
 class OrganizationUsersNamespace(_Namespace):
     """Namespace for organization user operations."""
 
@@ -662,6 +670,7 @@ class OrganizationUsersNamespace(_Namespace):
         ]
 
 
+@beartype
 class OrganizationNamespace(_Namespace):
     """Namespace for organization operations."""
 
@@ -758,6 +767,7 @@ class OrganizationNamespace(_Namespace):
         return Quota.model_validate(obj=response.json())
 
 
+@beartype
 class CoderPad:
     """A client for the CoderPad Interview API."""
 

@@ -2,6 +2,7 @@
 
 from typing import ClassVar, Self, TypeGuard
 
+from beartype import beartype
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -81,6 +82,7 @@ def _optional_str(value: object, /) -> str | None:
     return value if isinstance(value, str) else None
 
 
+@beartype
 class ScreenCampaign(_APIModel):
     """A reusable Screen assessment campaign."""
 
@@ -111,6 +113,7 @@ class ScreenCampaign(_APIModel):
         )
 
 
+@beartype
 class ScreenInvitation(_APIModel):
     """An invitation to a Screen campaign."""
 
@@ -122,6 +125,7 @@ class ScreenInvitation(_APIModel):
     send_notification_email_on_bounce: bool | None = None
 
 
+@beartype
 class ScreenInvitationResult(_APIModel):
     """The result of creating a Screen test invitation."""
 
@@ -137,6 +141,7 @@ class ScreenInvitationResult(_APIModel):
         )
 
 
+@beartype
 class ScreenTestQuestion(_APIModel):
     """A question included in a Screen test."""
 
@@ -152,6 +157,7 @@ class ScreenTestQuestion(_APIModel):
         )
 
 
+@beartype
 class ScreenSkillResult(_APIModel):
     """A scored skill within a Screen report."""
 
@@ -169,6 +175,7 @@ class ScreenSkillResult(_APIModel):
         )
 
 
+@beartype
 class ScreenTechnologyResult(_APIModel):
     """A scored technology within a Screen report."""
 
@@ -200,6 +207,7 @@ class ScreenTechnologyResult(_APIModel):
         )
 
 
+@beartype
 class ScreenReport(_APIModel):
     """A candidate's scored Screen report."""
 
@@ -250,6 +258,7 @@ class ScreenReport(_APIModel):
         )
 
 
+@beartype
 class ScreenTest(_APIModel):
     """A candidate's Screen test session."""
 
@@ -297,6 +306,7 @@ class ScreenTest(_APIModel):
         )
 
 
+@beartype
 class ScreenPagination(_APIModel):
     """Offset pagination metadata returned by Screen."""
 
@@ -318,6 +328,7 @@ class ScreenPagination(_APIModel):
         )
 
 
+@beartype
 class ScreenTestsPage(_APIModel):
     """One page of Screen test sessions."""
 
@@ -341,6 +352,7 @@ class ScreenTestsPage(_APIModel):
         )
 
 
+@beartype
 class ScreenWebhook(_APIModel):
     """The configured Screen webhook."""
 

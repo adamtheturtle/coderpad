@@ -7,6 +7,8 @@ from http import HTTPStatus
 from pathlib import Path
 from typing import Self
 
+from beartype import beartype
+
 from coderpad.async_screen import AsyncScreenNamespace
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL
@@ -34,6 +36,7 @@ from coderpad.types import (
 )
 
 
+@beartype
 class _AsyncNamespace:
     """Base class providing shared async request logic."""
 
@@ -93,6 +96,7 @@ class _AsyncNamespace:
         return response
 
 
+@beartype
 class AsyncPadsNamespace(_AsyncNamespace):
     """Namespace for async pad operations."""
 
@@ -316,6 +320,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         return PadHistory.from_dict(data=data)
 
 
+@beartype
 class AsyncQuestionsNamespace(_AsyncNamespace):
     """Namespace for async question operations."""
 
@@ -564,6 +569,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         )
 
 
+@beartype
 class AsyncOrganizationPadsNamespace(_AsyncNamespace):
     """Namespace for async organization pad operations."""
 
@@ -600,6 +606,7 @@ class AsyncOrganizationPadsNamespace(_AsyncNamespace):
         )
 
 
+@beartype
 class AsyncOrganizationQuestionsNamespace(
     _AsyncNamespace,
 ):
@@ -641,6 +648,7 @@ class AsyncOrganizationQuestionsNamespace(
         )
 
 
+@beartype
 class AsyncOrganizationUsersNamespace(_AsyncNamespace):
     """Namespace for async organization user operations."""
 
@@ -671,6 +679,7 @@ class AsyncOrganizationUsersNamespace(_AsyncNamespace):
         ]
 
 
+@beartype
 class AsyncOrganizationNamespace(_AsyncNamespace):
     """Namespace for async organization operations."""
 
@@ -772,6 +781,7 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
         return Quota.model_validate(obj=response.json())
 
 
+@beartype
 class AsyncCoderPad:
     """An async client for the CoderPad Interview API."""
 

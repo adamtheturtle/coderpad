@@ -3,6 +3,8 @@
 import builtins
 from http import HTTPStatus
 
+from beartype import beartype
+
 from coderpad.exceptions import CoderPadError
 from coderpad.screen_types import (
     ScreenCampaign,
@@ -19,6 +21,7 @@ SCREEN_EU_BASE_URL = "https://www.codingame.eu"
 _SCREEN_PREFIX = "/assessment/api/v1.1"
 
 
+@beartype
 class _ScreenNamespace:
     """Shared synchronous Screen request handling."""
 
@@ -55,6 +58,7 @@ class _ScreenNamespace:
         return response
 
 
+@beartype
 class ScreenCampaignsNamespace(_ScreenNamespace):
     """Screen campaign operations."""
 
@@ -79,6 +83,7 @@ class ScreenCampaignsNamespace(_ScreenNamespace):
         return ScreenInvitationResult.from_dict(data=response.json())
 
 
+@beartype
 class ScreenTestsNamespace(_ScreenNamespace):
     """Screen test-session operations."""
 
@@ -178,6 +183,7 @@ class ScreenTestsNamespace(_ScreenNamespace):
         ).content
 
 
+@beartype
 class ScreenWebhookNamespace(_ScreenNamespace):
     """Screen webhook operations."""
 
@@ -195,6 +201,7 @@ class ScreenWebhookNamespace(_ScreenNamespace):
         self._request(method="DELETE", path="/webhook")
 
 
+@beartype
 class ScreenNamespace(_ScreenNamespace):
     """Root namespace for the synchronous Screen API."""
 

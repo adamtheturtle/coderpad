@@ -4,6 +4,7 @@ import enum
 from collections.abc import Iterable
 from typing import ClassVar, Self, TypeVar
 
+from beartype import beartype
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from coderpad._dict_types import (
@@ -42,6 +43,7 @@ class _APIModel(BaseModel):
     )
 
 
+@beartype
 class PaginatedList(list[_T]):
     """A list with pagination metadata from the API response."""
 
@@ -155,6 +157,7 @@ class Language(enum.Enum):
     VUE = "vue"
 
 
+@beartype
 class Team(_APIModel):
     """A team within an organization."""
 
@@ -177,6 +180,7 @@ class Team(_APIModel):
         )
 
 
+@beartype
 class PadInterviewerNotification(_APIModel):
     """An interviewer notification associated with a pad.
 
@@ -227,6 +231,7 @@ def _empty_pad_interviewer_notifications() -> list[PadInterviewerNotification]:
     return []
 
 
+@beartype
 class Pad(_APIModel):
     """A CoderPad interview pad."""
 
@@ -310,6 +315,7 @@ class Pad(_APIModel):
         )
 
 
+@beartype
 class PadEvent(_APIModel):
     """An event associated with a pad."""
 
@@ -343,6 +349,7 @@ class PadEvent(_APIModel):
         )
 
 
+@beartype
 class PadHistoryEntry(_APIModel):
     """An editor operation from a pad's Firebase history.
 
@@ -401,6 +408,7 @@ class PadHistoryEntry(_APIModel):
         return "".join(updated)
 
 
+@beartype
 class PadHistory(list[PadHistoryEntry]):
     """Chronologically ordered editor history for a pad file."""
 
@@ -447,6 +455,7 @@ class PadHistory(list[PadHistoryEntry]):
         return contents
 
 
+@beartype
 class FileContent(_APIModel):
     """A file within a pad environment.
 
@@ -482,6 +491,7 @@ class FileContent(_APIModel):
         )
 
 
+@beartype
 class PadEnvironment(_APIModel):
     """A pad environment."""
 
@@ -524,6 +534,7 @@ class PadEnvironment(_APIModel):
         )
 
 
+@beartype
 class QuestionFileContent(_APIModel):
     """A file for a multi-file question.
 
@@ -535,6 +546,7 @@ class QuestionFileContent(_APIModel):
     contents: str
 
 
+@beartype
 class CandidateInstruction(_APIModel):
     """Instructions shown to a candidate."""
 
@@ -568,6 +580,7 @@ class CandidateInstruction(_APIModel):
         )
 
 
+@beartype
 class TestCase(_APIModel):
     """A test case for a question."""
 
@@ -597,6 +610,7 @@ class TestCase(_APIModel):
         )
 
 
+@beartype
 class CustomFile(_APIModel):
     """A custom file attached to a question."""
 
@@ -628,6 +642,7 @@ class CustomFile(_APIModel):
         )
 
 
+@beartype
 class CustomDatabaseColumn(_APIModel):
     """A column in a question's custom database schema."""
 
@@ -657,6 +672,7 @@ class CustomDatabaseColumn(_APIModel):
         )
 
 
+@beartype
 class CustomDatabaseTable(_APIModel):
     """A table in a question's custom database schema."""
 
@@ -685,6 +701,7 @@ class CustomDatabaseTable(_APIModel):
         )
 
 
+@beartype
 class CustomDatabaseSchema(_APIModel):
     """The structured schema for a question's custom database."""
 
@@ -713,6 +730,7 @@ class CustomDatabaseSchema(_APIModel):
         )
 
 
+@beartype
 class CustomDatabase(_APIModel):
     """A custom database attached to a question.
 
@@ -752,6 +770,7 @@ class CustomDatabase(_APIModel):
         )
 
 
+@beartype
 class Question(_APIModel):
     """A CoderPad question."""
 
@@ -843,6 +862,7 @@ class Question(_APIModel):
         )
 
 
+@beartype
 class OrganizationUser(_APIModel):
     """A user within an organization."""
 
@@ -870,6 +890,7 @@ class OrganizationUser(_APIModel):
         )
 
 
+@beartype
 class OrganizationStatsUser(_APIModel):
     """A user's pad usage statistics."""
 
@@ -897,6 +918,7 @@ class OrganizationStatsUser(_APIModel):
         )
 
 
+@beartype
 class Quota(_APIModel):
     """Quota information."""
 
@@ -933,6 +955,7 @@ def _empty_child_organizations() -> list[dict[str, object]]:
     return []
 
 
+@beartype
 class Organization(_APIModel):
     """Organization information.
 
@@ -988,6 +1011,7 @@ class Organization(_APIModel):
         )
 
 
+@beartype
 class OrganizationStats(_APIModel):
     """Organization usage statistics."""
 
