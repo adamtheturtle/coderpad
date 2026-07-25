@@ -343,7 +343,7 @@ class TestPadEvent:
 
     @staticmethod
     def test_model_validate_without_optional_fields() -> None:
-        """Pydantic parsing accepts omitted nullable response fields."""
+        """Pydantic parsing accepts omitted optional response fields."""
         result = PadEvent.model_validate(
             obj={
                 "message": "Pad started",
@@ -552,7 +552,7 @@ class TestQuestion:
 
     @staticmethod
     def test_model_validate_without_optional_fields() -> None:
-        """Pydantic parsing accepts omitted nullable response fields."""
+        """Pydantic parsing accepts omitted optional response fields."""
         payload: dict[str, object] = dict(_question_dict())
         for field_name in (
             "language",
