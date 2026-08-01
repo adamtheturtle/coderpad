@@ -6,13 +6,14 @@ from doctest import ELLIPSIS
 
 import pytest
 import respx
-from openapi_mock import add_openapi_to_respx
 from sybil import Sybil
 from sybil.parsers.rest import (
     ClearNamespaceParser,
     DocTestParser,
     PythonCodeBlockParser,
 )
+
+from tests.openapi_mock import JSONMapping, add_openapi_to_respx
 
 _BASE_URL = "https://app.coderpad.io"
 
@@ -24,7 +25,7 @@ def fixture_mock_coderpad_api(
     """Provide a respx mock router backed by the OpenAPI spec."""
     openapi_spec_path = request.config.rootpath / "openapi.json"
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
-    openapi_spec: dict[str, object] = json.loads(s=spec_text)
+    openapi_spec: JSONMapping = json.loads(s=spec_text)
     with respx.mock(
         base_url=_BASE_URL,
         assert_all_called=False,

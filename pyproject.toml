@@ -431,6 +431,7 @@ plugins = [
 ]
 
 [tool.pyrefly]
+search_path = [ "." ]
 errors.non-exhaustive-match = "error"
 
 [tool.pyright]

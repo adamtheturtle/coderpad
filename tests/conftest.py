@@ -6,11 +6,11 @@ from http import HTTPStatus
 
 import pytest
 import respx
-from openapi_mock import add_openapi_to_respx
 
 from coderpad.async_client import AsyncCoderPad
 from coderpad.client import CoderPad
 from coderpad.transports import TransportResponse
+from tests.openapi_mock import JSONMapping, add_openapi_to_respx
 
 _BASE_URL = "https://app.coderpad.io"
 _LIVE_VARIANT_ORGANIZATION_ID = 42
@@ -113,17 +113,17 @@ def _question_payload() -> dict[str, object]:
 
 
 @pytest.fixture(name="openapi_spec")
-def fixture_openapi_spec(request: pytest.FixtureRequest) -> dict[str, object]:
+def fixture_openapi_spec(request: pytest.FixtureRequest) -> JSONMapping:
     """Load the OpenAPI spec from the repo."""
     openapi_spec_path = request.config.rootpath / "openapi.json"
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
-    result: dict[str, object] = json.loads(s=spec_text)
+    result: JSONMapping = json.loads(s=spec_text)
     return result
 
 
 @pytest.fixture(name="mock_coderpad_api")
 def fixture_mock_coderpad_api(
-    openapi_spec: dict[str, object],
+    openapi_spec: JSONMapping,
 ) -> Generator[respx.MockRouter]:
     """Provide a respx mock router backed by the OpenAPI spec."""
     with respx.mock(
