@@ -415,6 +415,15 @@
       },
       "post": {
         "summary": "Create a pad",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/PadCreateForm"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful request",
@@ -1041,6 +1050,15 @@
       ],
       "put": {
         "summary": "Modify a pad",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/PadUpdateForm"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful request",
@@ -2075,6 +2093,20 @@
       ],
       "put": {
         "summary": "Modify a question",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionForm"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionForm"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful request",
@@ -2863,6 +2895,29 @@
       },
       "post": {
         "summary": "Create a question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionForm",
+                "required": [
+                  "question[title]",
+                  "question[language]"
+                ]
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionForm",
+                "required": [
+                  "question[title]",
+                  "question[language]"
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful request",
@@ -4816,6 +4871,97 @@
     }
   },
   "components": {
+    "schemas": {
+      "PadCreateForm": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "contents": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "question_id": {
+            "type": "string"
+          }
+        }
+      },
+      "PadUpdateForm": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "contents": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "ended": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          "deleted": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      "QuestionForm": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "question[title]": {
+            "type": "string"
+          },
+          "question[language]": {
+            "type": "string"
+          },
+          "question[description]": {
+            "type": "string"
+          },
+          "question[contents]": {
+            "type": "string"
+          },
+          "question[solution]": {
+            "type": "string"
+          },
+          "question[ai_assist_custom_system_prompt]": {
+            "type": "string"
+          },
+          "question[candidate_instructions]": {
+            "type": "string",
+            "contentMediaType": "application/json"
+          },
+          "question[file_contents]": {
+            "type": "string",
+            "contentMediaType": "application/json"
+          },
+          "question[zip_file]": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "BearerAuth": {
         "type": "http",
