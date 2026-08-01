@@ -26,7 +26,7 @@ def add_openapi_to_respx(
     base_url: str,
 ) -> None:
     """Add response routes and validate requests with their OpenAPI
-    schemas.
+    definitions.
     """
     initial_route_count = len(mock_obj.routes)
     add_response_routes(mock_obj=mock_obj, spec=spec, base_url=base_url)
