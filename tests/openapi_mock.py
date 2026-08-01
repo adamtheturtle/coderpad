@@ -58,14 +58,13 @@ def _operations(*, spec: JSONMapping) -> Iterator[JSONMapping]:
     assert isinstance(paths_object, dict)
     paths: JSONMapping = paths_object
     for path_item_object in paths.values():
-        if not isinstance(path_item_object, dict):  # pragma: no cover
-            continue
+        assert isinstance(path_item_object, dict)
         path_item: JSONMapping = path_item_object
         for method, operation in path_item.items():
             if method.lower() not in _HTTP_METHODS:
                 continue
-            if isinstance(operation, dict):  # pragma: no branch
-                yield operation
+            assert isinstance(operation, dict)
+            yield operation
 
 
 def _request_validator(
