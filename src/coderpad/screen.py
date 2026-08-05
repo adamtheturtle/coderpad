@@ -42,8 +42,8 @@ class _ScreenNamespace:
         *,
         method: str,
         path: str,
-        params: dict[str, str | int] | None = None,
-        json: object | None = None,
+        params: dict[str, str | int] | None = None,  # noqa: NOD001
+        json: object | None = None,  # noqa: NOD001
     ) -> TransportResponse:
         """Make a Screen request and map HTTP failures."""
         response = self.transport(

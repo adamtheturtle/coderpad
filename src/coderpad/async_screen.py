@@ -29,7 +29,7 @@ class _AsyncScreenNamespace:
         *,
         transport: AsyncJSONTransport,
         api_key: str,
-        base_url: str = SCREEN_US_BASE_URL,
+        base_url: str = SCREEN_US_BASE_URL,  # noqa: NOD001
     ) -> None:
         """Create shared asynchronous Screen request state."""
         self.transport: AsyncJSONTransport = transport
@@ -41,8 +41,8 @@ class _AsyncScreenNamespace:
         *,
         method: str,
         path: str,
-        params: dict[str, str | int] | None = None,
-        json: object | None = None,
+        params: dict[str, str | int] | None = None,  # noqa: NOD001
+        json: object | None = None,  # noqa: NOD001
     ) -> TransportResponse:
         """Make a Screen request and map HTTP failures."""
         response = await self.transport(
