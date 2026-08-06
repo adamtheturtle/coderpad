@@ -97,9 +97,9 @@ class TestAsyncCoderPad:
                 method: str,
                 url: str,
                 headers: dict[str, str],
-                params: (dict[str, str | int] | None) = None,  # noqa: NOD001
-                data: dict[str, str] | None = None,  # noqa: NOD001
-                files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+                params: (dict[str, str | int] | None),
+                data: dict[str, str] | None,
+                files: (dict[str, tuple[str, bytes, str]] | None),
             ) -> TransportResponse:  # pragma: no cover
                 """Make a request."""
                 raise NotImplementedError
@@ -352,9 +352,9 @@ class TestAsyncGetPadEnvironment:
             method: str,
             url: str,
             headers: dict[str, str],
-            params: dict[str, str | int] | None = None,  # noqa: NOD001
-            data: dict[str, str] | None = None,  # noqa: NOD001
-            files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+            params: dict[str, str | int] | None,
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
         ) -> TransportResponse:
             """Return synthetic live-response variants."""
             del headers, params, data, files
@@ -399,9 +399,9 @@ class TestAsyncGetPadHistory:
             method: str,
             url: str,
             headers: dict[str, str],
-            params: (dict[str, str | int] | None) = None,  # noqa: NOD001
-            data: dict[str, str] | None = None,  # noqa: NOD001
-            files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+            params: (dict[str, str | int] | None),
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
         ) -> TransportResponse:
             """Return sample Firebase history."""
             del params, data, files
@@ -439,9 +439,9 @@ class TestAsyncGetPadHistory:
             method: str,
             url: str,
             headers: dict[str, str],
-            params: (dict[str, str | int] | None) = None,  # noqa: NOD001
-            data: dict[str, str] | None = None,  # noqa: NOD001
-            files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+            params: (dict[str, str | int] | None),
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
         ) -> TransportResponse:
             """Return an empty Firebase history."""
             del method, url, headers, params, data, files
@@ -470,9 +470,9 @@ class TestAsyncGetPadHistory:
             method: str,
             url: str,
             headers: dict[str, str],
-            params: (dict[str, str | int] | None) = None,  # noqa: NOD001
-            data: dict[str, str] | None = None,  # noqa: NOD001
-            files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+            params: (dict[str, str | int] | None),
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
         ) -> TransportResponse:
             """Return a missing history response."""
             del method, url, headers, params, data, files
@@ -939,9 +939,9 @@ class TestAsyncListOrganizationUsers:
             method: str,
             url: str,
             headers: dict[str, str],
-            params: (dict[str, str | int] | None) = None,  # noqa: NOD001
-            data: dict[str, str] | None = None,  # noqa: NOD001
-            files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+            params: (dict[str, str | int] | None),
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
         ) -> TransportResponse:
             """Return an empty successful user response."""
             del method, url, headers, params, data, files
@@ -966,9 +966,9 @@ class TestAsyncListOrganizationUsers:
             method: str,
             url: str,
             headers: dict[str, str],
-            params: (dict[str, str | int] | None) = None,  # noqa: NOD001
-            data: dict[str, str] | None = None,  # noqa: NOD001
-            files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+            params: (dict[str, str | int] | None),
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
         ) -> TransportResponse:
             """Return a not-found user response."""
             del method, url, headers, params, data, files
@@ -996,9 +996,9 @@ class TestAsyncExceptionHandling:
             method: str,
             url: str,
             headers: dict[str, str],
-            params: (dict[str, str | int] | None) = None,  # noqa: NOD001
-            data: dict[str, str] | None = None,  # noqa: NOD001
-            files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+            params: (dict[str, str | int] | None),
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
         ) -> TransportResponse:
             """Return a 404 response."""
             del method, url, headers, params, data, files

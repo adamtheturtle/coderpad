@@ -74,9 +74,9 @@ class Transport(Protocol):
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
     ) -> TransportResponse:
         """Make an HTTP request.
 
@@ -107,10 +107,10 @@ class JSONTransport(Protocol):
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
-        json: object | None = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
+        json: object | None,
     ) -> TransportResponse:
         """Make an HTTP request with an optional JSON body."""
         ...  # pylint: disable=unnecessary-ellipsis
@@ -155,9 +155,9 @@ class HTTPXTransport:
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
         json: object | None = None,
     ) -> TransportResponse:
         """Make an HTTP request using ``httpx``.
@@ -205,9 +205,9 @@ class AsyncTransport(Protocol):
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
     ) -> TransportResponse:
         """Make an async HTTP request.
 
@@ -238,10 +238,10 @@ class AsyncJSONTransport(Protocol):
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
-        json: object | None = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
+        json: object | None,
     ) -> TransportResponse:
         """Make an async HTTP request with an optional JSON body."""
         ...  # pylint: disable=unnecessary-ellipsis
@@ -287,9 +287,9 @@ class AsyncHTTPXTransport:
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
         json: object | None = None,
     ) -> TransportResponse:
         """Make an async HTTP request using ``httpx``.
