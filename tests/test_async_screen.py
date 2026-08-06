@@ -16,7 +16,7 @@ from coderpad.transports import TransportResponse
 class _AsyncScreenTransport:
     """Record asynchronous Screen requests."""
 
-    def __init__(self, *, error: bool = False) -> None:
+    def __init__(self, *, error: bool = False) -> None:  # noqa: NOD001
         """Create a recording transport."""
         self.calls: list[dict[str, object]] = []
         self.error = error
@@ -27,10 +27,10 @@ class _AsyncScreenTransport:
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: dict[str, tuple[str, bytes, str]] | None = None,
-        json: object | None = None,
+        params: dict[str, str | int] | None = None,  # noqa: NOD001
+        data: dict[str, str] | None = None,  # noqa: NOD001
+        files: dict[str, tuple[str, bytes, str]] | None = None,  # noqa: NOD001
+        json: object | None = None,  # noqa: NOD001
     ) -> TransportResponse:
         """Return a response selected by the request path."""
         del data, files
@@ -92,7 +92,7 @@ def _response(
     value: object,
     /,
     *,
-    status: HTTPStatus = HTTPStatus.OK,
+    status: HTTPStatus = HTTPStatus.OK,  # noqa: NOD001
 ) -> TransportResponse:
     """Create a JSON transport response."""
     return TransportResponse(
