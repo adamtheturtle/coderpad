@@ -16,7 +16,7 @@ from coderpad.transports import TransportResponse
 class _AsyncScreenTransport:
     """Record asynchronous Screen requests."""
 
-    def __init__(self, *, error: bool = False) -> None:  # noqa: NOD001
+    def __init__(self, *, error: bool) -> None:
         """Create a recording transport."""
         self.calls: list[dict[str, object]] = []
         self.error = error
@@ -27,10 +27,10 @@ class _AsyncScreenTransport:
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,  # noqa: NOD001
-        data: dict[str, str] | None = None,  # noqa: NOD001
-        files: dict[str, tuple[str, bytes, str]] | None = None,  # noqa: NOD001
-        json: object | None = None,  # noqa: NOD001
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: dict[str, tuple[str, bytes, str]] | None,
+        json: object | None,
     ) -> TransportResponse:
         """Return a response selected by the request path."""
         del data, files
@@ -49,9 +49,14 @@ class _AsyncScreenTransport:
                 status=HTTPStatus.UNAUTHORIZED,
             )
         if url.endswith("/campaigns"):
-            return _response([{"id": 7, "name": "Backend"}])
+            return _response(
+                [{"id": 7, "name": "Backend"}], status=HTTPStatus.OK
+            )
         if url.endswith("/campaigns/7/actions/send"):
-            return _response({"id": 11, "test_url": "https://test.example"})
+            return _response(
+                {"id": 11, "test_url": "https://test.example"},
+                status=HTTPStatus.OK,
+            )
         if url.endswith("/tests"):
             return _response(
                 {
@@ -64,6 +69,7 @@ class _AsyncScreenTransport:
                     ],
                     "pagination": {"total": 2},
                 },
+                status=HTTPStatus.OK,
             )
         if url.endswith("/tests/11/report"):
             return TransportResponse(
@@ -78,9 +84,12 @@ class _AsyncScreenTransport:
                     "status": "completed",
                     "report": dict[str, object](),
                 },
+                status=HTTPStatus.OK,
             )
         if url.endswith("/webhook") and method == "GET":
-            return _response({"url": "https://example.com/hook"})
+            return _response(
+                {"url": "https://example.com/hook"}, status=HTTPStatus.OK
+            )
         return TransportResponse(
             status_code=HTTPStatus.NO_CONTENT,
             headers={},
@@ -92,7 +101,7 @@ def _response(
     value: object,
     /,
     *,
-    status: HTTPStatus = HTTPStatus.OK,  # noqa: NOD001
+    status: HTTPStatus,
 ) -> TransportResponse:
     """Create a JSON transport response."""
     return TransportResponse(
@@ -114,7 +123,7 @@ def _client(transport: _AsyncScreenTransport, /) -> AsyncCoderPad:
 @pytest.mark.asyncio
 async def test_async_screen_matches_sync_surface() -> None:
     """The asynchronous namespaces expose equivalent operations."""
-    recorder = _AsyncScreenTransport()
+    recorder = _AsyncScreenTransport(error=False)
     client = _client(recorder)
     screen = client.screen
     campaigns = await screen.campaigns.list()

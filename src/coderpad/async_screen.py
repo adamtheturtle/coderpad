@@ -50,6 +50,8 @@ class _AsyncScreenNamespace:
             url=self.base_url + _SCREEN_PREFIX + path,
             headers=self.headers,
             params=params,
+            data=None,
+            files=None,
             json=json,
         )
         if response.status_code >= HTTPStatus.BAD_REQUEST:

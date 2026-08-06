@@ -48,7 +48,7 @@ _TEST = {
 class ScreenTransportStub:
     """Record requests and return representative Screen responses."""
 
-    def __init__(self, *, error: bool = False) -> None:  # noqa: NOD001
+    def __init__(self, *, error: bool) -> None:
         """Create a recording transport."""
         self.calls: list[dict[str, object]] = []
         self.error = error
@@ -59,10 +59,10 @@ class ScreenTransportStub:
         method: str,
         url: str,
         headers: dict[str, str],
-        params: dict[str, str | int] | None = None,  # noqa: NOD001
-        data: dict[str, str] | None = None,  # noqa: NOD001
-        files: dict[str, tuple[str, bytes, str]] | None = None,  # noqa: NOD001
-        json: object | None = None,  # noqa: NOD001
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: dict[str, tuple[str, bytes, str]] | None,
+        json: object | None,
     ) -> TransportResponse:
         """Return a response selected by the request path."""
         del data, files
@@ -89,9 +89,13 @@ class ScreenTransportStub:
                         "languages": ["python"],
                     },
                 ],
+                status=HTTPStatus.OK,
             )
         if url.endswith("/campaigns/7/actions/send"):
-            return _response({"id": 11, "test_url": "https://test.example"})
+            return _response(
+                {"id": 11, "test_url": "https://test.example"},
+                status=HTTPStatus.OK,
+            )
         if url.endswith("/tests"):
             return _response(
                 {
@@ -104,6 +108,7 @@ class ScreenTransportStub:
                         "next_start": 1,
                     },
                 },
+                status=HTTPStatus.OK,
             )
         if url.endswith("/tests/11/report"):
             return TransportResponse(
@@ -112,9 +117,11 @@ class ScreenTransportStub:
                 content=b"%PDF report",
             )
         if url.endswith("/tests/11"):
-            return _response(_TEST)
+            return _response(_TEST, status=HTTPStatus.OK)
         if url.endswith("/webhook") and method == "GET":
-            return _response({"url": "https://example.com/hook"})
+            return _response(
+                {"url": "https://example.com/hook"}, status=HTTPStatus.OK
+            )
         return TransportResponse(
             status_code=HTTPStatus.NO_CONTENT,
             headers={},
@@ -126,7 +133,7 @@ def _response(
     value: object,
     /,
     *,
-    status: HTTPStatus = HTTPStatus.OK,  # noqa: NOD001
+    status: HTTPStatus,
 ) -> TransportResponse:
     """Create a JSON transport response."""
     return TransportResponse(
@@ -140,7 +147,7 @@ def _client(
     transport: ScreenTransportStub,
     /,
     *,
-    base_url: str = SCREEN_EU_BASE_URL,  # noqa: NOD001
+    base_url: str,
 ) -> CoderPad:
     """Create a client using the recording transport."""
     return CoderPad(
@@ -153,8 +160,8 @@ def _client(
 
 def test_campaigns_and_invitation() -> None:
     """Campaigns and invitations use Screen authentication and JSON."""
-    transport = ScreenTransportStub()
-    client = _client(transport)
+    transport = ScreenTransportStub(error=False)
+    client = _client(transport, base_url=SCREEN_EU_BASE_URL)
     campaigns = client.screen.campaigns.list()
     invitation = ScreenInvitation(candidate_email="ada@example.com")
     result = client.screen.campaigns.send_invitation(
@@ -189,8 +196,8 @@ def test_malformed_optional_values_use_defaults() -> None:
 
 def test_tests_filters_pagination_and_decoding() -> None:
     """Test list filters, pagination, and nested models are preserved."""
-    transport = ScreenTransportStub()
-    page = _client(transport).screen.tests.list(
+    transport = ScreenTransportStub(error=False)
+    page = _client(transport, base_url=SCREEN_EU_BASE_URL).screen.tests.list(
         campaign_id=7,
         status="completed",
         tag="python",
@@ -244,8 +251,8 @@ def test_tests_filters_pagination_and_decoding() -> None:
 
 def test_get_actions_report_and_webhook() -> None:
     """Test retrieval, mutations, PDF bytes, and webhook operations."""
-    transport = ScreenTransportStub()
-    screen = _client(transport).screen
+    transport = ScreenTransportStub(error=False)
+    screen = _client(transport, base_url=SCREEN_EU_BASE_URL).screen
     test = screen.tests.get(test_id=11, with_community_stats=True)
     screen.tests.cancel(test_id=11)
     screen.tests.resend(test_id=11)
@@ -268,4 +275,6 @@ def test_get_actions_report_and_webhook() -> None:
 def test_screen_errors_use_existing_hierarchy() -> None:
     """Screen HTTP failures map to the shared exception hierarchy."""
     with pytest.raises(expected_exception=AuthenticationError):
-        _client(ScreenTransportStub(error=True)).screen.campaigns.list()
+        _client(
+            ScreenTransportStub(error=True), base_url=SCREEN_EU_BASE_URL
+        ).screen.campaigns.list()
