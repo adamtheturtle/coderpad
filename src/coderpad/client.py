@@ -57,14 +57,14 @@ class _Namespace:
         self.base_url = base_url
         self.headers = headers
 
-    def _request(
+    def _request(  # noqa: NOD001
         self,
         *,
         method: str,
         url: str,
-        params: dict[str, str | int] | None = None,  # noqa: NOD001
-        data: dict[str, str] | None = None,  # noqa: NOD001
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,  # noqa: NOD001
+        params: dict[str, str | int] | None = None,
+        data: dict[str, str] | None = None,
+        files: (dict[str, tuple[str, bytes, str]] | None) = None,
     ) -> TransportResponse:
         """Make an HTTP request.
 

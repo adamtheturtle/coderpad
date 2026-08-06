@@ -36,13 +36,13 @@ class _AsyncScreenNamespace:
         self.base_url: str = base_url.rstrip("/")
         self.headers: dict[str, str] = {"API-Key": api_key}
 
-    async def _request(
+    async def _request(  # noqa: NOD001
         self,
         *,
         method: str,
         path: str,
-        params: dict[str, str | int] | None = None,  # noqa: NOD001
-        json: object | None = None,  # noqa: NOD001
+        params: dict[str, str | int] | None = None,
+        json: object | None = None,
     ) -> TransportResponse:
         """Make a Screen request and map HTTP failures."""
         response = await self.transport(
