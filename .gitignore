@@ -107,3 +107,6 @@ ENV/
 src/*/_setuptools_scm_version.txt
 
 uv.lock
+
+# Vale styles downloaded by ``vale sync``
+styles/
