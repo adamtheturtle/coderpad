@@ -37,13 +37,13 @@ class _ScreenNamespace:
         self.base_url: str = base_url.rstrip("/")
         self.headers: dict[str, str] = {"API-Key": api_key}
 
-    def _request(  # noqa: NOD001
+    def _request(
         self,
         *,
         method: str,
         path: str,
-        params: dict[str, str | int] | None = None,
-        json: object | None = None,
+        params: dict[str, str | int] | None,
+        json: object | None,
     ) -> TransportResponse:
         """Make a Screen request and map HTTP failures."""
         response = self.transport(
@@ -66,7 +66,9 @@ class ScreenCampaignsNamespace(_ScreenNamespace):
 
     def list(self) -> builtins.list[ScreenCampaign]:
         """List assessment campaigns."""
-        response = self._request(method="GET", path="/campaigns")
+        response = self._request(
+            method="GET", path="/campaigns", params=None, json=None
+        )
         raw_campaigns: object = response.json()
         return ScreenCampaign.list_from_value(value=raw_campaigns)
 
@@ -81,6 +83,7 @@ class ScreenCampaignsNamespace(_ScreenNamespace):
             method="POST",
             path=f"/campaigns/{campaign_id}/actions/send",
             json=invitation.model_dump(exclude_none=True),
+            params=None,
         )
         return ScreenInvitationResult.from_dict(data=response.json())
 
@@ -124,7 +127,9 @@ class ScreenTestsNamespace(_ScreenNamespace):
         params.update(
             (key, value) for key, value in values if value is not None
         )
-        response = self._request(method="GET", path="/tests", params=params)
+        response = self._request(
+            method="GET", path="/tests", params=params, json=None
+        )
         return ScreenTestsPage.from_dict(data=response.json())
 
     def get(
@@ -141,20 +146,33 @@ class ScreenTestsNamespace(_ScreenNamespace):
             method="GET",
             path=f"/tests/{test_id}",
             params=params,
+            json=None,
         )
         return ScreenTest.from_dict(data=response.json())
 
     def cancel(self, *, test_id: int) -> None:
         """Cancel a test invitation."""
-        self._request(method="POST", path=f"/tests/{test_id}/actions/cancel")
+        self._request(
+            method="POST",
+            path=f"/tests/{test_id}/actions/cancel",
+            params=None,
+            json=None,
+        )
 
     def resend(self, *, test_id: int) -> None:
         """Resend a test invitation."""
-        self._request(method="POST", path=f"/tests/{test_id}/actions/resend")
+        self._request(
+            method="POST",
+            path=f"/tests/{test_id}/actions/resend",
+            params=None,
+            json=None,
+        )
 
     def delete(self, *, test_id: int) -> None:
         """Delete a test session."""
-        self._request(method="DELETE", path=f"/tests/{test_id}")
+        self._request(
+            method="DELETE", path=f"/tests/{test_id}", params=None, json=None
+        )
 
     def report(
         self,
@@ -182,6 +200,7 @@ class ScreenTestsNamespace(_ScreenNamespace):
             method="GET",
             path=f"/tests/{test_id}/report",
             params=params,
+            json=None,
         ).content
 
 
@@ -191,16 +210,18 @@ class ScreenWebhookNamespace(_ScreenNamespace):
 
     def get(self) -> ScreenWebhook:
         """Retrieve webhook configuration."""
-        response = self._request(method="GET", path="/webhook")
+        response = self._request(
+            method="GET", path="/webhook", params=None, json=None
+        )
         return ScreenWebhook.from_dict(data=response.json())
 
     def set(self, *, url: str) -> None:
         """Set or replace the webhook URL."""
-        self._request(method="POST", path="/webhook", json=url)
+        self._request(method="POST", path="/webhook", json=url, params=None)
 
     def delete(self) -> None:
         """Delete the webhook configuration."""
-        self._request(method="DELETE", path="/webhook")
+        self._request(method="DELETE", path="/webhook", params=None, json=None)
 
 
 @beartype
