@@ -57,14 +57,14 @@ class _Namespace:
         self.base_url = base_url
         self.headers = headers
 
-    def _request(  # noqa: NOD001
+    def _request(
         self,
         *,
         method: str,
         url: str,
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
     ) -> TransportResponse:
         """Make an HTTP request.
 
@@ -123,6 +123,8 @@ class PadsNamespace(_Namespace):
             method="GET",
             url="/api/pads/",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -171,6 +173,8 @@ class PadsNamespace(_Namespace):
             method="POST",
             url="/api/pads/",
             data=data,
+            params=None,
+            files=None,
         )
         return Pad.from_dict(data=response.json())
 
@@ -186,6 +190,9 @@ class PadsNamespace(_Namespace):
         response = self._request(
             method="GET",
             url=f"/api/pads/{pad_id}",
+            params=None,
+            data=None,
+            files=None,
         )
         return Pad.from_dict(data=response.json())
 
@@ -231,6 +238,8 @@ class PadsNamespace(_Namespace):
             method="PUT",
             url=f"/api/pads/{pad_id}",
             data=data,
+            params=None,
+            files=None,
         )
 
     def get_events(
@@ -259,6 +268,8 @@ class PadsNamespace(_Namespace):
             method="GET",
             url=f"/api/pads/{pad_id}/events",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -283,6 +294,9 @@ class PadsNamespace(_Namespace):
         response = self._request(
             method="GET",
             url=f"/api/pad_environments/{environment_id}",
+            params=None,
+            data=None,
+            files=None,
         )
         return PadEnvironment.from_dict(
             data=response.json(),
@@ -346,6 +360,8 @@ class QuestionsNamespace(_Namespace):
             method="GET",
             url="/api/questions/",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -439,6 +455,7 @@ class QuestionsNamespace(_Namespace):
             url="/api/questions/",
             data=data,
             files=files,
+            params=None,
         )
         return Question.model_validate(obj=response.json())
 
@@ -458,6 +475,9 @@ class QuestionsNamespace(_Namespace):
         response = self._request(
             method="GET",
             url=f"/api/questions/{question_id}",
+            params=None,
+            data=None,
+            files=None,
         )
         return Question.model_validate(obj=response.json())
 
@@ -547,6 +567,7 @@ class QuestionsNamespace(_Namespace):
             url=f"/api/questions/{question_id}",
             data=data,
             files=files,
+            params=None,
         )
 
     def delete(
@@ -562,6 +583,9 @@ class QuestionsNamespace(_Namespace):
         self._request(
             method="DELETE",
             url=f"/api/questions/{question_id}",
+            params=None,
+            data=None,
+            files=None,
         )
 
 
@@ -593,6 +617,8 @@ class OrganizationPadsNamespace(_Namespace):
             method="GET",
             url="/api/organization/pads",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -630,6 +656,8 @@ class OrganizationQuestionsNamespace(_Namespace):
             method="GET",
             url="/api/organization/questions",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -663,6 +691,8 @@ class OrganizationUsersNamespace(_Namespace):
             method="GET",
             url="/api/organization/users",
             params=params,
+            data=None,
+            files=None,
         )
         return [
             OrganizationUser.model_validate(obj=item)
@@ -720,6 +750,9 @@ class OrganizationNamespace(_Namespace):
         response = self._request(
             method="GET",
             url="/api/organization",
+            params=None,
+            data=None,
+            files=None,
         )
         return Organization.from_dict(
             data=response.json(),
@@ -749,6 +782,8 @@ class OrganizationNamespace(_Namespace):
             method="GET",
             url="/api/organization/stats",
             params=params,
+            data=None,
+            files=None,
         )
         return OrganizationStats.from_dict(
             data=response.json(),
@@ -763,6 +798,9 @@ class OrganizationNamespace(_Namespace):
         response = self._request(
             method="GET",
             url="/api/quota",
+            params=None,
+            data=None,
+            files=None,
         )
         return Quota.model_validate(obj=response.json())
 

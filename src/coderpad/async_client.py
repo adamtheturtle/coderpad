@@ -58,14 +58,14 @@ class _AsyncNamespace:
         self.base_url = base_url
         self.headers = headers
 
-    async def _request(  # noqa: NOD001
+    async def _request(
         self,
         *,
         method: str,
         url: str,
-        params: dict[str, str | int] | None = None,
-        data: dict[str, str] | None = None,
-        files: (dict[str, tuple[str, bytes, str]] | None) = None,
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: (dict[str, tuple[str, bytes, str]] | None),
     ) -> TransportResponse:
         """Make an async HTTP request.
 
@@ -124,6 +124,8 @@ class AsyncPadsNamespace(_AsyncNamespace):
             method="GET",
             url="/api/pads/",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -172,6 +174,8 @@ class AsyncPadsNamespace(_AsyncNamespace):
             method="POST",
             url="/api/pads/",
             data=data,
+            params=None,
+            files=None,
         )
         return Pad.from_dict(data=response.json())
 
@@ -187,6 +191,9 @@ class AsyncPadsNamespace(_AsyncNamespace):
         response = await self._request(
             method="GET",
             url=f"/api/pads/{pad_id}",
+            params=None,
+            data=None,
+            files=None,
         )
         return Pad.from_dict(data=response.json())
 
@@ -232,6 +239,8 @@ class AsyncPadsNamespace(_AsyncNamespace):
             method="PUT",
             url=f"/api/pads/{pad_id}",
             data=data,
+            params=None,
+            files=None,
         )
 
     async def get_events(
@@ -261,6 +270,8 @@ class AsyncPadsNamespace(_AsyncNamespace):
             method="GET",
             url=f"/api/pads/{pad_id}/events",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -285,6 +296,9 @@ class AsyncPadsNamespace(_AsyncNamespace):
         response = await self._request(
             method="GET",
             url=f"/api/pad_environments/{environment_id}",
+            params=None,
+            data=None,
+            files=None,
         )
         return PadEnvironment.from_dict(
             data=response.json(),
@@ -349,6 +363,8 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             method="GET",
             url="/api/questions/",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -443,6 +459,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             url="/api/questions/",
             data=data,
             files=files,
+            params=None,
         )
         return Question.model_validate(obj=response.json())
 
@@ -462,6 +479,9 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         response = await self._request(
             method="GET",
             url=f"/api/questions/{question_id}",
+            params=None,
+            data=None,
+            files=None,
         )
         return Question.model_validate(obj=response.json())
 
@@ -551,6 +571,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             url=f"/api/questions/{question_id}",
             data=data,
             files=files,
+            params=None,
         )
 
     async def delete(
@@ -566,6 +587,9 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         await self._request(
             method="DELETE",
             url=f"/api/questions/{question_id}",
+            params=None,
+            data=None,
+            files=None,
         )
 
 
@@ -597,6 +621,8 @@ class AsyncOrganizationPadsNamespace(_AsyncNamespace):
             method="GET",
             url="/api/organization/pads",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -639,6 +665,8 @@ class AsyncOrganizationQuestionsNamespace(
             method="GET",
             url="/api/organization/questions",
             params=params,
+            data=None,
+            files=None,
         )
         data = response.json()
         return PaginatedList(
@@ -672,6 +700,8 @@ class AsyncOrganizationUsersNamespace(_AsyncNamespace):
             method="GET",
             url="/api/organization/users",
             params=params,
+            data=None,
+            files=None,
         )
         return [
             OrganizationUser.model_validate(obj=item)
@@ -733,6 +763,9 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
         response = await self._request(
             method="GET",
             url="/api/organization",
+            params=None,
+            data=None,
+            files=None,
         )
         return Organization.from_dict(
             data=response.json(),
@@ -763,6 +796,8 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
             method="GET",
             url="/api/organization/stats",
             params=params,
+            data=None,
+            files=None,
         )
         return OrganizationStats.from_dict(
             data=response.json(),
@@ -777,6 +812,9 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
         response = await self._request(
             method="GET",
             url="/api/quota",
+            params=None,
+            data=None,
+            files=None,
         )
         return Quota.model_validate(obj=response.json())
 

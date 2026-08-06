@@ -29,20 +29,20 @@ class _AsyncScreenNamespace:
         *,
         transport: AsyncJSONTransport,
         api_key: str,
-        base_url: str = SCREEN_US_BASE_URL,  # noqa: NOD001
+        base_url: str,
     ) -> None:
         """Create shared asynchronous Screen request state."""
         self.transport: AsyncJSONTransport = transport
         self.base_url: str = base_url.rstrip("/")
         self.headers: dict[str, str] = {"API-Key": api_key}
 
-    async def _request(  # noqa: NOD001
+    async def _request(
         self,
         *,
         method: str,
         path: str,
-        params: dict[str, str | int] | None = None,
-        json: object | None = None,
+        params: dict[str, str | int] | None,
+        json: object | None,
     ) -> TransportResponse:
         """Make a Screen request and map HTTP failures."""
         response = await self.transport(
@@ -65,7 +65,9 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
 
     async def list(self) -> builtins.list[ScreenCampaign]:
         """List assessment campaigns."""
-        response = await self._request(method="GET", path="/campaigns")
+        response = await self._request(
+            method="GET", path="/campaigns", params=None, json=None
+        )
         raw_campaigns: object = response.json()
         return ScreenCampaign.list_from_value(value=raw_campaigns)
 
@@ -80,6 +82,7 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
             method="POST",
             path=f"/campaigns/{campaign_id}/actions/send",
             json=invitation.model_dump(exclude_none=True),
+            params=None,
         )
         return ScreenInvitationResult.from_dict(data=response.json())
 
@@ -127,6 +130,7 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
             method="GET",
             path="/tests",
             params=params,
+            json=None,
         )
         return ScreenTestsPage.from_dict(data=response.json())
 
@@ -144,6 +148,7 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
             method="GET",
             path=f"/tests/{test_id}",
             params=params,
+            json=None,
         )
         return ScreenTest.from_dict(data=response.json())
 
@@ -152,6 +157,8 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
         await self._request(
             method="POST",
             path=f"/tests/{test_id}/actions/cancel",
+            params=None,
+            json=None,
         )
 
     async def resend(self, *, test_id: int) -> None:
@@ -159,11 +166,15 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
         await self._request(
             method="POST",
             path=f"/tests/{test_id}/actions/resend",
+            params=None,
+            json=None,
         )
 
     async def delete(self, *, test_id: int) -> None:
         """Delete a test session."""
-        await self._request(method="DELETE", path=f"/tests/{test_id}")
+        await self._request(
+            method="DELETE", path=f"/tests/{test_id}", params=None, json=None
+        )
 
     async def report(
         self,
@@ -191,6 +202,7 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
             method="GET",
             path=f"/tests/{test_id}/report",
             params=params,
+            json=None,
         )
         return response.content
 
@@ -201,16 +213,22 @@ class AsyncScreenWebhookNamespace(_AsyncScreenNamespace):
 
     async def get(self) -> ScreenWebhook:
         """Retrieve webhook configuration."""
-        response = await self._request(method="GET", path="/webhook")
+        response = await self._request(
+            method="GET", path="/webhook", params=None, json=None
+        )
         return ScreenWebhook.from_dict(data=response.json())
 
     async def set(self, *, url: str) -> None:
         """Set or replace the webhook URL."""
-        await self._request(method="POST", path="/webhook", json=url)
+        await self._request(
+            method="POST", path="/webhook", json=url, params=None
+        )
 
     async def delete(self) -> None:
         """Delete the webhook configuration."""
-        await self._request(method="DELETE", path="/webhook")
+        await self._request(
+            method="DELETE", path="/webhook", params=None, json=None
+        )
 
 
 @beartype
