@@ -1,2 +1,0 @@
-Validate client form requests against request-body definitions in the bundled
-OpenAPI specification during tests.

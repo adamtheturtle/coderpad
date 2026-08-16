@@ -3,6 +3,23 @@ Changelog
 
 .. towncrier release notes start
 
+2026.08.16
+----------
+
+- Add typed synchronous and asynchronous CoderPad Screen clients covering
+  campaigns, invitations, tests, reports, pagination, regions, and webhooks.
+
+- Add synchronous and asynchronous organization user listing, with optional
+  server-side email filtering.
+
+- Validate client form requests against request-body definitions in the bundled
+  OpenAPI specification during tests.
+
+- API resource types are now strict, frozen Pydantic v2 models.  Responses are
+  validated with ``model_validate`` and request models support
+  ``model_dump``.  Beartype continues to provide runtime type checking
+  alongside Pydantic.
+
 2026.07.24
 ----------
 
