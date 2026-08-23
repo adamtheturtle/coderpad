@@ -1,0 +1,1 @@
+Bump PyPI development status classifier from Planning to Beta.
