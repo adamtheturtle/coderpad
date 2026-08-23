@@ -1,1 +1,0 @@
-``Language`` is now a ``StrEnum``, so its values work directly in API requests.

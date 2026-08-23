@@ -1,1 +1,0 @@
-Interview API types such as ``Pad``, ``Question``, and ``Language`` are now available from ``coderpad``.

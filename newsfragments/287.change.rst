@@ -1,1 +1,0 @@
-Add ``screen.tests.all()`` to iterate Screen tests across paginated responses.

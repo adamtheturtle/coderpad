@@ -1,1 +1,0 @@
-Add ``pads.all()`` to iterate Interview pads across paginated responses.

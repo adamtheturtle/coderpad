@@ -1,1 +1,0 @@
-``SortOrder`` is now a ``StrEnum``, so its values work directly as query strings.

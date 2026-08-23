@@ -1,2 +1,0 @@
-Add ``scripts/sync_openapi.py`` to normalize Postman OpenAPI exports
-into the bundled ``openapi.json``.

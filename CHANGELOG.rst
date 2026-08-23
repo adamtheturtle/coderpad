@@ -3,6 +3,74 @@ Changelog
 
 .. towncrier release notes start
 
+2026.08.23
+----------
+
+- Add ``pads.all()`` to iterate Interview pads across paginated responses.
+
+- Add ``screen.tests.all()`` to iterate Screen tests across paginated responses.
+
+- Expose ``prev_page`` on Interview API ``PaginatedList`` responses.
+
+- Interview API types such as ``Pad``, ``Question``, and ``Language`` are now available from ``coderpad``.
+
+- Exception classes such as ``CoderPadError`` and ``NotFoundError`` are now available from ``coderpad``.
+
+- Documented which ``Question`` and ``Pad`` fields are writable versus read-only in a new "Writable and read-only fields" reference page.
+
+- Validate that ``contents``, ``file_contents``, and ``zip_file`` are mutually exclusive on question create/update.
+
+- Support configurable ``httpx`` timeouts on ``CoderPad`` and ``AsyncCoderPad``.
+
+- Parse JSON API error bodies into optional ``CoderPadError.code`` and ``CoderPadError.message`` attributes.
+
+- Added ``BadGatewayError``, ``ServiceUnavailableError``, and ``GatewayTimeoutError`` for HTTP 502, 503, and 504 responses.
+
+- Defer Screen namespace initialization until first access on CoderPad clients.
+
+- Fail fast with a clear error when Screen methods are called without a ``screen_api_key``.
+
+- Support custom default headers on ``CoderPad`` and ``AsyncCoderPad``.
+
+- Support configuring an ``httpx`` proxy on ``CoderPad`` and ``AsyncCoderPad``.
+
+- Bump PyPI development status classifier from Planning to Beta.
+
+- Fixed the README minimum Python version badge to match ``requires-python`` (3.12).
+
+- Add Screen API usage documentation.
+
+- Document the exception hierarchy in the Sphinx API reference.
+
+- Add ``save_screen_report`` to write Screen report bytes to a file.
+
+- ``SortOrder`` is now a ``StrEnum``, so its values work directly as query strings.
+
+- ``Language`` is now a ``StrEnum``, so its values work directly in API requests.
+
+- Add ``scripts/sync_openapi.py`` to normalize Postman OpenAPI exports
+  into the bundled ``openapi.json``.
+
+- Load API keys from ``CODERPAD_API_KEY`` and ``CODERPAD_SCREEN_API_KEY`` via ``from_env()``.
+
+- ``PaginatedList`` and ``ScreenTestsPage`` now include concise ``__repr__`` output for debugging.
+
+- Add ``tests.report_json`` (sync and async) returning a typed
+  ``ScreenReport`` from the Screen test session payload.
+
+- Document the public API stability policy.
+
+- Add ``PadHistory.replay_to_file`` to write replayed editor contents to disk.
+
+- Support configuring ``httpx`` connection pool limits on CoderPad clients.
+
+- Document the maintainer workflow for empirically observed API variants
+  and link it to towncrier news fragments and the API drift issue template.
+
+- Add ``client.quota.get()`` as an alias for ``client.organization.get_quota()``.
+
+- Validate that Screen invitations include ``candidate_email`` and ``candidate_name`` before send.
+
 2026.08.16
 ----------
 

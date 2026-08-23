@@ -1,1 +1,0 @@
-Add ``PadHistory.replay_to_file`` to write replayed editor contents to disk.

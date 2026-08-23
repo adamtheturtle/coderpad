@@ -1,2 +1,0 @@
-Document the maintainer workflow for empirically observed API variants
-and link it to towncrier news fragments and the API drift issue template.

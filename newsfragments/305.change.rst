@@ -1,1 +1,0 @@
-Support custom default headers on ``CoderPad`` and ``AsyncCoderPad``.

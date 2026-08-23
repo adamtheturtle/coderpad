@@ -1,1 +1,0 @@
-Support configuring an ``httpx`` proxy on ``CoderPad`` and ``AsyncCoderPad``.

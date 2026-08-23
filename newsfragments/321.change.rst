@@ -1,2 +1,0 @@
-Add ``tests.report_json`` (sync and async) returning a typed
-``ScreenReport`` from the Screen test session payload.

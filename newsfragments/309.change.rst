@@ -1,1 +1,0 @@
-Add Screen API usage documentation.

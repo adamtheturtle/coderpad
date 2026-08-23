@@ -1,1 +1,0 @@
-Expose ``prev_page`` on Interview API ``PaginatedList`` responses.
