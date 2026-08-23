@@ -128,17 +128,22 @@ class HTTPXTransport:
         self,
         *,
         limits: httpx.Limits | None = None,
+        proxy: str | httpx.Proxy | None = None,
     ) -> None:
         """Create a new HTTPX transport.
 
         Args:
             limits: Optional connection pool limits for ``httpx.Client``.
+            proxy: Optional proxy passed to ``httpx.Client``.
         """
         self.limits = limits
-        if limits is None:
-            self._client = httpx.Client()
-        else:
-            self._client = httpx.Client(limits=limits)
+        self.proxy = proxy
+        client_kwargs: dict[str, object] = {}
+        if limits is not None:
+            client_kwargs["limits"] = limits
+        if proxy is not None:
+            client_kwargs["proxy"] = proxy
+        self._client = httpx.Client(**client_kwargs)
 
     def close(self) -> None:
         """Close the underlying HTTP client."""
@@ -271,17 +276,22 @@ class AsyncHTTPXTransport:
         self,
         *,
         limits: httpx.Limits | None = None,
+        proxy: str | httpx.Proxy | None = None,
     ) -> None:
         """Create a new async HTTPX transport.
 
         Args:
             limits: Optional connection pool limits for ``httpx.AsyncClient``.
+            proxy: Optional proxy passed to ``httpx.AsyncClient``.
         """
         self.limits = limits
-        if limits is None:
-            self._client = httpx.AsyncClient()
-        else:
-            self._client = httpx.AsyncClient(limits=limits)
+        self.proxy = proxy
+        client_kwargs: dict[str, object] = {}
+        if limits is not None:
+            client_kwargs["limits"] = limits
+        if proxy is not None:
+            client_kwargs["proxy"] = proxy
+        self._client = httpx.AsyncClient(**client_kwargs)
 
     async def aclose(self) -> None:
         """Close the underlying async HTTP client."""

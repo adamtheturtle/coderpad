@@ -159,6 +159,17 @@ class TestAsyncCoderPad:
         assert transport.limits is limits
         await client.aclose()
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_proxy_forwarded_to_default_transport() -> None:
+        """AsyncCoderPad forwards proxy to the default transport."""
+        proxy = "http://proxy.example:8080"
+        client = AsyncCoderPad(api_key="test-key", proxy=proxy)
+        transport = client.pads.transport
+        assert isinstance(transport, AsyncHTTPXTransport)
+        assert transport.proxy == proxy
+        await client.aclose()
+
 
 class TestAsyncHTTPXTransport:
     """Tests for ``AsyncHTTPXTransport``."""
@@ -197,6 +208,15 @@ class TestAsyncHTTPXTransport:
         limits = httpx.Limits(max_connections=5)
         transport = AsyncHTTPXTransport(limits=limits)
         assert transport.limits is limits
+        await transport.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_proxy_passed_to_httpx_client() -> None:
+        """A proxy is stored on the async HTTPX transport."""
+        proxy = "http://proxy.example:8080"
+        transport = AsyncHTTPXTransport(proxy=proxy)
+        assert transport.proxy == proxy
         await transport.aclose()
 
 

@@ -161,6 +161,16 @@ class TestCoderPad:
         assert transport.limits is limits
         client.close()
 
+    @staticmethod
+    def test_proxy_forwarded_to_default_transport() -> None:
+        """CoderPad forwards proxy to the default HTTPX transport."""
+        proxy = "http://proxy.example:8080"
+        client = CoderPad(api_key="test-key", proxy=proxy)
+        transport = client.pads.transport
+        assert isinstance(transport, HTTPXTransport)
+        assert transport.proxy == proxy
+        client.close()
+
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""
@@ -188,6 +198,14 @@ class TestHTTPXTransport:
         limits = httpx.Limits(max_connections=5)
         transport = HTTPXTransport(limits=limits)
         assert transport.limits is limits
+        transport.close()
+
+    @staticmethod
+    def test_proxy_passed_to_httpx_client() -> None:
+        """A proxy is stored on the HTTPX transport."""
+        proxy = "http://proxy.example:8080"
+        transport = HTTPXTransport(proxy=proxy)
+        assert transport.proxy == proxy
         transport.close()
 
 
