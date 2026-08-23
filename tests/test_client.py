@@ -407,6 +407,31 @@ class TestExceptionHierarchy:
         assert exc.args[0] == "HTTP 404"
 
     @staticmethod
+    def test_parses_json_error_body() -> None:
+        """JSON error bodies populate code and message attributes."""
+        response = TransportResponse(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            headers={},
+            content=b'{"code": "Unauthorized", "message": "Invalid API key"}',
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, AuthenticationError)
+        assert exc.code == "Unauthorized"
+        assert exc.message == "Invalid API key"
+
+    @staticmethod
+    def test_non_json_error_body_leaves_code_message_none() -> None:
+        """Non-JSON bodies leave code and message as None."""
+        response = TransportResponse(
+            status_code=HTTPStatus.BAD_REQUEST,
+            headers={},
+            content=b"not-json",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert exc.code is None
+        assert exc.message is None
+
+    @staticmethod
     def test_client_raises_specific_exception() -> None:
         """The client raises specific exceptions for error responses."""
 

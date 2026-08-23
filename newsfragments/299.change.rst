@@ -1,0 +1,1 @@
+Parse JSON API error bodies into optional ``CoderPadError.code`` and ``CoderPadError.message`` attributes.
