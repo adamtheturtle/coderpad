@@ -795,7 +795,9 @@ class TestPaginatedList:
 
     @staticmethod
     def test_repr() -> None:
-        """The string representation shows length, total, and next page."""
+        """The string representation shows length, total, and next
+        page.
+        """
         pads: PaginatedList[str] = PaginatedList(
             ["a", "b"],
             total=10,
