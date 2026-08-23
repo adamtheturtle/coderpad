@@ -382,7 +382,7 @@ class TestListPads:
             ) -> TransportResponse:
                 """Return synthetic paginated pads JSON."""
                 del method, url, headers, params, data, files
-                payload = {
+                payload: dict[str, object] = {
                     "status": "OK",
                     "pads": [],
                     "total": 0,
