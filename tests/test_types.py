@@ -37,6 +37,7 @@ from coderpad.types import (
     PadHistory,
     PadHistoryEntry,
     PadInterviewerNotification,
+    PaginatedList,
     Question,
     Quota,
     Team,
@@ -750,3 +751,21 @@ class TestOrganizationStats:
         assert result.end_time == data["end_time"]
         assert result.pads_created == data["pads_created"]
         assert len(result.users) == len(data["users"])
+
+
+def test_paginated_list_prev_page() -> None:
+    """PaginatedList stores prev_page from construction."""
+    page = PaginatedList(
+        ["a"],
+        total=2,
+        next_page="https://example.com?page=2",
+        prev_page="https://example.com?page=0",
+    )
+    assert page.prev_page == "https://example.com?page=0"
+    assert page.next_page == "https://example.com?page=2"
+
+
+def test_paginated_list_prev_page_defaults_none() -> None:
+    """PaginatedList defaults prev_page to None."""
+    page = PaginatedList(["a"], total=1)
+    assert page.prev_page is None

@@ -132,6 +132,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
             [Pad.from_dict(data=item) for item in data["pads"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
     async def create(
@@ -278,6 +279,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
             [PadEvent.model_validate(obj=item) for item in data["events"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
     async def get_environment(
@@ -371,6 +373,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
     async def create(
@@ -629,6 +632,7 @@ class AsyncOrganizationPadsNamespace(_AsyncNamespace):
             [Pad.from_dict(data=item) for item in data["pads"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
 
@@ -673,6 +677,7 @@ class AsyncOrganizationQuestionsNamespace(
             [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
 
