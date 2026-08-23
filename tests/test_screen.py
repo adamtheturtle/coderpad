@@ -2,10 +2,13 @@
 
 # ruff: noqa: PLR2004
 
+from pathlib import Path
+
 import pytest
 
 from coderpad import SCREEN_EU_BASE_URL, CoderPad
 from coderpad.exceptions import AuthenticationError
+from coderpad.screen import save_screen_report
 from coderpad.screen_types import (
     ScreenCampaign,
     ScreenInvitation,
@@ -140,14 +143,32 @@ def test_get_actions_report_and_webhook(
         report_type="simplified",
         anonymous=True,
     )
+    typed_report = screen.tests.report_json(
+        test_id=11,
+        with_community_stats=True,
+    )
     webhook = screen.webhook.get()
     screen.webhook.set(url="https://example.com/new-hook")
     screen.webhook.delete()
     assert test.candidate_name == "Ada"
     assert transport.calls[0]["params"] == {"withCommunityStats": "true"}
     assert report == b"%PDF report"
+    assert typed_report.score == 90
     assert webhook.url == "https://example.com/hook"
     assert transport.calls[-2]["json"] == "https://example.com/new-hook"
+
+
+def test_report_json_raises_when_no_report() -> None:
+    """Report_json raises LookupError when the test has no scored
+    report.
+    """
+    transport = ScreenTransportStub(error=False)
+    screen = _client(transport, base_url=SCREEN_EU_BASE_URL).screen
+    with pytest.raises(
+        expected_exception=LookupError,
+        match="Screen test 99 has no scored report",
+    ):
+        screen.tests.report_json(test_id=99)
 
 
 def test_screen_errors_use_existing_hierarchy() -> None:
@@ -166,3 +187,11 @@ def test_tests_all_iterates_pages() -> None:
     assert names == ["Ada", "Grace"]
     assert transport.calls[0]["params"] == {"limit": 1}
     assert transport.calls[1]["params"] == {"limit": 1, "start": 1}
+
+
+def test_save_screen_report(tmp_path: Path) -> None:
+    """Report bytes can be written to disk."""
+    out = tmp_path / "report.pdf"
+    save_screen_report(report_bytes=b"%PDF report", path=out)
+    assert out.read_bytes() == b"%PDF report"
+

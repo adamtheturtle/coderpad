@@ -281,6 +281,11 @@ class ScreenTransportStub:
                 headers={"content-type": "application/pdf"},
                 content=b"%PDF report",
             )
+        if url.endswith("/tests/99"):
+            return _response(
+                {**_TEST, "id": 99, "report": None},
+                status=HTTPStatus.OK,
+            )
         if url.endswith("/tests/11"):
             return _response(_TEST, status=HTTPStatus.OK)
         if url.endswith("/webhook") and method == "GET":
