@@ -25,3 +25,18 @@ observed in live API responses:
 The organization SSO sign-in URL is also conditional and may be omitted when
 single sign-on is not supported. These extensions are covered by synthetic
 fixtures so that no account-specific response data is stored in the project.
+
+Changelog and review process
+----------------------------
+
+When a maintainer adds support for a new undocumented response or request
+shape, the pull request should include:
+
+* a towncrier news fragment describing the user-visible parsing or typing
+  change;
+* an update to the empirically observed response fields list above; and
+* synthetic regression tests (see :doc:`contributing`).
+
+Report unfixed drift with the repository's **API drift report** issue
+template so samples and endpoint context are tracked before the client
+change lands.
