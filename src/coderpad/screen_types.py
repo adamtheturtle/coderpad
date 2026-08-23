@@ -351,6 +351,13 @@ class ScreenTestsPage(_APIModel):
             else None,
         )
 
+    def __repr__(self) -> str:
+        """Return a concise debug representation."""
+        return (
+            f"ScreenTestsPage(tests={len(self.tests)}, "
+            f"pagination={self.pagination!r})"
+        )
+
 
 @beartype
 class ScreenWebhook(_APIModel):

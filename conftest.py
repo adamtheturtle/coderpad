@@ -43,6 +43,17 @@ def fixture_mock_coderpad_api(
         ).respond(
             json=[{"id": 1, "name": "Example campaign"}],
         )
+        mock_router.post(
+            url=(
+                "https://www.codingame.com/assessment/api/v1.1/"
+                "campaigns/1/actions/send"
+            ),
+        ).respond(
+            json={
+                "id": 11,
+                "test_url": "https://test.example/invite",
+            },
+        )
         mock_router.get(
             url="https://www.codingame.com/assessment/api/v1.1/tests",
         ).respond(

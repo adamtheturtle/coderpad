@@ -174,6 +174,57 @@ class TestAsyncCoderPad:
         assert client.screen.headers["API-Key"] == "env-screen"
         await client.aclose()
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_from_env_requires_api_key(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """From_env raises when CODERPAD_API_KEY is missing."""
+        monkeypatch.delenv(name="CODERPAD_API_KEY", raising=False)
+        monkeypatch.delenv(name="CODERPAD_SCREEN_API_KEY", raising=False)
+        with pytest.raises(expected_exception=KeyError):
+            AsyncCoderPad.from_env()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_screen_lazy_requires_api_key() -> None:
+        """Accessing screen without a Screen API key raises ValueError."""
+        client = AsyncCoderPad(api_key="test-key")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="screen_api_key",
+        ):
+            _ = client.screen
+        await client.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_screen_lazy_initialized_once() -> None:
+        """Screen namespace is created on first access and reused."""
+        client = AsyncCoderPad(
+            api_key="test-key",
+            screen_api_key="screen-key",
+        )
+        first = client.screen
+        second = client.screen
+        assert first is second
+        await client.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_screen_with_provided_transport() -> None:
+        """Providing screen_transport closes that transport with the
+        client.
+        """
+        transport = AsyncHTTPXTransport()
+        client = AsyncCoderPad(
+            api_key="test-key",
+            screen_api_key="screen-key",
+            screen_transport=transport,
+        )
+        assert client.screen.headers["API-Key"] == "screen-key"
+        await client.aclose()
+
 
 class TestAsyncHTTPXTransport:
     """Tests for ``AsyncHTTPXTransport``."""
@@ -1214,3 +1265,16 @@ class TestAsyncPadsAll:
         titles = [item.title async for item in client.pads.all()]
         assert titles == ["One", "Two"]
         await client.aclose()
+
+
+class TestAsyncQuotaNamespace:
+    """Tests for ``AsyncCoderPad.quota.get``."""
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_quota_get_alias(
+        async_coderpad_client: AsyncCoderPad,
+    ) -> None:
+        """``quota.get`` delegates to ``organization.get_quota``."""
+        result = await async_coderpad_client.quota.get()
+        assert result.pads_used >= 0

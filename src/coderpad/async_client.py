@@ -188,9 +188,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         if title is not None:
             data["title"] = title
         if language is not None:
-            lang = (
-                language.value if isinstance(language, Language) else language
-            )
+            lang = language
             data["language"] = lang
         if contents is not None:
             data["contents"] = contents
@@ -251,9 +249,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         if title is not None:
             data["title"] = title
         if language is not None:
-            lang = (
-                language.value if isinstance(language, Language) else language
-            )
+            lang = language
             data["language"] = lang
         if contents is not None:
             data["contents"] = contents
@@ -445,7 +441,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             file_contents=file_contents,
             zip_file=zip_file,
         )
-        lang = language.value if isinstance(language, Language) else language
+        lang = language
         data: dict[str, str] = {
             "question[title]": title,
             "question[language]": lang,
@@ -563,9 +559,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         if title is not None:
             data["question[title]"] = title
         if language is not None:
-            lang = (
-                language.value if isinstance(language, Language) else language
-            )
+            lang = language
             data["question[language]"] = lang
         if description is not None:
             data["question[description]"] = description
@@ -862,6 +856,31 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
 
 
 @beartype
+class AsyncQuotaNamespace:
+    """Namespace for quota operations."""
+
+    def __init__(
+        self,
+        *,
+        organization: AsyncOrganizationNamespace,
+    ) -> None:
+        """Create a quota namespace.
+
+        Args:
+            organization: The organization namespace to delegate to.
+        """
+        self._organization = organization
+
+    async def get(self) -> Quota:
+        """Retrieve quota information.
+
+        Returns:
+            The quota details.
+        """
+        return await self._organization.get_quota()
+
+
+@beartype
 class AsyncCoderPad:
     """An async client for the CoderPad Interview API."""
 
@@ -893,10 +912,8 @@ class AsyncCoderPad:
             limits: Optional connection pool limits for default transports.
         """
         self.base_url = base_url
+        self._limits = limits
         resolved_transport = transport or AsyncHTTPXTransport(limits=limits)
-        resolved_screen_transport = screen_transport or AsyncHTTPXTransport(
-            limits=limits,
-        )
         headers = {
             **(default_headers or {}),
             "Authorization": f'Token token="{api_key}"',
@@ -911,31 +928,26 @@ class AsyncCoderPad:
             base_url=base_url,
             headers=headers,
         )
-        self.screen: AsyncScreenNamespace = AsyncScreenNamespace(
-            transport=resolved_screen_transport,
-            api_key=screen_api_key or "",
-            base_url=screen_base_url,
-            default_headers=default_headers,
-        )
+        self._screen_api_key = screen_api_key
+        self._screen_base_url = screen_base_url
+        self._screen_transport = screen_transport
+        self._default_headers = default_headers
+        self._screen: AsyncScreenNamespace | None = None
+
+        async def _noop() -> None:
+            """No-op close for transports without aclose."""
+
         if isinstance(
             resolved_transport,
             AsyncHTTPXTransport,
         ):
             self._aclose = resolved_transport.aclose
         else:
-
-            async def _noop() -> None:
-                """No-op close for transports without aclose."""
-
             self._aclose = _noop
-        if isinstance(resolved_screen_transport, AsyncHTTPXTransport):
-            self._screen_aclose = resolved_screen_transport.aclose
+        if isinstance(screen_transport, AsyncHTTPXTransport):
+            self._screen_aclose = screen_transport.aclose
         else:
-
-            async def _screen_noop() -> None:
-                """No-op close for Screen transports without aclose."""
-
-            self._screen_aclose = _screen_noop
+            self._screen_aclose = _noop
         self.organization: AsyncOrganizationNamespace = (
             AsyncOrganizationNamespace(
                 transport=resolved_transport,
@@ -943,6 +955,38 @@ class AsyncCoderPad:
                 headers=headers,
             )
         )
+        self.quota: AsyncQuotaNamespace = AsyncQuotaNamespace(
+            organization=self.organization,
+        )
+
+    @property
+    def screen(self) -> AsyncScreenNamespace:
+        """Screen API namespace, created on first access.
+
+        Raises:
+            ValueError: If ``screen_api_key`` was not provided.
+        """
+        if self._screen is None:
+            if not self._screen_api_key:
+                msg = "screen_api_key is required to use the Screen API"
+                raise ValueError(msg)
+            resolved_screen_transport = (
+                self._screen_transport
+                or AsyncHTTPXTransport(limits=self._limits)
+            )
+            if self._screen_transport is None and isinstance(
+                resolved_screen_transport,
+                AsyncHTTPXTransport,
+            ):
+                self._screen_aclose = resolved_screen_transport.aclose
+            self._screen_transport = resolved_screen_transport
+            self._screen = AsyncScreenNamespace(
+                transport=resolved_screen_transport,
+                api_key=self._screen_api_key,
+                base_url=self._screen_base_url,
+                default_headers=self._default_headers,
+            )
+        return self._screen
 
     @classmethod
     def from_env(cls) -> Self:
