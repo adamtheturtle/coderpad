@@ -67,7 +67,7 @@ class PaginatedList(list[_T]):
         self.next_page = next_page
 
 
-class SortOrder(enum.Enum):
+class SortOrder(enum.StrEnum):
     """Sort order for list endpoints."""
 
     CREATED_AT_ASC = "created_at,asc"

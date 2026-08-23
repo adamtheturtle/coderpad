@@ -116,7 +116,7 @@ class PadsNamespace(_Namespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = self._request(
@@ -261,7 +261,7 @@ class PadsNamespace(_Namespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = self._request(
@@ -353,7 +353,7 @@ class QuestionsNamespace(_Namespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = self._request(
@@ -610,7 +610,7 @@ class OrganizationPadsNamespace(_Namespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = self._request(
@@ -649,7 +649,7 @@ class OrganizationQuestionsNamespace(_Namespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = self._request(
