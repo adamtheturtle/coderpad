@@ -306,3 +306,21 @@ def test_tests_all_iterates_pages() -> None:
     assert names == ["Ada", "Grace"]
     assert transport.calls[0]["params"] == {"limit": 1}
     assert transport.calls[1]["params"] == {"limit": 1, "start": 1}
+
+
+def test_empty_screen_api_key_fails_fast() -> None:
+    """Screen requests fail before transport when api_key is empty."""
+    transport = ScreenTransportStub(error=False)
+    client = CoderPad(
+        api_key="interview-key",
+        screen_api_key="",
+        screen_base_url=SCREEN_EU_BASE_URL,
+        screen_transport=transport,
+    )
+    with pytest.raises(
+        expected_exception=ValueError,
+        match="Screen API key is required",
+    ):
+        client.screen.campaigns.list()
+    assert not transport.calls
+    client.close()

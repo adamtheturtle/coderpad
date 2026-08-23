@@ -36,6 +36,7 @@ class _AsyncScreenNamespace:
         """Create shared asynchronous Screen request state."""
         self.transport: AsyncJSONTransport = transport
         self.base_url: str = base_url.rstrip("/")
+        self.api_key: str = api_key
         self.headers: dict[str, str] = {
             **(default_headers or {}),
             "API-Key": api_key,
@@ -50,6 +51,12 @@ class _AsyncScreenNamespace:
         json: object | None,
     ) -> TransportResponse:
         """Make a Screen request and map HTTP failures."""
+        if not self.api_key:
+            msg = (
+                "Screen API key is required; pass screen_api_key when "
+                "creating the client."
+            )
+            raise ValueError(msg)
         response = await self.transport(
             method=method,
             url=self.base_url + _SCREEN_PREFIX + path,
