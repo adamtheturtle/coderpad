@@ -161,6 +161,16 @@ class TestCoderPad:
         assert transport.limits is limits
         client.close()
 
+    @staticmethod
+    def test_timeout_forwarded_to_default_transport() -> None:
+        """CoderPad forwards timeout to the default HTTPX transport."""
+        timeout = httpx.Timeout(timeout=7.5)
+        client = CoderPad(api_key="test-key", timeout=timeout)
+        transport = client.pads.transport
+        assert isinstance(transport, HTTPXTransport)
+        assert transport._client.timeout == timeout  # noqa: SLF001
+        client.close()
+
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""
@@ -188,6 +198,21 @@ class TestHTTPXTransport:
         limits = httpx.Limits(max_connections=5)
         transport = HTTPXTransport(limits=limits)
         assert transport.limits is limits
+        transport.close()
+
+    @staticmethod
+    def test_timeout_passed_to_httpx_client() -> None:
+        """A timeout is forwarded to the underlying httpx client."""
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = HTTPXTransport(timeout=timeout)
+        assert transport._client.timeout == timeout  # noqa: SLF001
+        transport.close()
+
+    @staticmethod
+    def test_float_timeout_passed_to_httpx_client() -> None:
+        """A float timeout is accepted by the HTTPX transport."""
+        transport = HTTPXTransport(timeout=3.0)
+        assert transport._client.timeout == httpx.Timeout(timeout=3.0)  # noqa: SLF001
         transport.close()
 
 
