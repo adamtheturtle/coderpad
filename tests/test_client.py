@@ -1210,6 +1210,18 @@ class TestGetQuota:
         assert result.pads_used >= 0
 
 
+class TestQuotaNamespace:
+    """Tests for ``CoderPad.quota.get``."""
+
+    @staticmethod
+    def test_quota_get_alias(
+        coderpad_client: CoderPad,
+    ) -> None:
+        """``quota.get`` delegates to ``organization.get_quota``."""
+        result = coderpad_client.quota.get()
+        assert result.pads_used >= 0
+
+
 class TestGetOrganization:
     """Tests for ``CoderPad.organization.get``."""
 
