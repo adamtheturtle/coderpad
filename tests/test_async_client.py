@@ -6,6 +6,7 @@ from http import HTTPStatus
 from pathlib import Path
 from urllib.parse import parse_qs
 
+import httpx
 import pytest
 import respx
 
@@ -147,6 +148,17 @@ class TestAsyncCoderPad:
         }
         await client.aclose()
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_limits_forwarded_to_default_transport() -> None:
+        """AsyncCoderPad forwards limits to the default transport."""
+        limits = httpx.Limits(max_connections=10)
+        client = AsyncCoderPad(api_key="test-key", limits=limits)
+        transport = client.pads.transport
+        assert isinstance(transport, AsyncHTTPXTransport)
+        assert transport.limits is limits
+        await client.aclose()
+
 
 class TestAsyncHTTPXTransport:
     """Tests for ``AsyncHTTPXTransport``."""
@@ -175,6 +187,17 @@ class TestAsyncHTTPXTransport:
                 transport,
                 AsyncHTTPXTransport,
             )
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_limits_passed_to_httpx_client() -> None:
+        """Connection pool limits are stored on the async HTTPX
+        transport.
+        """
+        limits = httpx.Limits(max_connections=5)
+        transport = AsyncHTTPXTransport(limits=limits)
+        assert transport.limits is limits
+        await transport.aclose()
 
 
 class TestAsyncListPads:
