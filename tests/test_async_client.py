@@ -1239,3 +1239,16 @@ class TestAsyncPadsAll:
         titles = [item.title async for item in client.pads.all()]
         assert titles == ["One", "Two"]
         await client.aclose()
+
+
+class TestAsyncQuotaNamespace:
+    """Tests for ``AsyncCoderPad.quota.get``."""
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_quota_get_alias(
+        async_coderpad_client: AsyncCoderPad,
+    ) -> None:
+        """``quota.get`` delegates to ``organization.get_quota``."""
+        result = await async_coderpad_client.quota.get()
+        assert result.pads_used >= 0

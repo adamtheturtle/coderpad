@@ -855,6 +855,31 @@ class AsyncOrganizationNamespace(_AsyncNamespace):
 
 
 @beartype
+class AsyncQuotaNamespace:
+    """Namespace for quota operations."""
+
+    def __init__(
+        self,
+        *,
+        organization: AsyncOrganizationNamespace,
+    ) -> None:
+        """Create a quota namespace.
+
+        Args:
+            organization: The organization namespace to delegate to.
+        """
+        self._organization = organization
+
+    async def get(self) -> Quota:
+        """Retrieve quota information.
+
+        Returns:
+            The quota details.
+        """
+        return await self._organization.get_quota()
+
+
+@beartype
 class AsyncCoderPad:
     """An async client for the CoderPad Interview API."""
 
@@ -928,6 +953,9 @@ class AsyncCoderPad:
                 base_url=base_url,
                 headers=headers,
             )
+        )
+        self.quota: AsyncQuotaNamespace = AsyncQuotaNamespace(
+            organization=self.organization,
         )
 
     @property
