@@ -880,6 +880,7 @@ class CoderPad:
         screen_transport: JSONTransport | None = None,
         default_headers: dict[str, str] | None = None,
         limits: httpx.Limits | None = None,
+        proxy: str | httpx.Proxy | None = None,
         timeout: httpx.Timeout | float | None = None,
     ) -> None:
         """Create a new CoderPad client.
@@ -896,13 +897,16 @@ class CoderPad:
                 and Screen request. Authorization and API-Key values
                 from these headers are overwritten by the client keys.
             limits: Optional connection pool limits for default transports.
+            proxy: Optional proxy for the default httpx transports.
             timeout: Optional timeout for the default httpx transports.
         """
         self.base_url = base_url
         self._limits = limits
+        self._proxy = proxy
         self._timeout = timeout
         resolved_transport = transport or HTTPXTransport(
             limits=limits,
+            proxy=proxy,
             timeout=timeout,
         )
         headers = {
@@ -956,6 +960,7 @@ class CoderPad:
                 self._screen_transport
                 or HTTPXTransport(
                     limits=self._limits,
+                    proxy=self._proxy,
                     timeout=self._timeout,
                 )
             )

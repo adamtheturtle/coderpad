@@ -172,6 +172,16 @@ class TestCoderPad:
         client.close()
 
     @staticmethod
+    def test_proxy_forwarded_to_default_transport() -> None:
+        """CoderPad forwards proxy to the default HTTPX transport."""
+        proxy = "http://proxy.example:8080"
+        client = CoderPad(api_key="test-key", proxy=proxy)
+        transport = client.pads.transport
+        assert isinstance(transport, HTTPXTransport)
+        assert transport.proxy == proxy
+        client.close()
+
+    @staticmethod
     def test_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
         """From_env loads Interview and Screen keys from the
         environment.
@@ -275,6 +285,24 @@ class TestHTTPXTransport:
         float_timeout = 3.0
         transport = HTTPXTransport(timeout=float_timeout)
         assert transport.timeout == float_timeout
+        transport.close()
+
+    @staticmethod
+    def test_proxy_passed_to_httpx_client() -> None:
+        """A proxy is stored on the HTTPX transport."""
+        proxy = "http://proxy.example:8080"
+        transport = HTTPXTransport(proxy=proxy)
+        assert transport.proxy == proxy
+        transport.close()
+
+    @staticmethod
+    def test_limits_and_proxy_passed_to_httpx_client() -> None:
+        """Limits and proxy can both be set on the HTTPX transport."""
+        limits = httpx.Limits(max_connections=5)
+        proxy = "http://proxy.example:8080"
+        transport = HTTPXTransport(limits=limits, proxy=proxy)
+        assert transport.limits is limits
+        assert transport.proxy == proxy
         transport.close()
 
     @staticmethod

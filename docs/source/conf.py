@@ -81,6 +81,7 @@ nitpick_ignore: list[tuple[str, str]] = [
     ("py:class", "coderpad.types._T"),
     # httpx is not in intersphinx_mapping; keep typed annotations.
     ("py:class", "httpx.Limits"),
+    ("py:class", "httpx.Proxy"),
     ("py:class", "httpx.Timeout"),
 ]
 nitpick_ignore_regex = [

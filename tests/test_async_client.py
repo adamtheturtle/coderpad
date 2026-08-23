@@ -172,6 +172,17 @@ class TestAsyncCoderPad:
 
     @staticmethod
     @pytest.mark.asyncio
+    async def test_proxy_forwarded_to_default_transport() -> None:
+        """AsyncCoderPad forwards proxy to the default transport."""
+        proxy = "http://proxy.example:8080"
+        client = AsyncCoderPad(api_key="test-key", proxy=proxy)
+        transport = client.pads.transport
+        assert isinstance(transport, AsyncHTTPXTransport)
+        assert transport.proxy == proxy
+        await client.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
     async def test_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
         """From_env loads Interview and Screen keys from the
         environment.
@@ -283,6 +294,28 @@ class TestAsyncHTTPXTransport:
         timeout = httpx.Timeout(timeout=12.5)
         transport = AsyncHTTPXTransport(timeout=timeout)
         assert transport.timeout == timeout
+        await transport.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_proxy_passed_to_httpx_client() -> None:
+        """A proxy is stored on the async HTTPX transport."""
+        proxy = "http://proxy.example:8080"
+        transport = AsyncHTTPXTransport(proxy=proxy)
+        assert transport.proxy == proxy
+        await transport.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_limits_and_proxy_passed_to_httpx_client() -> None:
+        """Limits and proxy can both be set on the async HTTPX
+        transport.
+        """
+        limits = httpx.Limits(max_connections=5)
+        proxy = "http://proxy.example:8080"
+        transport = AsyncHTTPXTransport(limits=limits, proxy=proxy)
+        assert transport.limits is limits
+        assert transport.proxy == proxy
         await transport.aclose()
 
     @staticmethod
