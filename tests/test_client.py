@@ -162,6 +162,16 @@ class TestCoderPad:
         client.close()
 
     @staticmethod
+    def test_timeout_forwarded_to_default_transport() -> None:
+        """CoderPad forwards timeout to the default HTTPX transport."""
+        timeout = httpx.Timeout(timeout=7.5)
+        client = CoderPad(api_key="test-key", timeout=timeout)
+        transport = client.pads.transport
+        assert isinstance(transport, HTTPXTransport)
+        assert transport.timeout == timeout
+        client.close()
+
+    @staticmethod
     def test_proxy_forwarded_to_default_transport() -> None:
         """CoderPad forwards proxy to the default HTTPX transport."""
         proxy = "http://proxy.example:8080"
@@ -238,6 +248,22 @@ class TestHTTPXTransport:
         transport.close()
 
     @staticmethod
+    def test_timeout_passed_to_httpx_client() -> None:
+        """A timeout is forwarded to the underlying httpx client."""
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = HTTPXTransport(timeout=timeout)
+        assert transport.timeout == timeout
+        transport.close()
+
+    @staticmethod
+    def test_float_timeout_passed_to_httpx_client() -> None:
+        """A float timeout is accepted by the HTTPX transport."""
+        float_timeout = 3.0
+        transport = HTTPXTransport(timeout=float_timeout)
+        assert transport.timeout == float_timeout
+        transport.close()
+
+    @staticmethod
     def test_proxy_passed_to_httpx_client() -> None:
         """A proxy is stored on the HTTPX transport."""
         proxy = "http://proxy.example:8080"
@@ -253,6 +279,16 @@ class TestHTTPXTransport:
         transport = HTTPXTransport(limits=limits, proxy=proxy)
         assert transport.limits is limits
         assert transport.proxy == proxy
+        transport.close()
+
+    @staticmethod
+    def test_limits_and_timeout_passed_to_httpx_client() -> None:
+        """Limits and timeout can both be set on the HTTPX transport."""
+        limits = httpx.Limits(max_connections=5)
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = HTTPXTransport(limits=limits, timeout=timeout)
+        assert transport.limits is limits
+        assert transport.timeout == timeout
         transport.close()
 
 

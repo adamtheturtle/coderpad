@@ -14,6 +14,7 @@ class _HTTPXClientKwargs(TypedDict, total=False):
 
     limits: httpx.Limits
     proxy: str | httpx.Proxy
+    timeout: httpx.Timeout | float
 
 
 class HTTPStatusError(Exception):
@@ -136,20 +137,26 @@ class HTTPXTransport:
         *,
         limits: httpx.Limits | None = None,
         proxy: str | httpx.Proxy | None = None,
+        timeout: httpx.Timeout | float | None = None,
     ) -> None:
         """Create a new HTTPX transport.
 
         Args:
             limits: Optional connection pool limits for ``httpx.Client``.
             proxy: Optional proxy passed to ``httpx.Client``.
+            timeout: Optional timeout passed to ``httpx.Client``.
+                When omitted, the default ``httpx`` timeout is used.
         """
         self.limits = limits
         self.proxy = proxy
+        self.timeout = timeout
         client_kwargs: _HTTPXClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits
         if proxy is not None:
             client_kwargs["proxy"] = proxy
+        if timeout is not None:
+            client_kwargs["timeout"] = timeout
         self._client = httpx.Client(**client_kwargs)
 
     def close(self) -> None:
@@ -284,20 +291,26 @@ class AsyncHTTPXTransport:
         *,
         limits: httpx.Limits | None = None,
         proxy: str | httpx.Proxy | None = None,
+        timeout: httpx.Timeout | float | None = None,
     ) -> None:
         """Create a new async HTTPX transport.
 
         Args:
             limits: Optional connection pool limits for ``httpx.AsyncClient``.
             proxy: Optional proxy passed to ``httpx.AsyncClient``.
+            timeout: Optional timeout passed to ``httpx.AsyncClient``.
+                When omitted, the default ``httpx`` timeout is used.
         """
         self.limits = limits
         self.proxy = proxy
+        self.timeout = timeout
         client_kwargs: _HTTPXClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits
         if proxy is not None:
             client_kwargs["proxy"] = proxy
+        if timeout is not None:
+            client_kwargs["timeout"] = timeout
         self._client = httpx.AsyncClient(**client_kwargs)
 
     async def aclose(self) -> None:

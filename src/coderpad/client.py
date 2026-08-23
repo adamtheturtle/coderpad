@@ -880,6 +880,7 @@ class CoderPad:
         default_headers: dict[str, str] | None = None,
         limits: httpx.Limits | None = None,
         proxy: str | httpx.Proxy | None = None,
+        timeout: httpx.Timeout | float | None = None,
     ) -> None:
         """Create a new CoderPad client.
 
@@ -896,13 +897,16 @@ class CoderPad:
                 from these headers are overwritten by the client keys.
             limits: Optional connection pool limits for default transports.
             proxy: Optional proxy for the default httpx transports.
+            timeout: Optional timeout for the default httpx transports.
         """
         self.base_url = base_url
         self._limits = limits
         self._proxy = proxy
+        self._timeout = timeout
         resolved_transport = transport or HTTPXTransport(
             limits=limits,
             proxy=proxy,
+            timeout=timeout,
         )
         headers = {
             **(default_headers or {}),
@@ -948,7 +952,7 @@ class CoderPad:
             ValueError: If ``screen_api_key`` was not provided.
         """
         if self._screen is None:
-            if not self._screen_api_key:
+            if self._screen_api_key is None:
                 msg = "screen_api_key is required to use the Screen API"
                 raise ValueError(msg)
             resolved_screen_transport = (
@@ -956,6 +960,7 @@ class CoderPad:
                 or HTTPXTransport(
                     limits=self._limits,
                     proxy=self._proxy,
+                    timeout=self._timeout,
                 )
             )
             if self._screen_transport is None and isinstance(

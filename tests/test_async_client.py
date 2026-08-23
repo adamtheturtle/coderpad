@@ -161,6 +161,17 @@ class TestAsyncCoderPad:
 
     @staticmethod
     @pytest.mark.asyncio
+    async def test_timeout_forwarded_to_default_transport() -> None:
+        """AsyncCoderPad forwards timeout to the default transport."""
+        timeout = httpx.Timeout(timeout=7.5)
+        client = AsyncCoderPad(api_key="test-key", timeout=timeout)
+        transport = client.pads.transport
+        assert isinstance(transport, AsyncHTTPXTransport)
+        assert transport.timeout == timeout
+        await client.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
     async def test_proxy_forwarded_to_default_transport() -> None:
         """AsyncCoderPad forwards proxy to the default transport."""
         proxy = "http://proxy.example:8080"
@@ -252,6 +263,15 @@ class TestAsyncHTTPXTransport:
 
     @staticmethod
     @pytest.mark.asyncio
+    async def test_timeout_passed_to_httpx_client() -> None:
+        """A timeout is forwarded to the underlying async httpx client."""
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = AsyncHTTPXTransport(timeout=timeout)
+        assert transport.timeout == timeout
+        await transport.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
     async def test_proxy_passed_to_httpx_client() -> None:
         """A proxy is stored on the async HTTPX transport."""
         proxy = "http://proxy.example:8080"
@@ -270,6 +290,19 @@ class TestAsyncHTTPXTransport:
         transport = AsyncHTTPXTransport(limits=limits, proxy=proxy)
         assert transport.limits is limits
         assert transport.proxy == proxy
+        await transport.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_limits_and_timeout_passed_to_httpx_client() -> None:
+        """Limits and timeout can both be set on the async HTTPX
+        transport.
+        """
+        limits = httpx.Limits(max_connections=5)
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = AsyncHTTPXTransport(limits=limits, timeout=timeout)
+        assert transport.limits is limits
+        assert transport.timeout == timeout
         await transport.aclose()
 
 

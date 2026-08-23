@@ -10,6 +10,24 @@ Postman's export grouped the ``PUT`` (modify pad) operation under the ``/api/pad
 This was because the Postman collection used a literal URL rather than a ``:id`` path variable.
 The spec has been corrected to place the ``PUT`` operation under ``/api/pads/{id}``.
 
+Refreshing the bundled spec
+---------------------------
+
+CoderPad does not publish a stable OpenAPI download URL.
+To refresh ``openapi.json``:
+
+#. Export the Interview API collection from Postman as OpenAPI JSON.
+#. Run the maintainer script against that export:
+
+   .. code-block:: console
+
+      $ python scripts/sync_openapi.py /path/to/postman-export.json
+
+   The script applies the known Postman path correction above and writes
+   ``openapi.json`` at the repository root.
+#. Keep the empirically observed response fields below in sync with any
+   new live variants, and extend the synthetic fixtures that cover them.
+
 Empirically observed response fields
 ------------------------------------
 
