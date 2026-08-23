@@ -112,6 +112,41 @@ class TestCoderPad:
         )
         client.close()
 
+    @staticmethod
+    def test_default_headers_merged_preserving_authorization() -> None:
+        """Default headers merge while Authorization stays the API
+        token.
+        """
+        client = CoderPad(
+            api_key="secret",
+            default_headers={
+                "User-Agent": "coderpad-tests",
+                "Authorization": "should-not-win",
+            },
+        )
+        assert client.pads.headers == {
+            "User-Agent": "coderpad-tests",
+            "Authorization": 'Token token="secret"',
+        }
+        client.close()
+
+    @staticmethod
+    def test_default_headers_merged_preserving_screen_api_key() -> None:
+        """Default headers merge while Screen API-Key stays the Screen key."""
+        client = CoderPad(
+            api_key="interview",
+            screen_api_key="screen-secret",
+            default_headers={
+                "User-Agent": "coderpad-tests",
+                "API-Key": "should-not-win",
+            },
+        )
+        assert client.screen.headers == {
+            "User-Agent": "coderpad-tests",
+            "API-Key": "screen-secret",
+        }
+        client.close()
+
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""

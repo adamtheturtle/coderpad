@@ -30,11 +30,15 @@ class _AsyncScreenNamespace:
         transport: AsyncJSONTransport,
         api_key: str,
         base_url: str,
+        default_headers: dict[str, str] | None,
     ) -> None:
         """Create shared asynchronous Screen request state."""
         self.transport: AsyncJSONTransport = transport
         self.base_url: str = base_url.rstrip("/")
-        self.headers: dict[str, str] = {"API-Key": api_key}
+        self.headers: dict[str, str] = {
+            **(default_headers or {}),
+            "API-Key": api_key,
+        }
 
     async def _request(
         self,
@@ -241,29 +245,34 @@ class AsyncScreenNamespace(_AsyncScreenNamespace):
         transport: AsyncJSONTransport,
         api_key: str,
         base_url: str = SCREEN_US_BASE_URL,
+        default_headers: dict[str, str] | None = None,
     ) -> None:
         """Create the root asynchronous Screen namespace."""
         super().__init__(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
+            default_headers=default_headers,
         )
         self.campaigns: AsyncScreenCampaignsNamespace = (
             AsyncScreenCampaignsNamespace(
                 transport=transport,
                 api_key=api_key,
                 base_url=base_url,
+                default_headers=default_headers,
             )
         )
         self.tests: AsyncScreenTestsNamespace = AsyncScreenTestsNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
+            default_headers=default_headers,
         )
         self.webhook: AsyncScreenWebhookNamespace = (
             AsyncScreenWebhookNamespace(
                 transport=transport,
                 api_key=api_key,
                 base_url=base_url,
+                default_headers=default_headers,
             )
         )

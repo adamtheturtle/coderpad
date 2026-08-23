@@ -31,11 +31,15 @@ class _ScreenNamespace:
         transport: JSONTransport,
         api_key: str,
         base_url: str,
+        default_headers: dict[str, str] | None,
     ) -> None:
         """Create shared Screen request state."""
         self.transport: JSONTransport = transport
         self.base_url: str = base_url.rstrip("/")
-        self.headers: dict[str, str] = {"API-Key": api_key}
+        self.headers: dict[str, str] = {
+            **(default_headers or {}),
+            "API-Key": api_key,
+        }
 
     def _request(
         self,
@@ -234,25 +238,30 @@ class ScreenNamespace(_ScreenNamespace):
         transport: JSONTransport,
         api_key: str,
         base_url: str,
+        default_headers: dict[str, str] | None = None,
     ) -> None:
         """Create the root Screen namespace."""
         super().__init__(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
+            default_headers=default_headers,
         )
         self.campaigns: ScreenCampaignsNamespace = ScreenCampaignsNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
+            default_headers=default_headers,
         )
         self.tests: ScreenTestsNamespace = ScreenTestsNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
+            default_headers=default_headers,
         )
         self.webhook: ScreenWebhookNamespace = ScreenWebhookNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,
+            default_headers=default_headers,
         )

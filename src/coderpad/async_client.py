@@ -832,6 +832,7 @@ class AsyncCoderPad:
         screen_base_url: str = SCREEN_US_BASE_URL,
         transport: AsyncTransport | None = None,
         screen_transport: AsyncJSONTransport | None = None,
+        default_headers: dict[str, str] | None = None,
     ) -> None:
         """Create a new async CoderPad client.
 
@@ -843,11 +844,17 @@ class AsyncCoderPad:
             transport: The async HTTP transport. Defaults
                 to ``AsyncHTTPXTransport()``.
             screen_transport: The independent Screen HTTP transport.
+            default_headers: Extra headers merged into every Interview
+                and Screen request. Authorization and API-Key values
+                from these headers are overwritten by the client keys.
         """
         self.base_url = base_url
         resolved_transport = transport or AsyncHTTPXTransport()
         resolved_screen_transport = screen_transport or AsyncHTTPXTransport()
-        headers = {"Authorization": f'Token token="{api_key}"'}
+        headers = {
+            **(default_headers or {}),
+            "Authorization": f'Token token="{api_key}"',
+        }
         self.pads: AsyncPadsNamespace = AsyncPadsNamespace(
             transport=resolved_transport,
             base_url=base_url,
@@ -862,6 +869,7 @@ class AsyncCoderPad:
             transport=resolved_screen_transport,
             api_key=screen_api_key or "",
             base_url=screen_base_url,
+            default_headers=default_headers,
         )
         if isinstance(
             resolved_transport,
