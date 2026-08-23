@@ -39,6 +39,7 @@ Reference
 
    api-reference
    field-reference
+   stability
    openapi-spec
    contributing
    release-process
