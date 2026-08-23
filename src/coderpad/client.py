@@ -831,6 +831,7 @@ class CoderPad:
         screen_base_url: str = SCREEN_US_BASE_URL,
         transport: Transport | None = None,
         screen_transport: JSONTransport | None = None,
+        default_headers: dict[str, str] | None = None,
     ) -> None:
         """Create a new CoderPad client.
 
@@ -842,11 +843,17 @@ class CoderPad:
             transport: The HTTP transport. Defaults to
                 ``HTTPXTransport()``.
             screen_transport: The independent Screen HTTP transport.
+            default_headers: Extra headers merged into every Interview
+                and Screen request. Authorization and API-Key values
+                from these headers are overwritten by the client keys.
         """
         self.base_url = base_url
         resolved_transport = transport or HTTPXTransport()
         resolved_screen_transport = screen_transport or HTTPXTransport()
-        headers = {"Authorization": f'Token token="{api_key}"'}
+        headers = {
+            **(default_headers or {}),
+            "Authorization": f'Token token="{api_key}"',
+        }
         self.pads: PadsNamespace = PadsNamespace(
             transport=resolved_transport,
             base_url=base_url,
@@ -861,6 +868,7 @@ class CoderPad:
             transport=resolved_screen_transport,
             api_key=screen_api_key or "",
             base_url=screen_base_url,
+            default_headers=default_headers,
         )
         if isinstance(resolved_transport, HTTPXTransport):
             self._close = resolved_transport.close
