@@ -887,7 +887,6 @@ class CoderPad:
             limits=limits,
             timeout=timeout,
         )
-        )
         headers = {
             **(default_headers or {}),
             "Authorization": f'Token token="{api_key}"',
