@@ -894,6 +894,7 @@ class AsyncCoderPad:
         screen_transport: AsyncJSONTransport | None = None,
         default_headers: dict[str, str] | None = None,
         limits: httpx.Limits | None = None,
+        timeout: httpx.Timeout | float | None = None,
     ) -> None:
         """Create a new async CoderPad client.
 
@@ -909,10 +910,15 @@ class AsyncCoderPad:
                 and Screen request. Authorization and API-Key values
                 from these headers are overwritten by the client keys.
             limits: Optional connection pool limits for default transports.
+            timeout: Optional timeout for the default httpx transports.
         """
         self.base_url = base_url
         self._limits = limits
-        resolved_transport = transport or AsyncHTTPXTransport(limits=limits)
+        self._timeout = timeout
+        resolved_transport = transport or AsyncHTTPXTransport(
+            limits=limits,
+            timeout=timeout,
+        )
         headers = {
             **(default_headers or {}),
             "Authorization": f'Token token="{api_key}"',
@@ -971,7 +977,10 @@ class AsyncCoderPad:
                 raise ValueError(msg)
             resolved_screen_transport = (
                 self._screen_transport
-                or AsyncHTTPXTransport(limits=self._limits)
+                or AsyncHTTPXTransport(
+                    limits=self._limits,
+                    timeout=self._timeout,
+                )
             )
             if self._screen_transport is None and isinstance(
                 resolved_screen_transport,
