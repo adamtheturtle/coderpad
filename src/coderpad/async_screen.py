@@ -84,9 +84,6 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
         invitation: ScreenInvitation,
     ) -> ScreenInvitationResult:
         """Create a test session and optionally email the candidate."""
-        invitation = ScreenInvitation.model_validate(
-            obj=invitation.model_dump(),
-        )
         response = await self._request(
             method="POST",
             path=f"/campaigns/{campaign_id}/actions/send",
