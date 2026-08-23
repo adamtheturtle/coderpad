@@ -1,7 +1,7 @@
 Public API stability
 ====================
 
-``coderpad-py`` follows a semver-ish policy for its public Python API.
+``coderpad-py`` follows a Semantic Versioning inspired policy for its public Python API.
 
 What is public
 --------------
