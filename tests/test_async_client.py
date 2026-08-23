@@ -1025,7 +1025,7 @@ class TestAsyncPadsAll:
     @pytest.mark.asyncio
     async def test_all_yields_pads_across_pages() -> None:
         """All() follows pagination until next_page is absent."""
-        pad = {
+        pad: dict[str, object] = {
             "id": "pad-1",
             "title": "One",
             "state": "active",
@@ -1051,7 +1051,7 @@ class TestAsyncPadsAll:
             "team": {"id": "team-1", "name": "Backend"},
             "restrict_interviewer_access": False,
         }
-        pages = {
+        pages: dict[int, dict[str, object]] = {
             1: {
                 "status": "OK",
                 "pads": [pad],
