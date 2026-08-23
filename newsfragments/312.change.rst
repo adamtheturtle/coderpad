@@ -1,0 +1,1 @@
+Add ``save_screen_report`` to write Screen report bytes to a file.

@@ -1,0 +1,1 @@
+Add ``client.quota.get()`` as an alias for ``client.organization.get_quota()``.

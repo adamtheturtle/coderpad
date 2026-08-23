@@ -70,6 +70,13 @@ class PaginatedList(list[_T]):
         self.next_page = next_page
         self.prev_page = prev_page
 
+    def __repr__(self) -> str:
+        """Return a concise debug representation."""
+        return (
+            f"PaginatedList(len={len(self)}, total={self.total}, "
+            f"next_page={self.next_page!r})"
+        )
+
 
 class SortOrder(enum.StrEnum):
     """Sort order for list endpoints."""
@@ -80,7 +87,7 @@ class SortOrder(enum.StrEnum):
     UPDATED_AT_DESC = "updated_at,desc"
 
 
-class Language(enum.Enum):
+class Language(enum.StrEnum):
     """Programming language for pads and questions.
 
     Single-file languages use a simple editor. Multi-file and
