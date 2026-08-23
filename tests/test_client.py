@@ -184,6 +184,20 @@ class TestCoderPad:
         assert first is second
         client.close()
 
+    @staticmethod
+    def test_screen_with_provided_transport() -> None:
+        """Providing screen_transport closes that transport with the
+        client.
+        """
+        transport = HTTPXTransport()
+        client = CoderPad(
+            api_key="test-key",
+            screen_api_key="screen-key",
+            screen_transport=transport,
+        )
+        assert client.screen.headers["API-Key"] == "screen-key"
+        client.close()
+
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""

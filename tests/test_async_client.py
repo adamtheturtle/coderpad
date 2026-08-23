@@ -184,6 +184,21 @@ class TestAsyncCoderPad:
         assert first is second
         await client.aclose()
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_screen_with_provided_transport() -> None:
+        """Providing screen_transport closes that transport with the
+        client.
+        """
+        transport = AsyncHTTPXTransport()
+        client = AsyncCoderPad(
+            api_key="test-key",
+            screen_api_key="screen-key",
+            screen_transport=transport,
+        )
+        assert client.screen.headers["API-Key"] == "screen-key"
+        await client.aclose()
+
 
 class TestAsyncHTTPXTransport:
     """Tests for ``AsyncHTTPXTransport``."""
