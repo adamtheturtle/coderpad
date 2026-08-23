@@ -135,7 +135,7 @@ class HTTPXTransport:
         Args:
             limits: Optional connection pool limits for ``httpx.Client``.
             timeout: Optional timeout passed to ``httpx.Client``.
-                When omitted, httpx's default timeout is used.
+                When omitted, the default ``httpx`` timeout is used.
         """
         self.limits = limits
         self.timeout = timeout
@@ -288,7 +288,7 @@ class AsyncHTTPXTransport:
         Args:
             limits: Optional connection pool limits for ``httpx.AsyncClient``.
             timeout: Optional timeout passed to ``httpx.AsyncClient``.
-                When omitted, httpx's default timeout is used.
+                When omitted, the default ``httpx`` timeout is used.
         """
         self.limits = limits
         self.timeout = timeout
