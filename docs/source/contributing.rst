@@ -67,6 +67,24 @@ Run the following commands to build and view documentation locally:
    $ uv run --extra=dev sphinx-build -M html docs/source docs/build -W
    $ python -c 'import os, webbrowser; webbrowser.open("file://" + os.path.abspath("docs/build/html/index.html"))'
 
+Undocumented API variants
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CoderPad responses sometimes include fields that are missing from the
+published OpenAPI specification. When you extend the client to support a
+new empirically observed variant, update all of the following:
+
+#. Add a ``newsfragments/<issue>.change.rst`` entry describing the
+   user-visible behavior (see :doc:`release-process`).
+#. Extend the bullet list in :doc:`openapi-spec` under empirically
+   observed response fields.
+#. Add or extend **synthetic** fixtures and tests so the variant is
+   covered without storing account-specific payloads in the repository.
+
+If you discover drift but are not ready to land a fix, file an
+`API drift report <https://github.com/adamtheturtle/coderpad/issues/new?template=api-drift.yml>`__
+with redacted request or response samples.
+
 Continuous integration
 ----------------------
 
