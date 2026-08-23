@@ -972,7 +972,7 @@ class AsyncCoderPad:
             ValueError: If ``screen_api_key`` was not provided.
         """
         if self._screen is None:
-            if not self._screen_api_key:
+            if self._screen_api_key is None:
                 msg = "screen_api_key is required to use the Screen API"
                 raise ValueError(msg)
             resolved_screen_transport = (
