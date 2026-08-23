@@ -97,15 +97,33 @@ class ScreenTransportStub:
                 status=HTTPStatus.OK,
             )
         if url.endswith("/tests"):
+            start = 0
+            if params is not None and "start" in params:
+                start = int(params["start"])
+            if start == 0:
+                return _response(
+                    {
+                        "tests": [_TEST],
+                        "pagination": {
+                            "start": 0,
+                            "limit": 1,
+                            "total": 2,
+                            "has_more_items": True,
+                            "next_start": 1,
+                        },
+                    },
+                    status=HTTPStatus.OK,
+                )
+            second = {**_TEST, "id": 12, "candidate_name": "Grace"}
             return _response(
                 {
-                    "tests": [_TEST],
+                    "tests": [second],
                     "pagination": {
-                        "start": 0,
+                        "start": 1,
                         "limit": 1,
                         "total": 2,
-                        "has_more_items": True,
-                        "next_start": 1,
+                        "has_more_items": False,
+                        "next_start": None,
                     },
                 },
                 status=HTTPStatus.OK,
@@ -278,3 +296,13 @@ def test_screen_errors_use_existing_hierarchy() -> None:
         _client(
             ScreenTransportStub(error=True), base_url=SCREEN_EU_BASE_URL
         ).screen.campaigns.list()
+
+
+def test_tests_all_iterates_pages() -> None:
+    """Tests.all() yields tests across pagination.next_start pages."""
+    transport = ScreenTransportStub(error=False)
+    client = _client(transport, base_url=SCREEN_EU_BASE_URL)
+    names = [test.candidate_name for test in client.screen.tests.all(limit=1)]
+    assert names == ["Ada", "Grace"]
+    assert transport.calls[0]["params"] == {"limit": 1}
+    assert transport.calls[1]["params"] == {"limit": 1, "start": 1}
