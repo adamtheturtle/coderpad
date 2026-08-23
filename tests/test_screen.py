@@ -194,4 +194,3 @@ def test_save_screen_report(tmp_path: Path) -> None:
     out = tmp_path / "report.pdf"
     save_screen_report(report_bytes=b"%PDF report", path=out)
     assert out.read_bytes() == b"%PDF report"
-
