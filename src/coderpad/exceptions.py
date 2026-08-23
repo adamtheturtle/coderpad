@@ -1,9 +1,28 @@
 """Custom exception hierarchy for the CoderPad API."""
 
+import json
 from http import HTTPStatus
-from typing import ClassVar
+from typing import ClassVar, TypeGuard
 
 from coderpad.transports import TransportResponse
+
+
+def _is_object_mapping(
+    value: object,
+    /,
+) -> TypeGuard[dict[object, object]]:
+    """Return whether a value is a mapping of objects."""
+    return isinstance(value, dict)
+
+
+def _optional_json_string(*, payload: object, key: str) -> str | None:
+    """Return a string field from a JSON object payload."""
+    if not _is_object_mapping(payload):
+        return None
+    for entry_key, entry_value in payload.items():
+        if entry_key == key and isinstance(entry_value, str):
+            return entry_value
+    return None
 
 
 class CoderPadError(Exception):
@@ -13,6 +32,8 @@ class CoderPadError(Exception):
         response: The full transport response for debugging.
         status_code: The HTTP status code.
         content: The response body.
+        code: Optional API error code from a JSON body.
+        message: Optional API error message from a JSON body.
     """
 
     _registry: ClassVar[dict[int, type["CoderPadError"]]] = {}
@@ -47,6 +68,16 @@ class CoderPadError(Exception):
         self.response: TransportResponse = response
         self.status_code: int = response.status_code
         self.content: bytes = response.content
+        self.code: str | None = None
+        self.message: str | None = None
+        try:
+            payload: object = json.loads(
+                s=response.content.decode(encoding="utf-8"),
+            )
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            return
+        self.code = _optional_json_string(payload=payload, key="code")
+        self.message = _optional_json_string(payload=payload, key="message")
 
     @classmethod
     def from_response(
