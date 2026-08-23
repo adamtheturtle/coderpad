@@ -902,7 +902,6 @@ class AsyncCoderPad:
             limits=limits,
             proxy=proxy,
         )
-        )
         headers = {
             **(default_headers or {}),
             "Authorization": f'Token token="{api_key}"',
