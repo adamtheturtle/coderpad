@@ -58,16 +58,47 @@ class _AsyncScreenTransport:
                 status=HTTPStatus.OK,
             )
         if url.endswith("/tests"):
+            start = 0
+            if params is not None and "start" in params:
+                start = int(params["start"])
+            if start == 0:
+                return _response(
+                    {
+                        "tests": [
+                            {
+                                "id": 11,
+                                "status": "completed",
+                                "candidate_name": "Ada",
+                                "report": dict[str, object](),
+                            },
+                        ],
+                        "pagination": {
+                            "start": 0,
+                            "limit": 1,
+                            "total": 2,
+                            "has_more_items": True,
+                            "next_start": 1,
+                        },
+                    },
+                    status=HTTPStatus.OK,
+                )
             return _response(
                 {
                     "tests": [
                         {
-                            "id": 11,
+                            "id": 12,
                             "status": "completed",
+                            "candidate_name": "Grace",
                             "report": dict[str, object](),
                         },
                     ],
-                    "pagination": {"total": 2},
+                    "pagination": {
+                        "start": 1,
+                        "limit": 1,
+                        "total": 2,
+                        "has_more_items": False,
+                        "next_start": None,
+                    },
                 },
                 status=HTTPStatus.OK,
             )
@@ -167,3 +198,15 @@ async def test_async_screen_errors_use_existing_hierarchy() -> None:
     screen = _client(recorder).screen
     with pytest.raises(expected_exception=AuthenticationError):
         await screen.campaigns.list()
+
+
+@pytest.mark.asyncio
+async def test_async_tests_all_iterates_pages() -> None:
+    """Async tests.all() yields tests across pagination pages."""
+    recorder = _AsyncScreenTransport(error=False)
+    client = _client(recorder)
+    names = [
+        test.candidate_name async for test in client.screen.tests.all(limit=1)
+    ]
+    assert names == ["Ada", "Grace"]
+    await client.aclose()
