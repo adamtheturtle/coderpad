@@ -1,0 +1,1 @@
+Validate that Screen invitations include ``candidate_email`` and ``candidate_name`` before send.

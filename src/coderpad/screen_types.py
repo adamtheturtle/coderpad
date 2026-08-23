@@ -3,7 +3,7 @@
 from typing import ClassVar, Self, TypeGuard
 
 from beartype import beartype
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class _APIModel(BaseModel):
@@ -115,7 +115,11 @@ class ScreenCampaign(_APIModel):
 
 @beartype
 class ScreenInvitation(_APIModel):
-    """An invitation to a Screen campaign."""
+    """An invitation to a Screen campaign.
+
+    ``candidate_email`` and ``candidate_name`` are required by the Screen
+    send-invitation API surface (the user interface collects email plus name).
+    """
 
     candidate_email: str | None = None
     candidate_name: str | None = None
@@ -123,6 +127,17 @@ class ScreenInvitation(_APIModel):
     tags: str | None = None
     send_invitation_email: bool | None = None
     send_notification_email_on_bounce: bool | None = None
+
+    @model_validator(mode="after")
+    def require_email_and_name(self) -> Self:
+        """Require candidate email and name before sending."""
+        if not self.candidate_email:
+            msg = "candidate_email is required"
+            raise ValueError(msg)
+        if not self.candidate_name:
+            msg = "candidate_name is required"
+            raise ValueError(msg)
+        return self
 
 
 @beartype
