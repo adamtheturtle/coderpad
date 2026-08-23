@@ -160,7 +160,10 @@ async def test_async_screen_matches_sync_surface() -> None:
     campaigns = await screen.campaigns.list()
     invitation = await screen.campaigns.send_invitation(
         campaign_id=7,
-        invitation=ScreenInvitation(candidate_name="Ada"),
+        invitation=ScreenInvitation(
+            candidate_email="ada@example.com",
+            candidate_name="Ada",
+        ),
     )
     page = await screen.tests.list(start=0, limit=1)
     test = await screen.tests.get(test_id=11, with_community_stats=True)

@@ -6,6 +6,7 @@ import json as json_module
 from http import HTTPStatus
 
 import pytest
+from pydantic import ValidationError
 
 from coderpad import SCREEN_EU_BASE_URL, CoderPad
 from coderpad.exceptions import AuthenticationError
@@ -181,7 +182,10 @@ def test_campaigns_and_invitation() -> None:
     transport = ScreenTransportStub(error=False)
     client = _client(transport, base_url=SCREEN_EU_BASE_URL)
     campaigns = client.screen.campaigns.list()
-    invitation = ScreenInvitation(candidate_email="ada@example.com")
+    invitation = ScreenInvitation(
+        candidate_email="ada@example.com",
+        candidate_name="Ada",
+    )
     result = client.screen.campaigns.send_invitation(
         campaign_id=campaigns[0].id,
         invitation=invitation,
@@ -192,7 +196,10 @@ def test_campaigns_and_invitation() -> None:
     assert result.id == 11
     assert result.test_url == "https://test.example"
     assert transport.calls[0]["headers"] == {"API-Key": "screen-key"}
-    assert transport.calls[1]["json"] == {"candidate_email": "ada@example.com"}
+    assert transport.calls[1]["json"] == {
+        "candidate_email": "ada@example.com",
+        "candidate_name": "Ada",
+    }
     assert f"{transport.calls[0]['url']}".startswith(SCREEN_EU_BASE_URL)
     client.close()
 
@@ -306,3 +313,17 @@ def test_tests_all_iterates_pages() -> None:
     assert names == ["Ada", "Grace"]
     assert transport.calls[0]["params"] == {"limit": 1}
     assert transport.calls[1]["params"] == {"limit": 1, "start": 1}
+
+
+def test_invitation_requires_email_and_name() -> None:
+    """ScreenInvitation requires candidate email and name."""
+    with pytest.raises(
+        expected_exception=ValidationError,
+        match="candidate_email",
+    ):
+        ScreenInvitation(candidate_name="Ada")
+    with pytest.raises(
+        expected_exception=ValidationError,
+        match="candidate_name",
+    ):
+        ScreenInvitation(candidate_email="ada@example.com")
