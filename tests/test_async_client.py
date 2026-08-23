@@ -219,6 +219,19 @@ class TestAsyncHTTPXTransport:
         assert transport.proxy == proxy
         await transport.aclose()
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_limits_and_proxy_passed_to_httpx_client() -> None:
+        """Limits and proxy can both be set on the async HTTPX
+        transport.
+        """
+        limits = httpx.Limits(max_connections=5)
+        proxy = "http://proxy.example:8080"
+        transport = AsyncHTTPXTransport(limits=limits, proxy=proxy)
+        assert transport.limits is limits
+        assert transport.proxy == proxy
+        await transport.aclose()
+
 
 class TestAsyncListPads:
     """Tests for ``AsyncCoderPad.pads.list``."""

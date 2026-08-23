@@ -3,10 +3,17 @@
 import json as json_module
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Protocol, Self, runtime_checkable
+from typing import Any, Protocol, Self, TypedDict, runtime_checkable
 
 import httpx
 from beartype import beartype
+
+
+class _HTTPXClientKwargs(TypedDict, total=False):
+    """Optional kwargs forwarded to ``httpx.Client`` / ``AsyncClient``."""
+
+    limits: httpx.Limits
+    proxy: str | httpx.Proxy
 
 
 class HTTPStatusError(Exception):
@@ -138,16 +145,12 @@ class HTTPXTransport:
         """
         self.limits = limits
         self.proxy = proxy
-        if limits is None and proxy is None:
-            self._client = httpx.Client()
-        elif limits is not None and proxy is None:
-            self._client = httpx.Client(limits=limits)
-        elif limits is None and proxy is not None:
-            self._client = httpx.Client(proxy=proxy)
-        elif limits is not None and proxy is not None:
-            self._client = httpx.Client(limits=limits, proxy=proxy)
-        else:
-            self._client = httpx.Client()
+        client_kwargs: _HTTPXClientKwargs = {}
+        if limits is not None:
+            client_kwargs["limits"] = limits
+        if proxy is not None:
+            client_kwargs["proxy"] = proxy
+        self._client = httpx.Client(**client_kwargs)
 
     def close(self) -> None:
         """Close the underlying HTTP client."""
@@ -290,16 +293,12 @@ class AsyncHTTPXTransport:
         """
         self.limits = limits
         self.proxy = proxy
-        if limits is None and proxy is None:
-            self._client = httpx.AsyncClient()
-        elif limits is not None and proxy is None:
-            self._client = httpx.AsyncClient(limits=limits)
-        elif limits is None and proxy is not None:
-            self._client = httpx.AsyncClient(proxy=proxy)
-        elif limits is not None and proxy is not None:
-            self._client = httpx.AsyncClient(limits=limits, proxy=proxy)
-        else:
-            self._client = httpx.AsyncClient()
+        client_kwargs: _HTTPXClientKwargs = {}
+        if limits is not None:
+            client_kwargs["limits"] = limits
+        if proxy is not None:
+            client_kwargs["proxy"] = proxy
+        self._client = httpx.AsyncClient(**client_kwargs)
 
     async def aclose(self) -> None:
         """Close the underlying async HTTP client."""

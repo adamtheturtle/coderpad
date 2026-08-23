@@ -208,6 +208,16 @@ class TestHTTPXTransport:
         assert transport.proxy == proxy
         transport.close()
 
+    @staticmethod
+    def test_limits_and_proxy_passed_to_httpx_client() -> None:
+        """Limits and proxy can both be set on the HTTPX transport."""
+        limits = httpx.Limits(max_connections=5)
+        proxy = "http://proxy.example:8080"
+        transport = HTTPXTransport(limits=limits, proxy=proxy)
+        assert transport.limits is limits
+        assert transport.proxy == proxy
+        transport.close()
+
 
 class TestTransportResponse:
     """Tests for ``TransportResponse``."""
