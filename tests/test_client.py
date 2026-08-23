@@ -161,6 +161,29 @@ class TestCoderPad:
         assert transport.limits is limits
         client.close()
 
+    @staticmethod
+    def test_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
+        """From_env loads Interview and Screen keys from the
+        environment.
+        """
+        monkeypatch.setenv(name="CODERPAD_API_KEY", value="env-interview")
+        monkeypatch.setenv(name="CODERPAD_SCREEN_API_KEY", value="env-screen")
+        client = CoderPad.from_env()
+        assert client.pads.headers["Authorization"] == (
+            'Token token="env-interview"'
+        )
+        assert client.screen.headers["API-Key"] == "env-screen"
+        client.close()
+
+    @staticmethod
+    def test_from_env_requires_api_key(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """From_env raises when CODERPAD_API_KEY is missing."""
+        monkeypatch.delenv(name="CODERPAD_API_KEY", raising=False)
+        monkeypatch.delenv(name="CODERPAD_SCREEN_API_KEY", raising=False)
+        with pytest.raises(expected_exception=KeyError):
+            CoderPad.from_env()
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""

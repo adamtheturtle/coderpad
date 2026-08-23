@@ -159,6 +159,21 @@ class TestAsyncCoderPad:
         assert transport.limits is limits
         await client.aclose()
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
+        """From_env loads Interview and Screen keys from the
+        environment.
+        """
+        monkeypatch.setenv(name="CODERPAD_API_KEY", value="env-interview")
+        monkeypatch.setenv(name="CODERPAD_SCREEN_API_KEY", value="env-screen")
+        client = AsyncCoderPad.from_env()
+        assert client.pads.headers["Authorization"] == (
+            'Token token="env-interview"'
+        )
+        assert client.screen.headers["API-Key"] == "env-screen"
+        await client.aclose()
+
 
 class TestAsyncHTTPXTransport:
     """Tests for ``AsyncHTTPXTransport``."""

@@ -2,6 +2,7 @@
 
 import builtins
 import json
+import os
 from collections.abc import Iterator, Sequence
 from http import HTTPStatus
 from pathlib import Path
@@ -913,6 +914,25 @@ class CoderPad:
             transport=resolved_transport,
             base_url=base_url,
             headers=headers,
+        )
+
+    @classmethod
+    def from_env(cls) -> Self:
+        """Create a client using ``CODERPAD_API_KEY`` and optional Screen
+        key.
+
+        Reads ``CODERPAD_API_KEY`` (required) and
+        ``CODERPAD_SCREEN_API_KEY`` (optional) from the environment.
+
+        Returns:
+            A new client configured from environment variables.
+
+        Raises:
+            KeyError: If ``CODERPAD_API_KEY`` is not set.
+        """
+        return cls(
+            api_key=os.environ["CODERPAD_API_KEY"],
+            screen_api_key=os.environ.get(key="CODERPAD_SCREEN_API_KEY"),
         )
 
     def close(self) -> None:
