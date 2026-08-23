@@ -120,7 +120,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = await self._request(
@@ -266,7 +266,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = await self._request(
@@ -359,7 +359,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = await self._request(
@@ -627,7 +627,7 @@ class AsyncOrganizationPadsNamespace(_AsyncNamespace):
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = await self._request(
@@ -671,7 +671,7 @@ class AsyncOrganizationQuestionsNamespace(
         """
         params: dict[str, str | int] = {}
         if sort is not None:
-            params["sort"] = sort.value
+            params["sort"] = sort
         if page is not None:
             params["page"] = page
         response = await self._request(
