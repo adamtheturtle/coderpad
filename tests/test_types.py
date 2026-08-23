@@ -1,5 +1,7 @@
 """Tests for the CoderPad types."""
 
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -442,6 +444,22 @@ class TestPadHistory:
         )
         assert [entry.id for entry in history] == ["earlier", "later"]
         assert history.replay(initial_contents="h") == "hi!"
+
+    @staticmethod
+    def test_replay_to_file(tmp_path: Path) -> None:
+        """Replayed history can be written to a file."""
+        history = PadHistory.from_dict(
+            data={
+                "earlier": {
+                    "a": "author-1",
+                    "o": [1, "i"],
+                    "t": 1,
+                },
+            },
+        )
+        out = tmp_path / "replayed.txt"
+        history.replay_to_file(path=out, initial_contents="h")
+        assert out.read_text(encoding="utf-8") == "hi"
 
 
 class TestPadEnvironment:
