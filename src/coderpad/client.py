@@ -2,7 +2,7 @@
 
 import builtins
 import json
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from http import HTTPStatus
 from pathlib import Path
 from typing import Self
@@ -135,6 +135,27 @@ class PadsNamespace(_Namespace):
             total=data["total"],
             next_page=data.get("next_page"),
         )
+
+    def all(
+        self,
+        *,
+        sort: SortOrder | None = None,
+    ) -> Iterator[Pad]:
+        """Yield all pads across paginated responses.
+
+        Args:
+            sort: Sort order.
+
+        Yields:
+            Each pad from successive pages until ``next_page`` is absent.
+        """
+        page_number = 1
+        while True:
+            page = self.list(sort=sort, page=page_number)
+            yield from page
+            if page.next_page is None:
+                break
+            page_number += 1
 
     def create(
         self,

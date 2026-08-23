@@ -1098,3 +1098,81 @@ class TestAsyncExceptionHandling:
             expected_exception=NotFoundError,
         ):
             await client.pads.get(pad_id="nonexistent")
+
+
+class TestAsyncPadsAll:
+    """Tests for ``AsyncPadsNamespace.all``."""
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_all_yields_pads_across_pages() -> None:
+        """All() follows pagination until next_page is absent."""
+        pad: dict[str, object] = {
+            "id": "pad-1",
+            "title": "One",
+            "state": "active",
+            "owner_email": "owner@example.com",
+            "language": "python",
+            "private": True,
+            "execution_enabled": True,
+            "contents": "",
+            "participants": [],
+            "events": "[]",
+            "notes": "",
+            "created_at": "2023-01-01T00:00:00Z",
+            "updated_at": "2023-01-02T00:00:00Z",
+            "ended_at": None,
+            "url": "https://app.coderpad.io/pad-1",
+            "playback": "https://app.coderpad.io/pad-1/playback",
+            "history": None,
+            "drawing": None,
+            "type": "sandbox",
+            "question_ids": [],
+            "pad_environment_ids": [],
+            "active_environment_id": None,
+            "team": {"id": "team-1", "name": "Backend"},
+            "restrict_interviewer_access": False,
+        }
+        pages: dict[int, dict[str, object]] = {
+            1: {
+                "status": "OK",
+                "pads": [pad],
+                "total": 2,
+                "next_page": "https://app.coderpad.io/api/pads/?page=2",
+            },
+            2: {
+                "status": "OK",
+                "pads": [{**pad, "id": "pad-2", "title": "Two"}],
+                "total": 2,
+                "next_page": None,
+            },
+        }
+
+        class _Transport:
+            """Serve two pad pages keyed by page query param."""
+
+            async def __call__(
+                self,
+                *,
+                method: str,
+                url: str,
+                headers: dict[str, str],
+                params: dict[str, str | int] | None,
+                data: dict[str, str] | None,
+                files: (dict[str, tuple[str, bytes, str]] | None),
+            ) -> TransportResponse:
+                """Return the page matching the request."""
+                del method, url, headers, data, files
+                page_number = (
+                    1 if params is None else int(params.get("page", 1))
+                )
+                return TransportResponse(
+                    status_code=HTTPStatus.OK,
+                    headers={},
+                    content=json.dumps(obj=pages[page_number]).encode(),
+                )
+
+        client = AsyncCoderPad(api_key="test-key", transport=_Transport())
+        titles = [item.title async for item in client.pads.all()]
+        assert titles == ["One", "Two"]
+        await client.aclose()

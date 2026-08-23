@@ -2,7 +2,7 @@
 
 import builtins
 import json
-from collections.abc import Sequence
+from collections.abc import AsyncIterator, Sequence
 from http import HTTPStatus
 from pathlib import Path
 from typing import Self
@@ -136,6 +136,28 @@ class AsyncPadsNamespace(_AsyncNamespace):
             total=data["total"],
             next_page=data.get("next_page"),
         )
+
+    async def all(
+        self,
+        *,
+        sort: SortOrder | None = None,
+    ) -> AsyncIterator[Pad]:
+        """Yield all pads across paginated responses.
+
+        Args:
+            sort: Sort order.
+
+        Yields:
+            Each pad from successive pages until ``next_page`` is absent.
+        """
+        page_number = 1
+        while True:
+            page = await self.list(sort=sort, page=page_number)
+            for pad in page:
+                yield pad
+            if page.next_page is None:
+                break
+            page_number += 1
 
     async def create(
         self,
