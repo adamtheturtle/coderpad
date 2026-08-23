@@ -124,9 +124,21 @@ class HTTPXTransport:
     ``httpx.Client`` for connection pooling.
     """
 
-    def __init__(self) -> None:
-        """Create a new HTTPX transport."""
-        self._client = httpx.Client()
+    def __init__(
+        self,
+        *,
+        limits: httpx.Limits | None = None,
+    ) -> None:
+        """Create a new HTTPX transport.
+
+        Args:
+            limits: Optional connection pool limits for ``httpx.Client``.
+        """
+        self.limits = limits
+        if limits is None:
+            self._client = httpx.Client()
+        else:
+            self._client = httpx.Client(limits=limits)
 
     def close(self) -> None:
         """Close the underlying HTTP client."""
@@ -255,9 +267,21 @@ class AsyncHTTPXTransport:
     ``httpx.AsyncClient`` for connection pooling.
     """
 
-    def __init__(self) -> None:
-        """Create a new async HTTPX transport."""
-        self._client = httpx.AsyncClient()
+    def __init__(
+        self,
+        *,
+        limits: httpx.Limits | None = None,
+    ) -> None:
+        """Create a new async HTTPX transport.
+
+        Args:
+            limits: Optional connection pool limits for ``httpx.AsyncClient``.
+        """
+        self.limits = limits
+        if limits is None:
+            self._client = httpx.AsyncClient()
+        else:
+            self._client = httpx.AsyncClient(limits=limits)
 
     async def aclose(self) -> None:
         """Close the underlying async HTTP client."""

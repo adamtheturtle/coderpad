@@ -7,6 +7,7 @@ from http import HTTPStatus
 from pathlib import Path
 from typing import Self
 
+import httpx
 from beartype import beartype
 
 from coderpad._question_content import (
@@ -858,6 +859,7 @@ class CoderPad:
         transport: Transport | None = None,
         screen_transport: JSONTransport | None = None,
         default_headers: dict[str, str] | None = None,
+        limits: httpx.Limits | None = None,
     ) -> None:
         """Create a new CoderPad client.
 
@@ -872,10 +874,13 @@ class CoderPad:
             default_headers: Extra headers merged into every Interview
                 and Screen request. Authorization and API-Key values
                 from these headers are overwritten by the client keys.
+            limits: Optional connection pool limits for default transports.
         """
         self.base_url = base_url
-        resolved_transport = transport or HTTPXTransport()
-        resolved_screen_transport = screen_transport or HTTPXTransport()
+        resolved_transport = transport or HTTPXTransport(limits=limits)
+        resolved_screen_transport = screen_transport or HTTPXTransport(
+            limits=limits,
+        )
         headers = {
             **(default_headers or {}),
             "Authorization": f'Token token="{api_key}"',

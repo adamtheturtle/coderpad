@@ -6,6 +6,7 @@ from http import HTTPStatus
 from pathlib import Path
 from urllib.parse import parse_qs
 
+import httpx
 import pytest
 import respx
 
@@ -150,6 +151,16 @@ class TestCoderPad:
         }
         client.close()
 
+    @staticmethod
+    def test_limits_forwarded_to_default_transport() -> None:
+        """CoderPad forwards limits to the default HTTPX transport."""
+        limits = httpx.Limits(max_connections=10)
+        client = CoderPad(api_key="test-key", limits=limits)
+        transport = client.pads.transport
+        assert isinstance(transport, HTTPXTransport)
+        assert transport.limits is limits
+        client.close()
+
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""
@@ -170,6 +181,14 @@ class TestHTTPXTransport:
         """The transport can be used as a context manager."""
         with HTTPXTransport() as transport:
             assert isinstance(transport, HTTPXTransport)
+
+    @staticmethod
+    def test_limits_passed_to_httpx_client() -> None:
+        """Connection pool limits are stored on the HTTPX transport."""
+        limits = httpx.Limits(max_connections=5)
+        transport = HTTPXTransport(limits=limits)
+        assert transport.limits is limits
+        transport.close()
 
 
 class TestTransportResponse:

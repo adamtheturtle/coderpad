@@ -1,0 +1,1 @@
+Support configuring ``httpx`` connection pool limits on CoderPad clients.
