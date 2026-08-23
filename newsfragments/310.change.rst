@@ -1,0 +1,1 @@
+Document the exception hierarchy in the Sphinx API reference.
