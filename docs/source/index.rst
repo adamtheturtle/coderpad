@@ -38,6 +38,7 @@ Reference
    :maxdepth: 3
 
    api-reference
+   field-reference
    openapi-spec
    contributing
    release-process
