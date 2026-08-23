@@ -74,6 +74,25 @@ Screen test listings use offset pagination. While
 ``screen_base_url`` for EU-hosted organizations. All Screen operations have
 equivalent methods on ``AsyncCoderPad``.
 
+
+Environment variables
+---------------------
+
+Set ``CODERPAD_API_KEY`` for the Interview API. Optionally set
+``CODERPAD_SCREEN_API_KEY`` for Screen. Then construct a client with
+``CoderPad.from_env()`` or ``AsyncCoderPad.from_env()``:
+
+.. code-block:: python
+
+   """Load API keys from the environment."""
+
+   import sys
+
+   from coderpad.client import CoderPad
+
+   client = CoderPad.from_env()
+   sys.stdout.write(client.base_url)
+
 Full Documentation
 ------------------
 

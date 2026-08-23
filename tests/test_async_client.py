@@ -172,6 +172,32 @@ class TestAsyncCoderPad:
 
     @staticmethod
     @pytest.mark.asyncio
+    async def test_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
+        """From_env loads Interview and Screen keys from the
+        environment.
+        """
+        monkeypatch.setenv(name="CODERPAD_API_KEY", value="env-interview")
+        monkeypatch.setenv(name="CODERPAD_SCREEN_API_KEY", value="env-screen")
+        client = AsyncCoderPad.from_env()
+        assert client.pads.headers["Authorization"] == (
+            'Token token="env-interview"'
+        )
+        assert client.screen.headers["API-Key"] == "env-screen"
+        await client.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_from_env_requires_api_key(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """From_env raises when CODERPAD_API_KEY is missing."""
+        monkeypatch.delenv(name="CODERPAD_API_KEY", raising=False)
+        monkeypatch.delenv(name="CODERPAD_SCREEN_API_KEY", raising=False)
+        with pytest.raises(expected_exception=KeyError):
+            AsyncCoderPad.from_env()
+
+    @staticmethod
+    @pytest.mark.asyncio
     async def test_screen_lazy_requires_api_key() -> None:
         """Accessing screen without a Screen API key raises ValueError."""
         client = AsyncCoderPad(api_key="test-key")
