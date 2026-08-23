@@ -1,6 +1,6 @@
 """Fixtures for CoderPad API tests."""
 
-import json
+import json as json_module
 from collections.abc import Callable, Generator
 from http import HTTPStatus
 
@@ -80,7 +80,7 @@ def fixture_live_variant_response() -> Callable[
         return TransportResponse(
             status_code=HTTPStatus.OK,
             headers={},
-            content=json.dumps(obj=payload).encode(),
+            content=json_module.dumps(obj=payload).encode(),
         )
 
     return live_variant_response
@@ -117,7 +117,7 @@ def fixture_openapi_spec(request: pytest.FixtureRequest) -> JSONMapping:
     """Load the OpenAPI spec from the repo."""
     openapi_spec_path = request.config.rootpath / "openapi.json"
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
-    result: JSONMapping = json.loads(s=spec_text)
+    result: JSONMapping = json_module.loads(s=spec_text)
     return result
 
 
@@ -162,3 +162,153 @@ def fixture_async_coderpad_client(
         api_key="test-key",
         base_url=_BASE_URL,
     )
+
+
+_TEST = {
+    "id": 11,
+    "status": "completed",
+    "campaign_id": 7,
+    "candidate_name": "Ada",
+    "candidate_email": "ada@example.com",
+    "tags": ["python"],
+    "send_time": 1000,
+    "questions": [{"id": 3, "last_activity_time": 1100}],
+    "report": {
+        "score": 90,
+        "technologies": {
+            "Python": {
+                "score": 95,
+                "skills": {
+                    "Language": {
+                        "points": 9,
+                        "score": 90,
+                        "total_points": 10,
+                    },
+                },
+            },
+        },
+        "community_stats": [1, 2, 3],
+    },
+}
+
+
+class ScreenTransportStub:
+    """Record requests and return representative Screen responses."""
+
+    def __init__(self, *, error: bool) -> None:
+        """Create a recording transport."""
+        self.calls: list[dict[str, object]] = []
+        self.error = error
+
+    def __call__(  # noqa: PLR0911
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: dict[str, tuple[str, bytes, str]] | None,
+        json: object | None,
+    ) -> TransportResponse:
+        """Return a response selected by the request path."""
+        del data, files
+        self.calls.append(
+            {
+                "method": method,
+                "url": url,
+                "headers": headers,
+                "params": params or {},
+                "json": json,
+            },
+        )
+        if self.error:
+            return _response(
+                {"code": "Unauthorized", "message": "Invalid API key"},
+                status=HTTPStatus.UNAUTHORIZED,
+            )
+        if url.endswith("/campaigns"):
+            return _response(
+                [
+                    {
+                        "id": 7,
+                        "name": "Backend",
+                        "languages": ["python"],
+                    },
+                ],
+                status=HTTPStatus.OK,
+            )
+        if url.endswith("/campaigns/7/actions/send"):
+            return _response(
+                {"id": 11, "test_url": "https://test.example"},
+                status=HTTPStatus.OK,
+            )
+        if url.endswith("/tests"):
+            start = 0
+            if params is not None and "start" in params:
+                start = int(params["start"])
+            if start == 0:
+                return _response(
+                    {
+                        "tests": [_TEST],
+                        "pagination": {
+                            "start": 0,
+                            "limit": 1,
+                            "total": 2,
+                            "has_more_items": True,
+                            "next_start": 1,
+                        },
+                    },
+                    status=HTTPStatus.OK,
+                )
+            second = {**_TEST, "id": 12, "candidate_name": "Grace"}
+            return _response(
+                {
+                    "tests": [second],
+                    "pagination": {
+                        "start": 1,
+                        "limit": 1,
+                        "total": 2,
+                        "has_more_items": False,
+                        "next_start": None,
+                    },
+                },
+                status=HTTPStatus.OK,
+            )
+        if url.endswith("/tests/11/report"):
+            return TransportResponse(
+                status_code=HTTPStatus.OK,
+                headers={"content-type": "application/pdf"},
+                content=b"%PDF report",
+            )
+        if url.endswith("/tests/11"):
+            return _response(_TEST, status=HTTPStatus.OK)
+        if url.endswith("/webhook") and method == "GET":
+            return _response(
+                {"url": "https://example.com/hook"}, status=HTTPStatus.OK
+            )
+        return TransportResponse(
+            status_code=HTTPStatus.NO_CONTENT,
+            headers={},
+            content=b"",
+        )
+
+
+def _response(
+    value: object,
+    /,
+    *,
+    status: HTTPStatus,
+) -> TransportResponse:
+    """Create a JSON transport response."""
+    return TransportResponse(
+        status_code=status,
+        headers={"content-type": "application/json"},
+        content=json_module.dumps(obj=value).encode(),
+    )
+
+
+@pytest.fixture(name="screen_transport_stub")
+def fixture_screen_transport_stub() -> ScreenTransportStub:
+    """Provide a Screen transport stub that records requests."""
+    return ScreenTransportStub(error=False)
