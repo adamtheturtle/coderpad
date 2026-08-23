@@ -214,7 +214,9 @@ async def test_async_tests_all_iterates_pages() -> None:
 
 @pytest.mark.asyncio
 async def test_async_empty_screen_api_key_fails_fast() -> None:
-    """Async Screen requests fail before transport when api_key is empty."""
+    """Async Screen requests fail before transport when api_key is
+    empty.
+    """
     recorder = _AsyncScreenTransport(error=False)
     client = AsyncCoderPad(
         api_key="interview-key",
