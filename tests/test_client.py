@@ -185,6 +185,7 @@ class TestCoderPad:
         with pytest.raises(expected_exception=KeyError):
             CoderPad.from_env()
 
+
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""
 
