@@ -29,7 +29,7 @@ Usage
    org = client.organization.get()
    sys.stdout.write(org.organization_name)
 
-See the :doc:`api-reference` for full usage details.
+See the :doc:`api-reference` for full usage details, including the exception hierarchy.
 
 Reference
 ---------
