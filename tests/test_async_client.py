@@ -222,7 +222,9 @@ class TestAsyncHTTPXTransport:
     @staticmethod
     @pytest.mark.asyncio
     async def test_limits_and_timeout_passed_to_httpx_client() -> None:
-        """Limits and timeout can both be set on the async HTTPX transport."""
+        """Limits and timeout can both be set on the async HTTPX
+        transport.
+        """
         limits = httpx.Limits(max_connections=5)
         timeout = httpx.Timeout(timeout=12.5)
         transport = AsyncHTTPXTransport(limits=limits, timeout=timeout)

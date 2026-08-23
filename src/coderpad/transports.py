@@ -3,10 +3,17 @@
 import json as json_module
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Protocol, Self, runtime_checkable
+from typing import Any, Protocol, Self, TypedDict, runtime_checkable
 
 import httpx
 from beartype import beartype
+
+
+class _HTTPXClientKwargs(TypedDict, total=False):
+    """Optional kwargs forwarded to ``httpx.Client`` / ``AsyncClient``."""
+
+    limits: httpx.Limits
+    timeout: httpx.Timeout | float
 
 
 class HTTPStatusError(Exception):
@@ -139,7 +146,7 @@ class HTTPXTransport:
         """
         self.limits = limits
         self.timeout = timeout
-        client_kwargs: dict[str, object] = {}
+        client_kwargs: _HTTPXClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits
         if timeout is not None:
@@ -288,7 +295,7 @@ class AsyncHTTPXTransport:
         """
         self.limits = limits
         self.timeout = timeout
-        client_kwargs: dict[str, object] = {}
+        client_kwargs: _HTTPXClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits
         if timeout is not None:
