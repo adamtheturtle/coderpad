@@ -1,6 +1,7 @@
 """Setup for Sybil."""
 
 import json
+import os
 from collections.abc import Generator
 from doctest import ELLIPSIS
 
@@ -26,6 +27,8 @@ def fixture_mock_coderpad_api(
     openapi_spec_path = request.config.rootpath / "openapi.json"
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
     openapi_spec: JSONMapping = json.loads(s=spec_text)
+    os.environ.setdefault(key="CODERPAD_API_KEY", value="test-key")
+    os.environ.setdefault(key="CODERPAD_SCREEN_API_KEY", value="screen-key")
     with respx.mock(
         base_url=_BASE_URL,
         assert_all_called=False,
