@@ -3,6 +3,7 @@
 import builtins
 from collections.abc import Iterator
 from http import HTTPStatus
+from pathlib import Path
 
 from beartype import beartype
 
@@ -20,6 +21,16 @@ from coderpad.transports import JSONTransport, TransportResponse
 SCREEN_US_BASE_URL = "https://www.codingame.com"
 SCREEN_EU_BASE_URL = "https://www.codingame.eu"
 _SCREEN_PREFIX = "/assessment/api/v1.1"
+
+
+def save_screen_report(*, report_bytes: bytes, path: Path) -> None:
+    """Write Screen report bytes to a file.
+
+    Args:
+        report_bytes: PDF (or other) report content from ``tests.report``.
+        path: Destination file path.
+    """
+    path.write_bytes(data=report_bytes)
 
 
 @beartype

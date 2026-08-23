@@ -4,11 +4,13 @@
 
 import json as json_module
 from http import HTTPStatus
+from pathlib import Path
 
 import pytest
 
 from coderpad import SCREEN_EU_BASE_URL, CoderPad
 from coderpad.exceptions import AuthenticationError
+from coderpad.screen import save_screen_report
 from coderpad.screen_types import (
     ScreenCampaign,
     ScreenInvitation,
@@ -306,3 +308,10 @@ def test_tests_all_iterates_pages() -> None:
     assert names == ["Ada", "Grace"]
     assert transport.calls[0]["params"] == {"limit": 1}
     assert transport.calls[1]["params"] == {"limit": 1, "start": 1}
+
+
+def test_save_screen_report(tmp_path: Path) -> None:
+    """Report bytes can be written to disk."""
+    out = tmp_path / "report.pdf"
+    save_screen_report(report_bytes=b"%PDF report", path=out)
+    assert out.read_bytes() == b"%PDF report"
