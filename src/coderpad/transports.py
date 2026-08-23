@@ -139,12 +139,16 @@ class HTTPXTransport:
         """
         self.limits = limits
         self.timeout = timeout
-        client_kwargs: dict[str, object] = {}
-        if limits is not None:
-            client_kwargs["limits"] = limits
-        if timeout is not None:
-            client_kwargs["timeout"] = timeout
-        self._client = httpx.Client(**client_kwargs)
+        if limits is None and timeout is None:
+            self._client = httpx.Client()
+        elif limits is not None and timeout is None:
+            self._client = httpx.Client(limits=limits)
+        elif limits is None and timeout is not None:
+            self._client = httpx.Client(timeout=timeout)
+        else:
+            assert limits is not None
+            assert timeout is not None
+            self._client = httpx.Client(limits=limits, timeout=timeout)
 
     def close(self) -> None:
         """Close the underlying HTTP client."""
@@ -288,12 +292,16 @@ class AsyncHTTPXTransport:
         """
         self.limits = limits
         self.timeout = timeout
-        client_kwargs: dict[str, object] = {}
-        if limits is not None:
-            client_kwargs["limits"] = limits
-        if timeout is not None:
-            client_kwargs["timeout"] = timeout
-        self._client = httpx.AsyncClient(**client_kwargs)
+        if limits is None and timeout is None:
+            self._client = httpx.AsyncClient()
+        elif limits is not None and timeout is None:
+            self._client = httpx.AsyncClient(limits=limits)
+        elif limits is None and timeout is not None:
+            self._client = httpx.AsyncClient(timeout=timeout)
+        else:
+            assert limits is not None
+            assert timeout is not None
+            self._client = httpx.AsyncClient(limits=limits, timeout=timeout)
 
     async def aclose(self) -> None:
         """Close the underlying async HTTP client."""
