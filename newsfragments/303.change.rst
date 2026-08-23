@@ -1,0 +1,1 @@
+Fail fast with a clear error when Screen methods are called without a ``screen_api_key``.

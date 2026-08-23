@@ -3,10 +3,17 @@
 import json as json_module
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Protocol, Self, runtime_checkable
+from typing import Any, Protocol, Self, TypedDict, runtime_checkable
 
 import httpx
 from beartype import beartype
+
+
+class _HTTPXClientKwargs(TypedDict, total=False):
+    """Optional kwargs forwarded to ``httpx.Client`` / ``AsyncClient``."""
+
+    limits: httpx.Limits
+    timeout: httpx.Timeout | float
 
 
 class HTTPStatusError(Exception):
@@ -128,17 +135,23 @@ class HTTPXTransport:
         self,
         *,
         limits: httpx.Limits | None = None,
+        timeout: httpx.Timeout | float | None = None,
     ) -> None:
         """Create a new HTTPX transport.
 
         Args:
             limits: Optional connection pool limits for ``httpx.Client``.
+            timeout: Optional timeout passed to ``httpx.Client``.
+                When omitted, the default ``httpx`` timeout is used.
         """
         self.limits = limits
-        if limits is None:
-            self._client = httpx.Client()
-        else:
-            self._client = httpx.Client(limits=limits)
+        self.timeout = timeout
+        client_kwargs: _HTTPXClientKwargs = {}
+        if limits is not None:
+            client_kwargs["limits"] = limits
+        if timeout is not None:
+            client_kwargs["timeout"] = timeout
+        self._client = httpx.Client(**client_kwargs)
 
     def close(self) -> None:
         """Close the underlying HTTP client."""
@@ -271,17 +284,23 @@ class AsyncHTTPXTransport:
         self,
         *,
         limits: httpx.Limits | None = None,
+        timeout: httpx.Timeout | float | None = None,
     ) -> None:
         """Create a new async HTTPX transport.
 
         Args:
             limits: Optional connection pool limits for ``httpx.AsyncClient``.
+            timeout: Optional timeout passed to ``httpx.AsyncClient``.
+                When omitted, the default ``httpx`` timeout is used.
         """
         self.limits = limits
-        if limits is None:
-            self._client = httpx.AsyncClient()
-        else:
-            self._client = httpx.AsyncClient(limits=limits)
+        self.timeout = timeout
+        client_kwargs: _HTTPXClientKwargs = {}
+        if limits is not None:
+            client_kwargs["limits"] = limits
+        if timeout is not None:
+            client_kwargs["timeout"] = timeout
+        self._client = httpx.AsyncClient(**client_kwargs)
 
     async def aclose(self) -> None:
         """Close the underlying async HTTP client."""

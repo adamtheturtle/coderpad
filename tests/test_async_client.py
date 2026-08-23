@@ -161,6 +161,17 @@ class TestAsyncCoderPad:
 
     @staticmethod
     @pytest.mark.asyncio
+    async def test_timeout_forwarded_to_default_transport() -> None:
+        """AsyncCoderPad forwards timeout to the default transport."""
+        timeout = httpx.Timeout(timeout=7.5)
+        client = AsyncCoderPad(api_key="test-key", timeout=timeout)
+        transport = client.pads.transport
+        assert isinstance(transport, AsyncHTTPXTransport)
+        assert transport.timeout == timeout
+        await client.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
     async def test_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
         """From_env loads Interview and Screen keys from the
         environment.
@@ -263,6 +274,28 @@ class TestAsyncHTTPXTransport:
         limits = httpx.Limits(max_connections=5)
         transport = AsyncHTTPXTransport(limits=limits)
         assert transport.limits is limits
+        await transport.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_timeout_passed_to_httpx_client() -> None:
+        """A timeout is forwarded to the underlying async httpx client."""
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = AsyncHTTPXTransport(timeout=timeout)
+        assert transport.timeout == timeout
+        await transport.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_limits_and_timeout_passed_to_httpx_client() -> None:
+        """Limits and timeout can both be set on the async HTTPX
+        transport.
+        """
+        limits = httpx.Limits(max_connections=5)
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = AsyncHTTPXTransport(limits=limits, timeout=timeout)
+        assert transport.limits is limits
+        assert transport.timeout == timeout
         await transport.aclose()
 
 

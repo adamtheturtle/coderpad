@@ -8,7 +8,7 @@ from http import HTTPStatus
 
 import pytest
 
-from coderpad import AsyncCoderPad
+from coderpad import SCREEN_EU_BASE_URL, AsyncCoderPad
 from coderpad.exceptions import AuthenticationError
 from coderpad.screen_types import ScreenInvitation
 from coderpad.transports import TransportResponse
@@ -166,7 +166,10 @@ async def test_async_screen_matches_sync_surface() -> None:
     campaigns = await screen.campaigns.list()
     invitation = await screen.campaigns.send_invitation(
         campaign_id=7,
-        invitation=ScreenInvitation(candidate_name="Ada"),
+        invitation=ScreenInvitation(
+            candidate_email="ada@example.com",
+            candidate_name="Ada",
+        ),
     )
     page = await screen.tests.list(start=0, limit=1)
     test = await screen.tests.get(test_id=11, with_community_stats=True)
@@ -234,4 +237,25 @@ async def test_async_tests_all_iterates_pages() -> None:
         test.candidate_name async for test in client.screen.tests.all(limit=1)
     ]
     assert names == ["Ada", "Grace"]
+    await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_async_empty_screen_api_key_fails_fast() -> None:
+    """Async Screen requests fail before transport when api_key is
+    empty.
+    """
+    recorder = _AsyncScreenTransport(error=False)
+    client = AsyncCoderPad(
+        api_key="interview-key",
+        screen_api_key="",
+        screen_base_url=SCREEN_EU_BASE_URL,
+        screen_transport=recorder,
+    )
+    with pytest.raises(
+        expected_exception=ValueError,
+        match="Screen API key is required",
+    ):
+        await client.screen.campaigns.list()
+    assert not recorder.calls
     await client.aclose()
