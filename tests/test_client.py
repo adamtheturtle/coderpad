@@ -216,6 +216,16 @@ class TestHTTPXTransport:
         assert transport.timeout == float_timeout
         transport.close()
 
+    @staticmethod
+    def test_limits_and_timeout_passed_to_httpx_client() -> None:
+        """Limits and timeout can both be set on the HTTPX transport."""
+        limits = httpx.Limits(max_connections=5)
+        timeout = httpx.Timeout(timeout=12.5)
+        transport = HTTPXTransport(limits=limits, timeout=timeout)
+        assert transport.limits is limits
+        assert transport.timeout == timeout
+        transport.close()
+
 
 class TestTransportResponse:
     """Tests for ``TransportResponse``."""
