@@ -80,7 +80,7 @@ class SortOrder(enum.StrEnum):
     UPDATED_AT_DESC = "updated_at,desc"
 
 
-class Language(enum.Enum):
+class Language(enum.StrEnum):
     """Programming language for pads and questions.
 
     Single-file languages use a simple editor. Multi-file and

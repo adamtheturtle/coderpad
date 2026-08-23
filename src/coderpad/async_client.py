@@ -187,9 +187,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         if title is not None:
             data["title"] = title
         if language is not None:
-            lang = (
-                language.value if isinstance(language, Language) else language
-            )
+            lang = language
             data["language"] = lang
         if contents is not None:
             data["contents"] = contents
@@ -250,9 +248,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         if title is not None:
             data["title"] = title
         if language is not None:
-            lang = (
-                language.value if isinstance(language, Language) else language
-            )
+            lang = language
             data["language"] = lang
         if contents is not None:
             data["contents"] = contents
@@ -444,7 +440,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             file_contents=file_contents,
             zip_file=zip_file,
         )
-        lang = language.value if isinstance(language, Language) else language
+        lang = language
         data: dict[str, str] = {
             "question[title]": title,
             "question[language]": lang,
@@ -562,9 +558,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         if title is not None:
             data["question[title]"] = title
         if language is not None:
-            lang = (
-                language.value if isinstance(language, Language) else language
-            )
+            lang = language
             data["question[language]"] = lang
         if description is not None:
             data["question[description]"] = description
