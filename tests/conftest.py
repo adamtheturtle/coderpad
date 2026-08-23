@@ -201,7 +201,7 @@ class ScreenTransportStub:
         self.calls: list[dict[str, object]] = []
         self.error = error
 
-    def __call__(  # noqa: PLR0911
+    def __call__(  # noqa: C901, PLR0911
         self,
         *,
         method: str,
