@@ -432,6 +432,30 @@ class TestExceptionHierarchy:
         assert exc.message is None
 
     @staticmethod
+    def test_non_object_json_error_body_leaves_code_message_none() -> None:
+        """JSON arrays (non-objects) leave code and message as None."""
+        response = TransportResponse(
+            status_code=HTTPStatus.BAD_REQUEST,
+            headers={},
+            content=b'["not", "an", "object"]',
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert exc.code is None
+        assert exc.message is None
+
+    @staticmethod
+    def test_json_object_without_string_code_or_message() -> None:
+        """JSON objects without string code/message leave them None."""
+        response = TransportResponse(
+            status_code=HTTPStatus.BAD_REQUEST,
+            headers={},
+            content=b'{"code": 123, "message": null, "other": "x"}',
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert exc.code is None
+        assert exc.message is None
+
+    @staticmethod
     def test_client_raises_specific_exception() -> None:
         """The client raises specific exceptions for error responses."""
 
