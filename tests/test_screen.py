@@ -1,6 +1,6 @@
 """Tests for synchronous CoderPad Screen support."""
 
-# ruff: noqa: PLR0911, PLR2004
+# ruff: noqa: C901, PLR0911, PLR2004
 
 import json as json_module
 from http import HTTPStatus
@@ -133,6 +133,11 @@ class ScreenTransportStub:
                 status_code=HTTPStatus.OK,
                 headers={"content-type": "application/pdf"},
                 content=b"%PDF report",
+            )
+        if url.endswith("/tests/99"):
+            return _response(
+                {**_TEST, "id": 99, "report": None},
+                status=HTTPStatus.OK,
             )
         if url.endswith("/tests/11"):
             return _response(_TEST, status=HTTPStatus.OK)
@@ -293,6 +298,19 @@ def test_get_actions_report_and_webhook() -> None:
     assert typed_report.score == 90
     assert webhook.url == "https://example.com/hook"
     assert transport.calls[-2]["json"] == "https://example.com/new-hook"
+
+
+def test_report_json_raises_when_no_report() -> None:
+    """Report_json raises LookupError when the test has no scored
+    report.
+    """
+    transport = ScreenTransportStub(error=False)
+    screen = _client(transport, base_url=SCREEN_EU_BASE_URL).screen
+    with pytest.raises(
+        expected_exception=LookupError,
+        match="Screen test 99 has no scored report",
+    ):
+        screen.tests.report_json(test_id=99)
 
 
 def test_screen_errors_use_existing_hierarchy() -> None:
