@@ -1,6 +1,7 @@
 """Synchronous CoderPad Screen API namespaces."""
 
 import builtins
+from collections.abc import Iterator
 from http import HTTPStatus
 
 from beartype import beartype
@@ -131,6 +132,59 @@ class ScreenTestsNamespace(_ScreenNamespace):
             method="GET", path="/tests", params=params, json=None
         )
         return ScreenTestsPage.from_dict(data=response.json())
+
+    def all(
+        self,
+        *,
+        campaign_id: int | None = None,
+        status: str | None = None,
+        tag: str | None = None,
+        search: str | None = None,
+        product: str | None = None,
+        candidate_email: str | None = None,
+        from_time: int | None = None,
+        to_time: int | None = None,
+        limit: int | None = None,
+    ) -> Iterator[ScreenTest]:
+        """Yield all tests across offset-paginated responses.
+
+        Args:
+            campaign_id: Filter by campaign id.
+            status: Filter by status.
+            tag: Filter by tag.
+            search: Free-text search.
+            product: Filter by product.
+            candidate_email: Filter by candidate email.
+            from_time: Lower bound timestamp.
+            to_time: Upper bound timestamp.
+            limit: Page size.
+
+        Yields:
+            Each test until ``pagination.has_more_items`` is false.
+        """
+        start: int | None = None
+        while True:
+            page = self.list(
+                campaign_id=campaign_id,
+                status=status,
+                tag=tag,
+                search=search,
+                product=product,
+                candidate_email=candidate_email,
+                from_time=from_time,
+                to_time=to_time,
+                start=start,
+                limit=limit,
+            )
+            yield from page.tests
+            pagination = page.pagination
+            if (
+                pagination is None
+                or not pagination.has_more_items
+                or pagination.next_start is None
+            ):
+                break
+            start = pagination.next_start
 
     def get(
         self,
