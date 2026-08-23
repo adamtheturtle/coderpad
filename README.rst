@@ -83,4 +83,4 @@ See the `full documentation <https://adamtheturtle.github.io/coderpad-api-python
    :target: https://github.com/adamtheturtle/coderpad-api-python/actions
 .. |PyPI| image:: https://badge.fury.io/py/coderpad-py.svg
    :target: https://badge.fury.io/py/coderpad-py
-.. |minimum-python-version| replace:: 3.13
+.. |minimum-python-version| replace:: 3.12

@@ -1,0 +1,1 @@
+Fixed the README minimum Python version badge to match ``requires-python`` (3.12).
