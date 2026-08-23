@@ -168,7 +168,7 @@ class TestCoderPad:
         client = CoderPad(api_key="test-key", timeout=timeout)
         transport = client.pads.transport
         assert isinstance(transport, HTTPXTransport)
-        assert transport._client.timeout == timeout  # noqa: SLF001
+        assert transport.timeout == timeout
         client.close()
 
 
@@ -205,14 +205,15 @@ class TestHTTPXTransport:
         """A timeout is forwarded to the underlying httpx client."""
         timeout = httpx.Timeout(timeout=12.5)
         transport = HTTPXTransport(timeout=timeout)
-        assert transport._client.timeout == timeout  # noqa: SLF001
+        assert transport.timeout == timeout
         transport.close()
 
     @staticmethod
     def test_float_timeout_passed_to_httpx_client() -> None:
         """A float timeout is accepted by the HTTPX transport."""
-        transport = HTTPXTransport(timeout=3.0)
-        assert transport._client.timeout == httpx.Timeout(timeout=3.0)  # noqa: SLF001
+        float_timeout = 3.0
+        transport = HTTPXTransport(timeout=float_timeout)
+        assert transport.timeout == float_timeout
         transport.close()
 
 

@@ -167,7 +167,7 @@ class TestAsyncCoderPad:
         client = AsyncCoderPad(api_key="test-key", timeout=timeout)
         transport = client.pads.transport
         assert isinstance(transport, AsyncHTTPXTransport)
-        assert transport._client.timeout == timeout  # noqa: SLF001
+        assert transport.timeout == timeout
         await client.aclose()
 
 
@@ -216,7 +216,7 @@ class TestAsyncHTTPXTransport:
         """A timeout is forwarded to the underlying async httpx client."""
         timeout = httpx.Timeout(timeout=12.5)
         transport = AsyncHTTPXTransport(timeout=timeout)
-        assert transport._client.timeout == timeout  # noqa: SLF001
+        assert transport.timeout == timeout
         await transport.aclose()
 
 
