@@ -173,6 +173,10 @@ async def test_async_screen_matches_sync_surface() -> None:
         anonymous=True,
         include_rank=False,
     )
+    typed_report = await screen.tests.report_json(
+        test_id=11,
+        with_community_stats=True,
+    )
     webhook = await screen.webhook.get()
     await screen.webhook.set(url="https://example.com/hook")
     await screen.webhook.delete()
@@ -182,6 +186,7 @@ async def test_async_screen_matches_sync_surface() -> None:
     assert page.pagination.total == 2
     assert test.report is not None
     assert report == b"%PDF report"
+    assert typed_report.score == test.report.score
     assert recorder.calls[7]["params"] == {
         "report_type": "full",
         "anonymous": "true",

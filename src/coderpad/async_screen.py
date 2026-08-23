@@ -12,6 +12,7 @@ from coderpad.screen_types import (
     ScreenCampaign,
     ScreenInvitation,
     ScreenInvitationResult,
+    ScreenReport,
     ScreenTest,
     ScreenTestsPage,
     ScreenWebhook,
@@ -264,6 +265,39 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
             json=None,
         )
         return response.content
+
+    async def report_json(
+        self,
+        *,
+        test_id: int,
+        with_community_stats: bool = False,
+    ) -> ScreenReport:
+        """Return the typed JSON report embedded in a test session.
+
+        The Screen ``/tests/{id}/report`` endpoint serves PDF bytes.
+        Scored report fields are returned on ``GET /tests/{id}`` as
+        ``ScreenTest.report``; this helper fetches that payload and
+        returns the typed report.
+
+        Args:
+            test_id: The Screen test session id.
+            with_community_stats: Whether to include community
+                statistics on the report.
+
+        Returns:
+            The typed scored report.
+
+        Raises:
+            LookupError: If the test exists but has no report yet.
+        """
+        test = await self.get(
+            test_id=test_id,
+            with_community_stats=with_community_stats,
+        )
+        if test.report is None:
+            message = f"Screen test {test_id} has no scored report"
+            raise LookupError(message)
+        return test.report
 
 
 @beartype

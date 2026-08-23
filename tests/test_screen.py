@@ -280,12 +280,17 @@ def test_get_actions_report_and_webhook() -> None:
         report_type="simplified",
         anonymous=True,
     )
+    typed_report = screen.tests.report_json(
+        test_id=11,
+        with_community_stats=True,
+    )
     webhook = screen.webhook.get()
     screen.webhook.set(url="https://example.com/new-hook")
     screen.webhook.delete()
     assert test.candidate_name == "Ada"
     assert transport.calls[0]["params"] == {"withCommunityStats": "true"}
     assert report == b"%PDF report"
+    assert typed_report.score == 90
     assert webhook.url == "https://example.com/hook"
     assert transport.calls[-2]["json"] == "https://example.com/new-hook"
 
