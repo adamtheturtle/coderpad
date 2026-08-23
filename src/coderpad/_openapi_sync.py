@@ -66,11 +66,11 @@ def apply_postman_corrections(spec: dict[str, Any]) -> list[str]:
     return notes
 
 
-def run_sync(*, argv: list[str], repo_root: Path) -> int:
+def run_sync(*, arguments: list[str], repo_root: Path) -> int:
     """Run the OpenAPI sync entry point.
 
     Args:
-        argv: Argument vector excluding ``sys.argv[0]``.
+        arguments: Command-line arguments excluding the program name.
         repo_root: Repository root used for the default output path.
 
     Returns:
@@ -94,7 +94,7 @@ def run_sync(*, argv: list[str], repo_root: Path) -> int:
         default=default_target,
         help=f"Output path (default: {default_target})",
     )
-    args = parser.parse_args(args=argv)
+    args = parser.parse_args(args=arguments)
     loaded = json.loads(s=args.source.read_text(encoding="utf-8"))
     spec = _as_string_key_mapping(loaded)
     if spec is None:

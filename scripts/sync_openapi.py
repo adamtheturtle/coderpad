@@ -17,4 +17,4 @@ from coderpad._openapi_sync import run_sync
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 if __name__ == "__main__":
-    raise SystemExit(run_sync(argv=sys.argv[1:], repo_root=_REPO_ROOT))
+    raise SystemExit(run_sync(arguments=sys.argv[1:], repo_root=_REPO_ROOT))
