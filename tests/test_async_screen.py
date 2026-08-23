@@ -1,6 +1,7 @@
 """Tests for asynchronous CoderPad Screen support."""
 
-# ruff: noqa: PLR0911, PLR2004
+# ruff: noqa: C901, PLR0911, PLR2004
+# pylint: disable=too-complex
 
 import json as json_module
 from http import HTTPStatus
@@ -108,6 +109,11 @@ class _AsyncScreenTransport:
                 headers={"content-type": "application/pdf"},
                 content=b"%PDF report",
             )
+        if url.endswith("/tests/99"):
+            return _response(
+                {"id": 99, "status": "completed", "report": None},
+                status=HTTPStatus.OK,
+            )
         if url.endswith("/tests/11"):
             return _response(
                 {
@@ -173,6 +179,10 @@ async def test_async_screen_matches_sync_surface() -> None:
         anonymous=True,
         include_rank=False,
     )
+    typed_report = await screen.tests.report_json(
+        test_id=11,
+        with_community_stats=True,
+    )
     webhook = await screen.webhook.get()
     await screen.webhook.set(url="https://example.com/hook")
     await screen.webhook.delete()
@@ -182,6 +192,7 @@ async def test_async_screen_matches_sync_surface() -> None:
     assert page.pagination.total == 2
     assert test.report is not None
     assert report == b"%PDF report"
+    assert typed_report.score == test.report.score
     assert recorder.calls[7]["params"] == {
         "report_type": "full",
         "anonymous": "true",
@@ -198,6 +209,20 @@ async def test_async_screen_errors_use_existing_hierarchy() -> None:
     screen = _client(recorder).screen
     with pytest.raises(expected_exception=AuthenticationError):
         await screen.campaigns.list()
+
+
+@pytest.mark.asyncio
+async def test_async_report_json_raises_when_no_report() -> None:
+    """Async report_json raises LookupError when the test has no
+    report.
+    """
+    recorder = _AsyncScreenTransport(error=False)
+    screen = _client(recorder).screen
+    with pytest.raises(
+        expected_exception=LookupError,
+        match="Screen test 99 has no scored report",
+    ):
+        await screen.tests.report_json(test_id=99)
 
 
 @pytest.mark.asyncio
