@@ -192,6 +192,7 @@ _TEST = {
 }
 
 
+# pylint: disable=too-complex
 class ScreenTransportStub:
     """Record requests and return representative Screen responses."""
 
