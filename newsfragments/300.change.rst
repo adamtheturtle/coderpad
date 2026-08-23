@@ -1,0 +1,1 @@
+Added ``BadGatewayError``, ``ServiceUnavailableError``, and ``GatewayTimeoutError`` for HTTP 502, 503, and 504 responses.

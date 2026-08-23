@@ -113,3 +113,24 @@ class ServerError(
     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
 ):
     """Raised for 500 Internal Server Error responses."""
+
+
+class BadGatewayError(
+    CoderPadError,
+    status_code=HTTPStatus.BAD_GATEWAY,
+):
+    """Raised for 502 Bad Gateway responses."""
+
+
+class ServiceUnavailableError(
+    CoderPadError,
+    status_code=HTTPStatus.SERVICE_UNAVAILABLE,
+):
+    """Raised for 503 Service Unavailable responses."""
+
+
+class GatewayTimeoutError(
+    CoderPadError,
+    status_code=HTTPStatus.GATEWAY_TIMEOUT,
+):
+    """Raised for 504 Gateway Timeout responses."""

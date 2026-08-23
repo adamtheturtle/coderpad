@@ -12,12 +12,15 @@ import respx
 from coderpad.client import CoderPad
 from coderpad.exceptions import (
     AuthenticationError,
+    BadGatewayError,
     BadRequestError,
     CoderPadError,
     ForbiddenError,
+    GatewayTimeoutError,
     NotFoundError,
     RateLimitError,
     ServerError,
+    ServiceUnavailableError,
 )
 from coderpad.transports import (
     HTTPStatusError,
@@ -235,6 +238,39 @@ class TestExceptionHierarchy:
         assert isinstance(exc, ServerError)
 
     @staticmethod
+    def test_bad_gateway_error() -> None:
+        """A 502 response raises BadGatewayError."""
+        response = TransportResponse(
+            status_code=HTTPStatus.BAD_GATEWAY,
+            headers={},
+            content=b"Bad Gateway",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, BadGatewayError)
+
+    @staticmethod
+    def test_service_unavailable_error() -> None:
+        """A 503 response raises ServiceUnavailableError."""
+        response = TransportResponse(
+            status_code=HTTPStatus.SERVICE_UNAVAILABLE,
+            headers={},
+            content=b"Service Unavailable",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, ServiceUnavailableError)
+
+    @staticmethod
+    def test_gateway_timeout_error() -> None:
+        """A 504 response raises GatewayTimeoutError."""
+        response = TransportResponse(
+            status_code=HTTPStatus.GATEWAY_TIMEOUT,
+            headers={},
+            content=b"Gateway Timeout",
+        )
+        exc = CoderPadError.from_response(response=response)
+        assert isinstance(exc, GatewayTimeoutError)
+
+    @staticmethod
     def test_unmapped_status_code() -> None:
         """An unmapped status code raises CoderPadError."""
         response = TransportResponse(
@@ -253,6 +289,9 @@ class TestExceptionHierarchy:
                 NotFoundError,
                 RateLimitError,
                 ServerError,
+                BadGatewayError,
+                ServiceUnavailableError,
+                GatewayTimeoutError,
             ),
         )
         assert exc.status_code == HTTPStatus.IM_A_TEAPOT
@@ -277,6 +316,9 @@ class TestExceptionHierarchy:
                 NotFoundError,
                 RateLimitError,
                 ServerError,
+                BadGatewayError,
+                ServiceUnavailableError,
+                GatewayTimeoutError,
             ),
         )
         assert exc.status_code == nonstandard_status
