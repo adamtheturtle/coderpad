@@ -1,6 +1,7 @@
 """Tests for synchronous CoderPad Screen support."""
 
 # ruff: noqa: C901, PLR0911, PLR2004
+# pylint: disable=too-complex
 
 import json as json_module
 from http import HTTPStatus
