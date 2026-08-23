@@ -73,11 +73,7 @@ def test_apply_postman_corrections_replaces_non_object_item_path() -> None:
         spec={"openapi": "3.0.0", "paths": paths},
     )
     assert any("Replaced non-object" in note for note in notes)
-    pad_item = paths["/api/pads/{id}"]
-    assert isinstance(pad_item, dict)
-    put_operation = pad_item.get("put")
-    assert isinstance(put_operation, dict)
-    assert put_operation["summary"] == "modify"
+    assert paths["/api/pads/{id}"] == {"put": {"summary": "modify"}}
 
 
 def test_apply_postman_corrections_removes_duplicate_put() -> None:
@@ -91,7 +87,7 @@ def test_apply_postman_corrections_removes_duplicate_put() -> None:
     )
     assert any("Removed duplicate PUT" in note for note in notes)
     assert "put" not in paths["/api/pads/"]
-    assert paths["/api/pads/{id}"]["put"]["summary"] == "canonical"
+    assert paths["/api/pads/{id}"] == {"put": {"summary": "canonical"}}
 
 
 def test_main_writes_normalized_spec(tmp_path: Path) -> None:
