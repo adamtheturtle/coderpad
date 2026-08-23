@@ -299,6 +299,8 @@ ignore = [
     "Makefile",
     "newsfragments",
     "newsfragments/**",
+    "scripts",
+    "scripts/**",
     "spelling_private_dict.txt",
     "tests",
     "tests/**",
