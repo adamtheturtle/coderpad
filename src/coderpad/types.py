@@ -233,7 +233,11 @@ def _empty_pad_interviewer_notifications() -> list[PadInterviewerNotification]:
 
 @beartype
 class Pad(_APIModel):
-    """A CoderPad interview pad."""
+    """A CoderPad interview pad.
+
+    Not every field here can be written via ``create`` or ``update``.
+    See the "Writable and read-only fields" reference for the matrix.
+    """
 
     id: str
     title: str
@@ -775,7 +779,11 @@ class CustomDatabase(_APIModel):
 
 @beartype
 class Question(_APIModel):
-    """A CoderPad question."""
+    """A CoderPad question.
+
+    Not every field here can be written via ``create`` or ``update``.
+    See the "Writable and read-only fields" reference for the matrix.
+    """
 
     id: int
     title: str
