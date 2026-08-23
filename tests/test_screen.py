@@ -1,10 +1,7 @@
 """Tests for synchronous CoderPad Screen support."""
 
-# ruff: noqa: C901, PLR0911, PLR2004
-# pylint: disable=too-complex
+# ruff: noqa: PLR2004
 
-import json as json_module
-from http import HTTPStatus
 from pathlib import Path
 
 import pytest
@@ -18,155 +15,7 @@ from coderpad.screen_types import (
     ScreenReport,
     ScreenTest,
 )
-from coderpad.transports import TransportResponse
-
-_TEST = {
-    "id": 11,
-    "status": "completed",
-    "campaign_id": 7,
-    "candidate_name": "Ada",
-    "candidate_email": "ada@example.com",
-    "tags": ["python"],
-    "send_time": 1000,
-    "questions": [{"id": 3, "last_activity_time": 1100}],
-    "report": {
-        "score": 90,
-        "technologies": {
-            "Python": {
-                "score": 95,
-                "skills": {
-                    "Language": {
-                        "points": 9,
-                        "score": 90,
-                        "total_points": 10,
-                    },
-                },
-            },
-        },
-        "community_stats": [1, 2, 3],
-    },
-}
-
-
-class ScreenTransportStub:
-    """Record requests and return representative Screen responses."""
-
-    def __init__(self, *, error: bool) -> None:
-        """Create a recording transport."""
-        self.calls: list[dict[str, object]] = []
-        self.error = error
-
-    def __call__(
-        self,
-        *,
-        method: str,
-        url: str,
-        headers: dict[str, str],
-        params: dict[str, str | int] | None,
-        data: dict[str, str] | None,
-        files: dict[str, tuple[str, bytes, str]] | None,
-        json: object | None,
-    ) -> TransportResponse:
-        """Return a response selected by the request path."""
-        del data, files
-        self.calls.append(
-            {
-                "method": method,
-                "url": url,
-                "headers": headers,
-                "params": params or {},
-                "json": json,
-            },
-        )
-        if self.error:
-            return _response(
-                {"code": "Unauthorized", "message": "Invalid API key"},
-                status=HTTPStatus.UNAUTHORIZED,
-            )
-        if url.endswith("/campaigns"):
-            return _response(
-                [
-                    {
-                        "id": 7,
-                        "name": "Backend",
-                        "languages": ["python"],
-                    },
-                ],
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/campaigns/7/actions/send"):
-            return _response(
-                {"id": 11, "test_url": "https://test.example"},
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/tests"):
-            start = 0
-            if params is not None and "start" in params:
-                start = int(params["start"])
-            if start == 0:
-                return _response(
-                    {
-                        "tests": [_TEST],
-                        "pagination": {
-                            "start": 0,
-                            "limit": 1,
-                            "total": 2,
-                            "has_more_items": True,
-                            "next_start": 1,
-                        },
-                    },
-                    status=HTTPStatus.OK,
-                )
-            second = {**_TEST, "id": 12, "candidate_name": "Grace"}
-            return _response(
-                {
-                    "tests": [second],
-                    "pagination": {
-                        "start": 1,
-                        "limit": 1,
-                        "total": 2,
-                        "has_more_items": False,
-                        "next_start": None,
-                    },
-                },
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/tests/11/report"):
-            return TransportResponse(
-                status_code=HTTPStatus.OK,
-                headers={"content-type": "application/pdf"},
-                content=b"%PDF report",
-            )
-        if url.endswith("/tests/99"):
-            return _response(
-                {**_TEST, "id": 99, "report": None},
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/tests/11"):
-            return _response(_TEST, status=HTTPStatus.OK)
-        if url.endswith("/webhook") and method == "GET":
-            return _response(
-                {"url": "https://example.com/hook"}, status=HTTPStatus.OK
-            )
-        return TransportResponse(
-            status_code=HTTPStatus.NO_CONTENT,
-            headers={},
-            content=b"",
-        )
-
-
-def _response(
-    value: object,
-    /,
-    *,
-    status: HTTPStatus,
-) -> TransportResponse:
-    """Create a JSON transport response."""
-    return TransportResponse(
-        status_code=status,
-        headers={"content-type": "application/json"},
-        content=json_module.dumps(obj=value).encode(),
-    )
+from tests.conftest import ScreenTransportStub
 
 
 def _client(
@@ -184,9 +33,11 @@ def _client(
     )
 
 
-def test_campaigns_and_invitation() -> None:
+def test_campaigns_and_invitation(
+    screen_transport_stub: ScreenTransportStub,
+) -> None:
     """Campaigns and invitations use Screen authentication and JSON."""
-    transport = ScreenTransportStub(error=False)
+    transport = screen_transport_stub
     client = _client(transport, base_url=SCREEN_EU_BASE_URL)
     campaigns = client.screen.campaigns.list()
     invitation = ScreenInvitation(candidate_email="ada@example.com")
@@ -220,9 +71,11 @@ def test_malformed_optional_values_use_defaults() -> None:
     assert test.status == "unknown"
 
 
-def test_tests_filters_pagination_and_decoding() -> None:
+def test_tests_filters_pagination_and_decoding(
+    screen_transport_stub: ScreenTransportStub,
+) -> None:
     """Test list filters, pagination, and nested models are preserved."""
-    transport = ScreenTransportStub(error=False)
+    transport = screen_transport_stub
     page = _client(transport, base_url=SCREEN_EU_BASE_URL).screen.tests.list(
         campaign_id=7,
         status="completed",
@@ -275,9 +128,11 @@ def test_tests_filters_pagination_and_decoding() -> None:
     }
 
 
-def test_get_actions_report_and_webhook() -> None:
+def test_get_actions_report_and_webhook(
+    screen_transport_stub: ScreenTransportStub,
+) -> None:
     """Test retrieval, mutations, PDF bytes, and webhook operations."""
-    transport = ScreenTransportStub(error=False)
+    transport = screen_transport_stub
     screen = _client(transport, base_url=SCREEN_EU_BASE_URL).screen
     test = screen.tests.get(test_id=11, with_community_stats=True)
     screen.tests.cancel(test_id=11)
