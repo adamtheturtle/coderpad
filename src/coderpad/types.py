@@ -54,6 +54,7 @@ class PaginatedList(list[_T]):
         *,
         total: int,
         next_page: str | None = None,
+        prev_page: str | None = None,
     ) -> None:
         """Create a new paginated list.
 
@@ -61,10 +62,12 @@ class PaginatedList(list[_T]):
             iterable: The items for the list.
             total: Total number of items across all pages.
             next_page: URL for the next page, or ``None``.
+            prev_page: URL for the previous page, or ``None``.
         """
         super().__init__(iterable)
         self.total = total
         self.next_page = next_page
+        self.prev_page = prev_page
 
 
 class SortOrder(enum.StrEnum):

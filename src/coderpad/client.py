@@ -134,6 +134,7 @@ class PadsNamespace(_Namespace):
             [Pad.from_dict(data=item) for item in data["pads"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
     def all(
@@ -300,6 +301,7 @@ class PadsNamespace(_Namespace):
             [PadEvent.model_validate(obj=item) for item in data["events"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
     def get_environment(
@@ -392,6 +394,7 @@ class QuestionsNamespace(_Namespace):
             [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
     def create(
@@ -659,6 +662,7 @@ class OrganizationPadsNamespace(_Namespace):
             [Pad.from_dict(data=item) for item in data["pads"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
 
@@ -698,6 +702,7 @@ class OrganizationQuestionsNamespace(_Namespace):
             [Question.model_validate(obj=item) for item in data["questions"]],
             total=data["total"],
             next_page=data.get("next_page"),
+            prev_page=data.get("prev_page"),
         )
 
 

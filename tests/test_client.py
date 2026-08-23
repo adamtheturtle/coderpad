@@ -439,6 +439,46 @@ class TestListPads:
     """Tests for ``CoderPad.pads.list``."""
 
     @staticmethod
+    def test_list_pads_parses_prev_page() -> None:
+        """Pads.list exposes prev_page when present in the API
+        response.
+        """
+
+        class _Transport:
+            """Return a pads page that includes prev_page."""
+
+            def __call__(
+                self,
+                *,
+                method: str,
+                url: str,
+                headers: dict[str, str],
+                params: dict[str, str | int] | None,
+                data: dict[str, str] | None,
+                files: (dict[str, tuple[str, bytes, str]] | None),
+            ) -> TransportResponse:
+                """Return synthetic paginated pads JSON."""
+                del method, url, headers, params, data, files
+                payload: dict[str, object] = {
+                    "status": "OK",
+                    "pads": [],
+                    "total": 0,
+                    "next_page": "https://app.coderpad.io/api/pads?page=3",
+                    "prev_page": "https://app.coderpad.io/api/pads?page=1",
+                }
+                return TransportResponse(
+                    status_code=HTTPStatus.OK,
+                    headers={},
+                    content=json.dumps(obj=payload).encode(),
+                )
+
+        client = CoderPad(api_key="test-key", transport=_Transport())
+        result = client.pads.list()
+        assert result.prev_page == "https://app.coderpad.io/api/pads?page=1"
+        assert result.next_page == "https://app.coderpad.io/api/pads?page=3"
+        client.close()
+
+    @staticmethod
     def test_list_pads(
         coderpad_client: CoderPad,
     ) -> None:
