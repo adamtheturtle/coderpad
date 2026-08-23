@@ -161,6 +161,29 @@ class TestCoderPad:
         assert transport.limits is limits
         client.close()
 
+    @staticmethod
+    def test_screen_lazy_requires_api_key() -> None:
+        """Accessing screen without a Screen API key raises ValueError."""
+        client = CoderPad(api_key="test-key")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="screen_api_key",
+        ):
+            _ = client.screen
+        client.close()
+
+    @staticmethod
+    def test_screen_lazy_initialized_once() -> None:
+        """Screen namespace is created on first access and reused."""
+        client = CoderPad(
+            api_key="test-key",
+            screen_api_key="screen-key",
+        )
+        first = client.screen
+        second = client.screen
+        assert first is second
+        client.close()
+
 
 class TestHTTPXTransport:
     """Tests for ``HTTPXTransport``."""

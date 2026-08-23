@@ -159,6 +159,31 @@ class TestAsyncCoderPad:
         assert transport.limits is limits
         await client.aclose()
 
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_screen_lazy_requires_api_key() -> None:
+        """Accessing screen without a Screen API key raises ValueError."""
+        client = AsyncCoderPad(api_key="test-key")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="screen_api_key",
+        ):
+            _ = client.screen
+        await client.aclose()
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_screen_lazy_initialized_once() -> None:
+        """Screen namespace is created on first access and reused."""
+        client = AsyncCoderPad(
+            api_key="test-key",
+            screen_api_key="screen-key",
+        )
+        first = client.screen
+        second = client.screen
+        assert first is second
+        await client.aclose()
+
 
 class TestAsyncHTTPXTransport:
     """Tests for ``AsyncHTTPXTransport``."""

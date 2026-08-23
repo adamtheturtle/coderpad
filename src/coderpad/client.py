@@ -877,10 +877,8 @@ class CoderPad:
             limits: Optional connection pool limits for default transports.
         """
         self.base_url = base_url
+        self._limits = limits
         resolved_transport = transport or HTTPXTransport(limits=limits)
-        resolved_screen_transport = screen_transport or HTTPXTransport(
-            limits=limits,
-        )
         headers = {
             **(default_headers or {}),
             "Authorization": f'Token token="{api_key}"',
@@ -895,18 +893,17 @@ class CoderPad:
             base_url=base_url,
             headers=headers,
         )
-        self.screen: ScreenNamespace = ScreenNamespace(
-            transport=resolved_screen_transport,
-            api_key=screen_api_key or "",
-            base_url=screen_base_url,
-            default_headers=default_headers,
-        )
+        self._screen_api_key = screen_api_key
+        self._screen_base_url = screen_base_url
+        self._screen_transport = screen_transport
+        self._default_headers = default_headers
+        self._screen: ScreenNamespace | None = None
         if isinstance(resolved_transport, HTTPXTransport):
             self._close = resolved_transport.close
         else:
             self._close = lambda: None
-        if isinstance(resolved_screen_transport, HTTPXTransport):
-            self._screen_close = resolved_screen_transport.close
+        if isinstance(screen_transport, HTTPXTransport):
+            self._screen_close = screen_transport.close
         else:
             self._screen_close = lambda: None
         self.organization: OrganizationNamespace = OrganizationNamespace(
@@ -914,6 +911,34 @@ class CoderPad:
             base_url=base_url,
             headers=headers,
         )
+
+    @property
+    def screen(self) -> ScreenNamespace:
+        """Screen API namespace, created on first access.
+
+        Raises:
+            ValueError: If ``screen_api_key`` was not provided.
+        """
+        if self._screen is None:
+            if not self._screen_api_key:
+                msg = "screen_api_key is required to use the Screen API"
+                raise ValueError(msg)
+            resolved_screen_transport = (
+                self._screen_transport or HTTPXTransport(limits=self._limits)
+            )
+            if self._screen_transport is None and isinstance(
+                resolved_screen_transport,
+                HTTPXTransport,
+            ):
+                self._screen_close = resolved_screen_transport.close
+            self._screen_transport = resolved_screen_transport
+            self._screen = ScreenNamespace(
+                transport=resolved_screen_transport,
+                api_key=self._screen_api_key,
+                base_url=self._screen_base_url,
+                default_headers=self._default_headers,
+            )
+        return self._screen
 
     def close(self) -> None:
         """Close the underlying transport if it supports closing."""
