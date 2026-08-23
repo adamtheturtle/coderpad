@@ -3,6 +3,7 @@
 import builtins
 from collections.abc import Iterator
 from http import HTTPStatus
+from pathlib import Path
 
 from beartype import beartype
 
@@ -11,6 +12,7 @@ from coderpad.screen_types import (
     ScreenCampaign,
     ScreenInvitation,
     ScreenInvitationResult,
+    ScreenReport,
     ScreenTest,
     ScreenTestsPage,
     ScreenWebhook,
@@ -20,6 +22,16 @@ from coderpad.transports import JSONTransport, TransportResponse
 SCREEN_US_BASE_URL = "https://www.codingame.com"
 SCREEN_EU_BASE_URL = "https://www.codingame.eu"
 _SCREEN_PREFIX = "/assessment/api/v1.1"
+
+
+def save_screen_report(*, report_bytes: bytes, path: Path) -> None:
+    """Write Screen report bytes to a file.
+
+    Args:
+        report_bytes: PDF (or other) report content from ``tests.report``.
+        path: Destination file path.
+    """
+    path.write_bytes(data=report_bytes)
 
 
 @beartype
@@ -263,6 +275,39 @@ class ScreenTestsNamespace(_ScreenNamespace):
             params=params,
             json=None,
         ).content
+
+    def report_json(
+        self,
+        *,
+        test_id: int,
+        with_community_stats: bool = False,
+    ) -> ScreenReport:
+        """Return the typed JSON report embedded in a test session.
+
+        The Screen ``/tests/{id}/report`` endpoint serves PDF bytes.
+        Scored report fields are returned on ``GET /tests/{id}`` as
+        ``ScreenTest.report``; this helper fetches that payload and
+        returns the typed report.
+
+        Args:
+            test_id: The Screen test session id.
+            with_community_stats: Whether to include community
+                statistics on the report.
+
+        Returns:
+            The typed scored report.
+
+        Raises:
+            LookupError: If the test exists but has no report yet.
+        """
+        test = self.get(
+            test_id=test_id,
+            with_community_stats=with_community_stats,
+        )
+        if test.report is None:
+            message = f"Screen test {test_id} has no scored report"
+            raise LookupError(message)
+        return test.report
 
 
 @beartype
