@@ -299,6 +299,8 @@ ignore = [
     "newsfragments",
     "newsfragments/**",
     "prek.toml",
+    "scripts",
+    "scripts/**",
     "spelling_private_dict.txt",
     "tests",
     "tests/**",
