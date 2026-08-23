@@ -9,6 +9,9 @@ from typing import Self
 
 from beartype import beartype
 
+from coderpad._question_content import (
+    validate_mutually_exclusive_question_content,
+)
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL, ScreenNamespace
 from coderpad.transports import (
@@ -406,6 +409,11 @@ class QuestionsNamespace(_Namespace):
         Returns:
             The created question.
         """
+        validate_mutually_exclusive_question_content(
+            contents=contents,
+            file_contents=file_contents,
+            zip_file=zip_file,
+        )
         lang = language.value if isinstance(language, Language) else language
         data: dict[str, str] = {
             "question[title]": title,
@@ -515,6 +523,11 @@ class QuestionsNamespace(_Namespace):
                 files for a multi-file question. Cannot be
                 combined with ``file_contents``.
         """
+        validate_mutually_exclusive_question_content(
+            contents=contents,
+            file_contents=file_contents,
+            zip_file=zip_file,
+        )
         data: dict[str, str] = {}
         if title is not None:
             data["question[title]"] = title

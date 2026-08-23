@@ -826,6 +826,34 @@ class TestCreateQuestion:
             {"instructions": "Part 2", "default_visible": False},
         ]
 
+    @staticmethod
+    def test_create_question_rejects_multiple_content_sources(
+        coderpad_client: CoderPad,
+        tmp_path: Path,
+    ) -> None:
+        """Creating with multiple content sources raises ValueError."""
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+        with pytest.raises(
+            expected_exception=ValueError,
+            match="at most one of contents, file_contents, or zip_file",
+        ):
+            coderpad_client.questions.create(
+                title="Conflict",
+                language="python",
+                contents="print(1)",
+                file_contents=[
+                    QuestionFileContent(path="main.py", contents="x"),
+                ],
+            )
+        with pytest.raises(expected_exception=ValueError, match="zip_file"):
+            coderpad_client.questions.create(
+                title="Conflict",
+                language="python",
+                contents="print(1)",
+                zip_file=zip_path,
+            )
+
 
 class TestGetQuestion:
     """Tests for ``CoderPad.questions.get``."""
@@ -955,6 +983,21 @@ class TestUpdateQuestion:
         assert sent["question[ai_assist_custom_system_prompt]"] == [
             "Only provide hints.",
         ]
+
+    @staticmethod
+    def test_update_question_rejects_multiple_content_sources(
+        coderpad_client: CoderPad,
+        tmp_path: Path,
+    ) -> None:
+        """Updating with multiple content sources raises ValueError."""
+        zip_path = tmp_path / "project.zip"
+        zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+        with pytest.raises(expected_exception=ValueError, match="at most one"):
+            coderpad_client.questions.update(
+                question_id="1",
+                contents="print(1)",
+                zip_file=zip_path,
+            )
 
 
 class TestDeleteQuestion:
