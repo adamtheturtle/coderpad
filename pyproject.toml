@@ -510,3 +510,7 @@ whitelines = 1
 [tool.no_defaults]
 private_only = true
 per_file_enforcement."tests/**" = "all"
+
+[tool.mypy_strict_kwargs]
+# ``@beartype`` applies the decorator with one positional argument. That is the public decorator API; the plugin resolves the callable to this internal name.
+ignore_names = [ "beartype._decor.decorcache.beartype" ]
