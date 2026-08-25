@@ -24,5 +24,5 @@ jobs:
           pyproject_extras: dev
           python_version: '3.13'
           sphinx_build_options: -W
-          cache: true
+          cache: false
           publish: ${{ github.ref_name == 'main' }}
