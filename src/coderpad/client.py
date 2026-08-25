@@ -841,31 +841,6 @@ class OrganizationNamespace(_Namespace):
 
 
 @beartype
-class QuotaNamespace:
-    """Namespace for quota operations."""
-
-    def __init__(
-        self,
-        *,
-        organization: OrganizationNamespace,
-    ) -> None:
-        """Create a quota namespace.
-
-        Args:
-            organization: The organization namespace to delegate to.
-        """
-        self._organization = organization
-
-    def get(self) -> Quota:
-        """Retrieve quota information.
-
-        Returns:
-            The quota details.
-        """
-        return self._organization.get_quota()
-
-
-@beartype
 class CoderPad:
     """A client for the CoderPad Interview API."""
 
@@ -940,9 +915,6 @@ class CoderPad:
             transport=resolved_transport,
             base_url=base_url,
             headers=headers,
-        )
-        self.quota: QuotaNamespace = QuotaNamespace(
-            organization=self.organization,
         )
 
     @property

@@ -54,7 +54,3 @@ shape, the pull request should include:
   change;
 * an update to the empirically observed response fields list above; and
 * synthetic regression tests (see :doc:`contributing`).
-
-Report unfixed drift with the repository's **API drift report** issue
-template so samples and endpoint context are tracked before the client
-change lands.

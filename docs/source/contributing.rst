@@ -81,10 +81,6 @@ new empirically observed variant, update all of the following:
 #. Add or extend **synthetic** fixtures and tests so the variant is
    covered without storing account-specific payloads in the repository.
 
-If you discover drift but are not ready to land a fix, file an
-`API drift report <https://github.com/adamtheturtle/coderpad/issues/new?template=api-drift.yml>`__
-with redacted request or response samples.
-
 Continuous integration
 ----------------------
 
