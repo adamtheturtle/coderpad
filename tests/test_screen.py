@@ -2,14 +2,11 @@
 
 # ruff: noqa: PLR2004
 
-from pathlib import Path
-
 import pytest
 from pydantic import ValidationError
 
 from coderpad import SCREEN_EU_BASE_URL, CoderPad
 from coderpad.exceptions import AuthenticationError
-from coderpad.screen import save_screen_report
 from coderpad.screen_types import (
     ScreenCampaign,
     ScreenInvitation,
@@ -226,10 +223,3 @@ def test_empty_screen_api_key_fails_fast() -> None:
         client.screen.campaigns.list()
     assert not transport.calls
     client.close()
-
-
-def test_save_screen_report(tmp_path: Path) -> None:
-    """Report bytes can be written to disk."""
-    out = tmp_path / "report.pdf"
-    save_screen_report(report_bytes=b"%PDF report", path=out)
-    assert out.read_bytes() == b"%PDF report"

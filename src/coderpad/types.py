@@ -2,7 +2,6 @@
 
 import enum
 from collections.abc import Iterable
-from pathlib import Path
 from typing import ClassVar, Self, TypeVar
 
 from beartype import beartype
@@ -468,23 +467,6 @@ class PadHistory(list[PadHistoryEntry]):
         for entry in self:
             contents = entry.apply(contents=contents)
         return contents
-
-    def replay_to_file(
-        self,
-        *,
-        path: Path,
-        initial_contents: str = "",
-    ) -> None:
-        """Replay all operations and write the result to a file.
-
-        Args:
-            path: Destination file path.
-            initial_contents: Contents before the first operation.
-        """
-        path.write_text(
-            data=self.replay(initial_contents=initial_contents),
-            encoding="utf-8",
-        )
 
 
 @beartype
