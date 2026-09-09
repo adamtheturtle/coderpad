@@ -91,12 +91,8 @@ def test_apply_postman_corrections_replaces_non_object_item_path() -> None:
 
 def test_apply_postman_corrections_removes_duplicate_put() -> None:
     """A duplicate collection PUT is dropped when the item already has one."""
-    collection_path: dict[str, JsonValue] = {
-        "put": {"summary": "duplicate"}
-    }
-    item_path: dict[str, JsonValue] = {
-        "put": {"summary": "canonical"}
-    }
+    collection_path: dict[str, JsonValue] = {"put": {"summary": "duplicate"}}
+    item_path: dict[str, JsonValue] = {"put": {"summary": "canonical"}}
     paths: dict[str, JsonValue] = {
         "/api/pads/": collection_path,
         "/api/pads/{id}": item_path,
