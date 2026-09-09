@@ -6,20 +6,27 @@ from typing import TypeGuard
 from beartype import beartype
 from beartype.door import TypeHint
 
+type _JSONValue = (
+    bool | int | float | str | list[_JSONValue] | dict[str, _JSONValue] | None
+)
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Page:
     """A decoded page of API objects and its pagination metadata."""
 
-    items: list[dict[str, object]]
+    items: list[dict[str, _JSONValue]]
     total: int
     next_page: str | None
     prev_page: str | None
 
 
-def _is_objects(value: object, /) -> TypeGuard[list[dict[str, object]]]:
+def _is_objects(
+    value: object,
+    /,
+) -> TypeGuard[list[dict[str, _JSONValue]]]:
     """Return whether a value is a list of string-keyed objects."""
-    return TypeHint(hint=list[dict[str, object]]).is_bearable(obj=value)
+    return TypeHint(hint=list[dict[str, _JSONValue]]).is_bearable(obj=value)
 
 
 def _optional_string(value: object, /) -> str | None:
@@ -31,14 +38,17 @@ def _optional_string(value: object, /) -> str | None:
 
 
 @beartype
-def object_response(value: dict[str, object], /) -> dict[str, object]:
+def object_response(
+    value: dict[str, _JSONValue],
+    /,
+) -> dict[str, _JSONValue]:
     """Return a runtime-validated API response object."""
     return value
 
 
 @beartype
 def page_response(
-    value: dict[str, object],
+    value: dict[str, _JSONValue],
     /,
     *,
     item_key: str,
@@ -60,7 +70,7 @@ def page_response(
     )
 
 
-def object_list(value: object, /) -> list[dict[str, object]]:
+def object_list(value: object, /) -> list[dict[str, _JSONValue]]:
     """Return a runtime-validated list of API response objects."""
     if not _is_objects(value):
         message = "Expected a list of objects."
