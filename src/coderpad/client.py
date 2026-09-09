@@ -137,7 +137,7 @@ class PadsNamespace(_Namespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="pads")
+        page_data = page_response(value=response.json(), item_key="pads")
         return PaginatedList(
             [Pad.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -300,7 +300,7 @@ class PadsNamespace(_Namespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="events")
+        page_data = page_response(value=response.json(), item_key="events")
         return PaginatedList(
             [PadEvent.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -393,7 +393,7 @@ class QuestionsNamespace(_Namespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="questions")
+        page_data = page_response(value=response.json(), item_key="questions")
         return PaginatedList(
             [Question.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -659,7 +659,7 @@ class OrganizationPadsNamespace(_Namespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="pads")
+        page_data = page_response(value=response.json(), item_key="pads")
         return PaginatedList(
             [Pad.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -699,7 +699,7 @@ class OrganizationQuestionsNamespace(_Namespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="questions")
+        page_data = page_response(value=response.json(), item_key="questions")
         return PaginatedList(
             [Question.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -735,10 +735,10 @@ class OrganizationUsersNamespace(_Namespace):
             data=None,
             files=None,
         )
-        data = object_response(response.json())
+        data = object_response(value=response.json())
         return [
             OrganizationUser.model_validate(obj=item)
-            for item in object_list(data["users"])
+            for item in object_list(value=data["users"])
         ]
 
 

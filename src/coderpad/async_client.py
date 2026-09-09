@@ -138,7 +138,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="pads")
+        page_data = page_response(value=response.json(), item_key="pads")
         return PaginatedList(
             [Pad.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -303,7 +303,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="events")
+        page_data = page_response(value=response.json(), item_key="events")
         return PaginatedList(
             [PadEvent.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -397,7 +397,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="questions")
+        page_data = page_response(value=response.json(), item_key="questions")
         return PaginatedList(
             [Question.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -664,7 +664,7 @@ class AsyncOrganizationPadsNamespace(_AsyncNamespace):
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="pads")
+        page_data = page_response(value=response.json(), item_key="pads")
         return PaginatedList(
             [Pad.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -709,7 +709,7 @@ class AsyncOrganizationQuestionsNamespace(
             data=None,
             files=None,
         )
-        page_data = page_response(response.json(), item_key="questions")
+        page_data = page_response(value=response.json(), item_key="questions")
         return PaginatedList(
             [Question.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
@@ -745,10 +745,10 @@ class AsyncOrganizationUsersNamespace(_AsyncNamespace):
             data=None,
             files=None,
         )
-        data = object_response(response.json())
+        data = object_response(value=response.json())
         return [
             OrganizationUser.model_validate(obj=item)
-            for item in object_list(data["users"])
+            for item in object_list(value=data["users"])
         ]
 
 

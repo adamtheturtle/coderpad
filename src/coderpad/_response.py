@@ -29,7 +29,7 @@ def _is_objects(
     return TypeHint(hint=list[dict[str, _JSONValue]]).is_bearable(obj=value)
 
 
-def _optional_string(value: object, /) -> str | None:
+def _optional_string(value: object) -> str | None:
     """Return an optional string response value."""
     if value is None or isinstance(value, str):
         return value
@@ -40,7 +40,6 @@ def _optional_string(value: object, /) -> str | None:
 @beartype
 def object_response(
     value: dict[str, _JSONValue],
-    /,
 ) -> dict[str, _JSONValue]:
     """Return a runtime-validated API response object."""
     return value
@@ -49,7 +48,6 @@ def object_response(
 @beartype
 def page_response(
     value: dict[str, _JSONValue],
-    /,
     *,
     item_key: str,
 ) -> Page:
@@ -65,12 +63,12 @@ def page_response(
     return Page(
         items=items,
         total=total,
-        next_page=_optional_string(value.get("next_page")),
-        prev_page=_optional_string(value.get("prev_page")),
+        next_page=_optional_string(value=value.get("next_page")),
+        prev_page=_optional_string(value=value.get("prev_page")),
     )
 
 
-def object_list(value: object, /) -> list[dict[str, _JSONValue]]:
+def object_list(value: object) -> list[dict[str, _JSONValue]]:
     """Return a runtime-validated list of API response objects."""
     if not _is_objects(value):
         message = "Expected a list of objects."
