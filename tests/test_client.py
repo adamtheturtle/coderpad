@@ -10,6 +10,7 @@ import httpx
 import httpx2
 import pytest
 import respx
+from pydantic import ValidationError
 
 from coderpad.client import CoderPad
 from coderpad.exceptions import (
@@ -38,6 +39,13 @@ from coderpad.types import (
     QuestionFileContent,
     SortOrder,
 )
+
+_INVALID_PAD_RESPONSES: list[tuple[dict[str, object], type[Exception]]] = [
+    ({"pads": "invalid", "total": 0}, TypeError),
+    ({"pads": [], "total": "invalid"}, TypeError),
+    ({"pads": [], "total": 0, "next_page": 1}, TypeError),
+    ({"pads": [{}], "total": 1}, ValidationError),
+]
 
 
 class TestCoderPad:
@@ -744,6 +752,39 @@ class TestListPads:
         result = client.pads.list()
         assert result.prev_page == "https://app.coderpad.io/api/pads?page=1"
         assert result.next_page == "https://app.coderpad.io/api/pads?page=3"
+        client.close()
+
+    @staticmethod
+    @pytest.mark.parametrize(
+        argnames=("payload", "expected_exception"),
+        argvalues=_INVALID_PAD_RESPONSES,
+    )
+    def test_list_pads_rejects_invalid_responses(
+        payload: dict[str, object],
+        expected_exception: type[Exception],
+    ) -> None:
+        """Pads.list rejects malformed API response values."""
+
+        def _transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None,
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
+        ) -> TransportResponse:
+            """Return a malformed pads response."""
+            del method, url, headers, params, data, files
+            return TransportResponse(
+                status_code=HTTPStatus.OK,
+                headers={},
+                content=json.dumps(obj=payload).encode(),
+            )
+
+        client = CoderPad(api_key="test-key", transport=_transport)
+        with pytest.raises(expected_exception=expected_exception):
+            _ = client.pads.list()
         client.close()
 
     @staticmethod
@@ -1545,6 +1586,32 @@ class TestListOrganizationUsers:
 
         client = CoderPad(api_key="test-key", transport=_empty_transport)
         assert client.organization.users.list() == []
+
+    @staticmethod
+    def test_list_organization_users_rejects_invalid_response() -> None:
+        """Organization users must be returned as a list of objects."""
+
+        def _invalid_transport(
+            *,
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            params: dict[str, str | int] | None,
+            data: dict[str, str] | None,
+            files: (dict[str, tuple[str, bytes, str]] | None),
+        ) -> TransportResponse:
+            """Return a malformed successful user response."""
+            del method, url, headers, params, data, files
+            return TransportResponse(
+                status_code=HTTPStatus.OK,
+                headers={},
+                content=b'{"status": "OK", "users": "invalid"}',
+            )
+
+        client = CoderPad(api_key="test-key", transport=_invalid_transport)
+        with pytest.raises(expected_exception=TypeError):
+            _ = client.organization.users.list()
+        client.close()
 
     @staticmethod
     def test_list_organization_users_maps_http_errors() -> None:
