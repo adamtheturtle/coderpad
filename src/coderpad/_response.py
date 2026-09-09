@@ -6,8 +6,6 @@ from typing import TypeGuard
 from beartype import beartype
 from beartype.door import TypeHint
 
-from coderpad._dict_types import PadDict
-
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Page:
@@ -22,11 +20,6 @@ class Page:
 def _is_objects(value: object, /) -> TypeGuard[list[dict[str, object]]]:
     """Return whether a value is a list of string-keyed objects."""
     return TypeHint(hint=list[dict[str, object]]).is_bearable(obj=value)
-
-
-def _is_pad(value: object, /) -> TypeGuard[PadDict]:
-    """Return whether a value has the shape of a pad response."""
-    return TypeHint(hint=PadDict).is_bearable(obj=value)
 
 
 def _optional_string(value: object, /) -> str | None:
@@ -71,13 +64,5 @@ def object_list(value: object, /) -> list[dict[str, object]]:
     """Return a runtime-validated list of API response objects."""
     if not _is_objects(value):
         message = "Expected a list of objects."
-        raise TypeError(message)
-    return value
-
-
-def pad_response(value: object, /) -> PadDict:
-    """Return a runtime-validated pad response."""
-    if not _is_pad(value):
-        message = "Expected a pad response object."
         raise TypeError(message)
     return value

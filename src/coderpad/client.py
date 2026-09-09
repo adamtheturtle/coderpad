@@ -17,7 +17,6 @@ from coderpad._question_content import (
 from coderpad._response import (
     object_list,
     object_response,
-    pad_response,
     page_response,
 )
 from coderpad.exceptions import CoderPadError
@@ -140,10 +139,7 @@ class PadsNamespace(_Namespace):
         )
         page_data = page_response(response.json(), item_key="pads")
         return PaginatedList(
-            [
-                Pad.from_dict(data=pad_response(item))
-                for item in page_data.items
-            ],
+            [Pad.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
             next_page=page_data.next_page,
             prev_page=page_data.prev_page,
@@ -665,10 +661,7 @@ class OrganizationPadsNamespace(_Namespace):
         )
         page_data = page_response(response.json(), item_key="pads")
         return PaginatedList(
-            [
-                Pad.from_dict(data=pad_response(item))
-                for item in page_data.items
-            ],
+            [Pad.model_validate(obj=item) for item in page_data.items],
             total=page_data.total,
             next_page=page_data.next_page,
             prev_page=page_data.prev_page,
