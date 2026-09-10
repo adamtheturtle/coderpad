@@ -31,6 +31,10 @@ API Reference
    :members:
    :exclude-members: __init__, model_config
 
+.. automodule:: coderpad.json_types
+   :undoc-members:
+   :members:
+
 .. automodule:: coderpad.exceptions
    :undoc-members:
    :members:
