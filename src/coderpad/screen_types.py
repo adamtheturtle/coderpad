@@ -1,9 +1,8 @@
 """Types for the CoderPad Screen API."""
 
-from typing import ClassVar, Self, TypeGuard, override
+from typing import ClassVar, Self, override
 
 from beartype import beartype
-from beartype.door import TypeHint
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from coderpad.json_types import JsonValue
@@ -19,34 +18,21 @@ class _APIModel(BaseModel):
     )
 
 
-def _is_json_list(value: object, /) -> TypeGuard[list[JsonValue]]:
-    """Return whether an API value is a list."""
-    return TypeHint(hint=list[JsonValue]).is_bearable(obj=value)
-
-
-def _is_json_mapping(
-    value: object,
-    /,
-) -> TypeGuard[dict[str, JsonValue]]:
-    """Return whether an API value is a mapping."""
-    return TypeHint(hint=dict[str, JsonValue]).is_bearable(obj=value)
-
-
-def _json_values(value: object, /) -> list[JsonValue]:
+def _json_values(value: JsonValue) -> list[JsonValue]:
     """Return a JSON list from an API value."""
-    return value if _is_json_list(value) else []
+    return value if isinstance(value, list) else []
 
 
-def _mapping(value: object, /) -> dict[str, JsonValue] | None:
+def _mapping(value: JsonValue) -> dict[str, JsonValue] | None:
     """Return a string-keyed mapping from an API value."""
-    if not _is_json_mapping(value):
-        return None
-    return value
+    return value if isinstance(value, dict) else None
 
 
-def _strings(value: object, /) -> list[str]:
+def _strings(value: JsonValue) -> list[str]:
     """Return a string list from an API value."""
-    return [item for item in _json_values(value) if isinstance(item, str)]
+    return [
+        item for item in _json_values(value=value) if isinstance(item, str)
+    ]
 
 
 def _empty_strings() -> list[str]:
@@ -54,7 +40,7 @@ def _empty_strings() -> list[str]:
     return []
 
 
-def _optional_int(value: object, /) -> int | None:
+def _optional_int(value: JsonValue) -> int | None:
     """Return an integer API value when present."""
     return (
         value
@@ -63,7 +49,7 @@ def _optional_int(value: object, /) -> int | None:
     )
 
 
-def _required_int(value: object, /) -> int:
+def _required_int(value: JsonValue) -> int:
     """Return a required integer API value."""
     if isinstance(value, int) and not isinstance(value, bool):
         return value
@@ -71,7 +57,7 @@ def _required_int(value: object, /) -> int:
     raise TypeError(msg)
 
 
-def _optional_float(value: object, /) -> float | None:
+def _optional_float(value: JsonValue) -> float | None:
     """Return a numeric API value when present."""
     return (
         float(value)
@@ -80,7 +66,7 @@ def _optional_float(value: object, /) -> float | None:
     )
 
 
-def _optional_str(value: object, /) -> str | None:
+def _optional_str(value: JsonValue) -> str | None:
     """Return a string API value when present."""
     return value if isinstance(value, str) else None
 
@@ -96,21 +82,21 @@ class ScreenCampaign(_APIModel):
     archived: bool = False
 
     @classmethod
-    def list_from_value(cls, value: object) -> list[Self]:
+    def list_from_value(cls, value: JsonValue) -> list[Self]:
         """Create campaigns from an API response value."""
         return [
             cls.from_dict(data=mapping)
-            for item in _json_values(value)
-            if (mapping := _mapping(item)) is not None
+            for item in _json_values(value=value)
+            if (mapping := _mapping(value=item)) is not None
         ]
 
     @classmethod
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create a campaign from an API response."""
         return cls(
-            id=_required_int(data["id"]),
+            id=_required_int(value=data["id"]),
             name=f"{data['name']}",
-            languages=_strings(data.get("languages")),
+            languages=_strings(value=data.get("languages")),
             pinned=data.get("pinned") is True,
             archived=data.get("archived") is True,
         )
@@ -154,8 +140,8 @@ class ScreenInvitationResult(_APIModel):
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create an invitation result from an API response."""
         return cls(
-            id=_optional_int(data.get("id")),
-            test_url=_optional_str(data.get("test_url")),
+            id=_optional_int(value=data.get("id")),
+            test_url=_optional_str(value=data.get("test_url")),
         )
 
 
@@ -170,8 +156,10 @@ class ScreenTestQuestion(_APIModel):
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create a question from an API response."""
         return cls(
-            id=_required_int(data["id"]),
-            last_activity_time=_optional_int(data.get("last_activity_time")),
+            id=_required_int(value=data["id"]),
+            last_activity_time=_optional_int(
+                value=data.get("last_activity_time")
+            ),
         )
 
 
@@ -187,9 +175,9 @@ class ScreenSkillResult(_APIModel):
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create a skill result from an API response."""
         return cls(
-            points=_optional_int(data.get("points")),
-            score=_optional_float(data.get("score")),
-            total_points=_optional_int(data.get("total_points")),
+            points=_optional_int(value=data.get("points")),
+            score=_optional_float(value=data.get("score")),
+            total_points=_optional_int(value=data.get("total_points")),
         )
 
 
@@ -206,22 +194,24 @@ class ScreenTechnologyResult(_APIModel):
     @classmethod
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create a technology result from an API response."""
-        typed_skills = _mapping(data.get("skills"))
+        typed_skills = _mapping(value=data.get("skills"))
         skills = (
             {
                 name: ScreenSkillResult.from_dict(data=mapped)
                 for name, raw_value in typed_skills.items()
-                if (mapped := _mapping(raw_value)) is not None
+                if (mapped := _mapping(value=raw_value)) is not None
             }
             if typed_skills is not None
             else {}
         )
         return cls(
-            points=_optional_int(data.get("points")),
-            score=_optional_float(data.get("score")),
+            points=_optional_int(value=data.get("points")),
+            score=_optional_float(value=data.get("score")),
             skills=skills,
-            total_points=_optional_int(data.get("total_points")),
-            comparative_score=_optional_float(data.get("comparative_score")),
+            total_points=_optional_int(value=data.get("total_points")),
+            comparative_score=_optional_float(
+                value=data.get("comparative_score")
+            ),
         )
 
 
@@ -242,18 +232,18 @@ class ScreenReport(_APIModel):
     @classmethod
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create a report from an API response."""
-        typed_technologies = _mapping(data.get("technologies"))
+        typed_technologies = _mapping(value=data.get("technologies"))
         technologies = (
             {
                 name: ScreenTechnologyResult.from_dict(data=mapped)
                 for name, raw_value in typed_technologies.items()
-                if (mapped := _mapping(raw_value)) is not None
+                if (mapped := _mapping(value=raw_value)) is not None
             }
             if typed_technologies is not None
             else {}
         )
         raw_community_stats: JsonValue = data.get("community_stats")
-        community_items = _json_values(raw_community_stats)
+        community_items = _json_values(value=raw_community_stats)
         community_stats = (
             [
                 item
@@ -264,14 +254,16 @@ class ScreenReport(_APIModel):
             else None
         )
         return cls(
-            duration=_optional_int(data.get("duration")),
-            warnings=_strings(data.get("warnings")),
-            points=_optional_int(data.get("points")),
-            score=_optional_float(data.get("score")),
+            duration=_optional_int(value=data.get("duration")),
+            warnings=_strings(value=data.get("warnings")),
+            points=_optional_int(value=data.get("points")),
+            score=_optional_float(value=data.get("score")),
             technologies=technologies,
-            total_duration=_optional_int(data.get("total_duration")),
-            total_points=_optional_int(data.get("total_points")),
-            comparative_score=_optional_float(data.get("comparative_score")),
+            total_duration=_optional_int(value=data.get("total_duration")),
+            total_points=_optional_int(value=data.get("total_points")),
+            comparative_score=_optional_float(
+                value=data.get("comparative_score")
+            ),
             community_stats=community_stats,
         )
 
@@ -298,29 +290,31 @@ class ScreenTest(_APIModel):
     @classmethod
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create a test session from an API response."""
-        raw_report = _mapping(data.get("report"))
-        typed_questions = _json_values(data.get("questions"))
-        status = _optional_str(data.get("status"))
+        raw_report = _mapping(value=data.get("report"))
+        typed_questions = _json_values(value=data.get("questions"))
+        status = _optional_str(value=data.get("status"))
         return cls(
-            id=_required_int(data["id"]),
+            id=_required_int(value=data["id"]),
             status=status if status is not None else "unknown",
-            campaign_id=_optional_int(data.get("campaign_id")),
-            candidate_name=_optional_str(data.get("candidate_name")),
-            candidate_email=_optional_str(data.get("candidate_email")),
-            tags=_strings(data.get("tags")),
-            send_time=_optional_int(data.get("send_time")),
-            start_time=_optional_int(data.get("start_time")),
-            end_time=_optional_int(data.get("end_time")),
-            last_activity_time=_optional_int(data.get("last_activity_time")),
-            url=_optional_str(data.get("url")),
-            test_url=_optional_str(data.get("test_url")),
+            campaign_id=_optional_int(value=data.get("campaign_id")),
+            candidate_name=_optional_str(value=data.get("candidate_name")),
+            candidate_email=_optional_str(value=data.get("candidate_email")),
+            tags=_strings(value=data.get("tags")),
+            send_time=_optional_int(value=data.get("send_time")),
+            start_time=_optional_int(value=data.get("start_time")),
+            end_time=_optional_int(value=data.get("end_time")),
+            last_activity_time=_optional_int(
+                value=data.get("last_activity_time")
+            ),
+            url=_optional_str(value=data.get("url")),
+            test_url=_optional_str(value=data.get("test_url")),
             report=ScreenReport.from_dict(data=raw_report)
             if raw_report is not None
             else None,
             questions=[
                 ScreenTestQuestion.from_dict(data=mapping)
                 for item in typed_questions
-                if (mapping := _mapping(item)) is not None
+                if (mapping := _mapping(value=item)) is not None
             ],
         )
 
@@ -339,11 +333,11 @@ class ScreenPagination(_APIModel):
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create pagination metadata from an API response."""
         return cls(
-            start=_optional_int(data.get("start")),
-            limit=_optional_int(data.get("limit")),
-            total=_optional_int(data.get("total")),
+            start=_optional_int(value=data.get("start")),
+            limit=_optional_int(value=data.get("limit")),
+            total=_optional_int(value=data.get("total")),
             has_more_items=data.get("has_more_items") is True,
-            next_start=_optional_int(data.get("next_start")),
+            next_start=_optional_int(value=data.get("next_start")),
         )
 
 
@@ -357,13 +351,13 @@ class ScreenTestsPage(_APIModel):
     @classmethod
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create a tests page from an API response."""
-        typed_tests = _json_values(data.get("tests"))
-        raw_pagination = _mapping(data.get("pagination"))
+        typed_tests = _json_values(value=data.get("tests"))
+        raw_pagination = _mapping(value=data.get("pagination"))
         return cls(
             tests=[
                 ScreenTest.from_dict(data=mapping)
                 for item in typed_tests
-                if (mapping := _mapping(item)) is not None
+                if (mapping := _mapping(value=item)) is not None
             ],
             pagination=ScreenPagination.from_dict(data=raw_pagination)
             if raw_pagination is not None
@@ -388,4 +382,4 @@ class ScreenWebhook(_APIModel):
     @classmethod
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create webhook configuration from an API response."""
-        return cls(url=_optional_str(data.get("url")))
+        return cls(url=_optional_str(value=data.get("url")))
