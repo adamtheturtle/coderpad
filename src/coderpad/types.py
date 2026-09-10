@@ -29,6 +29,7 @@ from coderpad._dict_types import (
     TeamDict,
     TestCaseDict,
 )
+from coderpad.json_types import JsonValue
 
 _T = TypeVar("_T")
 
@@ -982,7 +983,7 @@ class Quota(_APIModel):
         )
 
 
-def _empty_child_organizations() -> list[dict[str, object]]:
+def _empty_child_organizations() -> list[dict[str, JsonValue]]:
     """Return an empty list for a response structure not yet typed."""
     return []
 
@@ -1004,7 +1005,7 @@ class Organization(_APIModel):
     teams: list[Team]
     single_sign_in_url: str | None = None
     id: int | None = None
-    child_organizations: list[dict[str, object]] = Field(
+    child_organizations: list[dict[str, JsonValue]] = Field(
         default_factory=_empty_child_organizations,
     )
 

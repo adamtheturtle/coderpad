@@ -2,6 +2,8 @@
 
 from typing import NotRequired, TypedDict
 
+from coderpad.json_types import JsonValue
+
 
 class TeamDict(TypedDict):
     """A team within an organization."""
@@ -229,7 +231,7 @@ class OrganizationDict(TypedDict):
     single_sign_in_url: NotRequired[str]
     teams: list[TeamDict]
     id: NotRequired[int]
-    child_organizations: NotRequired[list[dict[str, object]]]
+    child_organizations: NotRequired[list[dict[str, JsonValue]]]
 
 
 class OrganizationStatsDict(TypedDict):
