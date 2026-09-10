@@ -6,7 +6,9 @@ from beartype import beartype
 from beartype.door import TypeHint
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from coderpad._json_types import JsonValue
+type JsonValue = (
+    bool | int | float | str | list[JsonValue] | dict[str, JsonValue] | None
+)
 
 
 class _APIModel(BaseModel):
