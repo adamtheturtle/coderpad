@@ -6,6 +6,7 @@ from http import HTTPStatus
 
 from beartype import beartype
 
+from coderpad._screen_response import json_object, json_value
 from coderpad.exceptions import CoderPadError
 from coderpad.screen_types import (
     ScreenCampaign,
@@ -82,8 +83,9 @@ class ScreenCampaignsNamespace(_ScreenNamespace):
         response = self._request(
             method="GET", path="/campaigns", params=None, json=None
         )
-        raw_campaigns: object = response.json()
-        return ScreenCampaign.list_from_value(value=raw_campaigns)
+        return ScreenCampaign.list_from_value(
+            value=json_value(value=response.json())
+        )
 
     def send_invitation(
         self,
@@ -98,7 +100,9 @@ class ScreenCampaignsNamespace(_ScreenNamespace):
             json=invitation.model_dump(exclude_none=True),
             params=None,
         )
-        return ScreenInvitationResult.from_dict(data=response.json())
+        return ScreenInvitationResult.from_dict(
+            data=json_object(value=response.json())
+        )
 
 
 @beartype
@@ -143,7 +147,9 @@ class ScreenTestsNamespace(_ScreenNamespace):
         response = self._request(
             method="GET", path="/tests", params=params, json=None
         )
-        return ScreenTestsPage.from_dict(data=response.json())
+        return ScreenTestsPage.from_dict(
+            data=json_object(value=response.json())
+        )
 
     def all(
         self,
@@ -214,7 +220,7 @@ class ScreenTestsNamespace(_ScreenNamespace):
             params=params,
             json=None,
         )
-        return ScreenTest.from_dict(data=response.json())
+        return ScreenTest.from_dict(data=json_object(value=response.json()))
 
     def cancel(self, *, test_id: int) -> None:
         """Cancel a test invitation."""
@@ -312,7 +318,7 @@ class ScreenWebhookNamespace(_ScreenNamespace):
         response = self._request(
             method="GET", path="/webhook", params=None, json=None
         )
-        return ScreenWebhook.from_dict(data=response.json())
+        return ScreenWebhook.from_dict(data=json_object(value=response.json()))
 
     def set(self, *, url: str) -> None:
         """Set or replace the webhook URL."""

@@ -168,7 +168,7 @@ def test_report_json_raises_when_no_report() -> None:
     """Report_json raises LookupError when the test has no scored
     report.
     """
-    transport = ScreenTransportStub(error=False)
+    transport = ScreenTransportStub(error=False, non_object_response=False)
     screen = _client(transport, base_url=SCREEN_EU_BASE_URL).screen
     with pytest.raises(
         expected_exception=LookupError,
@@ -181,13 +181,14 @@ def test_screen_errors_use_existing_hierarchy() -> None:
     """Screen HTTP failures map to the shared exception hierarchy."""
     with pytest.raises(expected_exception=AuthenticationError):
         _ = _client(
-            ScreenTransportStub(error=True), base_url=SCREEN_EU_BASE_URL
+            ScreenTransportStub(error=True, non_object_response=False),
+            base_url=SCREEN_EU_BASE_URL,
         ).screen.campaigns.list()
 
 
 def test_tests_all_iterates_pages() -> None:
     """Tests.all() yields tests across pagination.next_start pages."""
-    transport = ScreenTransportStub(error=False)
+    transport = ScreenTransportStub(error=False, non_object_response=False)
     client = _client(transport, base_url=SCREEN_EU_BASE_URL)
     names = [test.candidate_name for test in client.screen.tests.all(limit=1)]
     assert names == ["Ada", "Grace"]
@@ -211,7 +212,7 @@ def test_invitation_requires_email_and_name() -> None:
 
 def test_empty_screen_api_key_fails_fast() -> None:
     """Screen requests fail before transport when api_key is empty."""
-    transport = ScreenTransportStub(error=False)
+    transport = ScreenTransportStub(error=False, non_object_response=False)
     client = CoderPad(
         api_key="interview-key",
         screen_api_key="",
@@ -225,3 +226,11 @@ def test_empty_screen_api_key_fails_fast() -> None:
         _ = client.screen.campaigns.list()
     assert not bool(transport.calls)
     client.close()
+
+
+def test_object_response_is_required() -> None:
+    """Screen object endpoints reject non-object JSON responses."""
+    transport = ScreenTransportStub(error=False, non_object_response=True)
+    screen = _client(transport, base_url=SCREEN_EU_BASE_URL).screen
+    with pytest.raises(expected_exception=TypeError):
+        _ = screen.webhook.get()

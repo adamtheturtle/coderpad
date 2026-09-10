@@ -199,10 +199,11 @@ _TEST = {
 class ScreenTransportStub:
     """Record requests and return representative Screen responses."""
 
-    def __init__(self, *, error: bool) -> None:
+    def __init__(self, *, error: bool, non_object_response: bool) -> None:
         """Create a recording transport."""
         self.calls: list[dict[str, object]] = []
         self.error = error
+        self.non_object_response = non_object_response
 
     def __call__(  # noqa: C901, PLR0911
         self,
@@ -231,6 +232,8 @@ class ScreenTransportStub:
                 {"code": "Unauthorized", "message": "Invalid API key"},
                 status=HTTPStatus.UNAUTHORIZED,
             )
+        if self.non_object_response:
+            return _response([], status=HTTPStatus.OK)
         if url.endswith("/campaigns"):
             return _response(
                 [
@@ -320,4 +323,4 @@ def _response(
 @pytest.fixture(name="screen_transport_stub")
 def fixture_screen_transport_stub() -> ScreenTransportStub:
     """Provide a Screen transport stub that records requests."""
-    return ScreenTransportStub(error=False)
+    return ScreenTransportStub(error=False, non_object_response=False)
