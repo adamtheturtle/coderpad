@@ -6,7 +6,7 @@ from typing import TypeGuard
 from beartype import beartype
 from beartype.door import TypeHint
 
-from coderpad._json_types import JsonValue
+from coderpad.json_types import JsonValue
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)

@@ -10,7 +10,7 @@ from typing import TypeGuard
 
 from beartype.door import TypeHint
 
-from coderpad._json_types import JsonValue
+from coderpad.json_types import JsonValue
 
 _PADS_COLLECTION_PATH = "/api/pads/"
 _PADS_ITEM_PATH = "/api/pads/{id}"
