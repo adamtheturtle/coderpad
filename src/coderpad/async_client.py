@@ -6,6 +6,7 @@ import os
 from collections.abc import AsyncIterator, Sequence
 from http import HTTPStatus
 from pathlib import Path
+from types import TracebackType
 from typing import Self
 
 import httpx
@@ -1024,7 +1025,7 @@ class AsyncCoderPad:
         self,
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
-        _exc_tb: object,
+        _exc_tb: TracebackType | None,
         /,
     ) -> None:
         """Exit the async context manager and close."""
