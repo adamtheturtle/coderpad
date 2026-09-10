@@ -11,7 +11,7 @@ import pytest
 from coderpad._openapi_sync import apply_postman_corrections, run_sync
 
 if TYPE_CHECKING:
-    from coderpad._json_types import JsonValue
+    from coderpad.json_types import JsonValue
 
 
 def test_apply_postman_corrections_moves_put() -> None:
