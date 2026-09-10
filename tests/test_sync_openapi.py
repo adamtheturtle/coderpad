@@ -105,10 +105,9 @@ def test_apply_postman_corrections_removes_duplicate_put() -> None:
     assert item_path == {"put": {"summary": "canonical"}}
 
 
-def test_main_writes_normalized_spec(tmp_path: object) -> None:
+def test_main_writes_normalized_spec(tmp_path: Path) -> None:
     """The sync entry point writes a corrected OpenAPI document."""
-    assert isinstance(tmp_path, Path)
-    source = tmp_path / "export.json"
+    source = Path(tmp_path, "export.json")
     target = tmp_path / "openapi.json"
     _ = source.write_text(
         data=json.dumps(
@@ -132,12 +131,11 @@ def test_main_writes_normalized_spec(tmp_path: object) -> None:
 
 
 def test_main_reports_when_no_corrections_needed(
-    tmp_path: object,
+    tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """The sync entry point reports when no path corrections apply."""
-    assert isinstance(tmp_path, Path)
-    source = tmp_path / "export.json"
+    source = Path(tmp_path, "export.json")
     target = tmp_path / "openapi.json"
     _ = source.write_text(
         data=json.dumps(
@@ -160,10 +158,9 @@ def test_main_reports_when_no_corrections_needed(
     assert "No Postman path corrections needed." in captured.err
 
 
-def test_main_rejects_non_object_root(tmp_path: object) -> None:
+def test_main_rejects_non_object_root(tmp_path: Path) -> None:
     """A non-object OpenAPI root fails fast."""
-    assert isinstance(tmp_path, Path)
-    source = tmp_path / "export.json"
+    source = Path(tmp_path, "export.json")
     _ = source.write_text(data="[]", encoding="utf-8")
     with pytest.raises(expected_exception=SystemExit):
         _ = run_sync(
