@@ -2,27 +2,27 @@
 
 import json
 from http import HTTPStatus
-from typing import ClassVar, TypeGuard
+from typing import ClassVar
 
+from pydantic import TypeAdapter
+
+from coderpad.json_types import JsonValue
 from coderpad.transports import TransportResponse
 
-
-def _is_object_mapping(
-    value: object,
-    /,
-) -> TypeGuard[dict[object, object]]:
-    """Return whether a value is a mapping of objects."""
-    return isinstance(value, dict)
+_JSON_VALUE_ADAPTER = TypeAdapter[JsonValue](type=JsonValue)
 
 
-def _optional_json_string(*, payload: object, key: str) -> str | None:
+def _json_value(value: object, /) -> JsonValue:
+    """Return a runtime-validated decoded JSON value."""
+    return _JSON_VALUE_ADAPTER.validate_python(value, strict=True)
+
+
+def _optional_json_string(*, payload: JsonValue, key: str) -> str | None:
     """Return a string field from a JSON object payload."""
-    if not _is_object_mapping(payload):
+    if not isinstance(payload, dict):
         return None
-    for entry_key, entry_value in payload.items():
-        if entry_key == key and isinstance(entry_value, str):
-            return entry_value
-    return None
+    value = payload.get(key)
+    return value if isinstance(value, str) else None
 
 
 class CoderPadError(Exception):
@@ -71,11 +71,12 @@ class CoderPadError(Exception):
         self.code: str | None = None
         self.message: str | None = None
         try:
-            payload: object = json.loads(
+            raw_payload: object = json.loads(
                 s=response.content.decode(encoding="utf-8"),
             )
         except (UnicodeDecodeError, json.JSONDecodeError):
             return
+        payload = _json_value(raw_payload)
         self.code = _optional_json_string(payload=payload, key="code")
         self.message = _optional_json_string(payload=payload, key="message")
 
