@@ -6,25 +6,36 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, TypeGuard
+from typing import TypeGuard
+
+from beartype.door import TypeHint
+
+from coderpad._json_types import JsonValue
 
 _PADS_COLLECTION_PATH = "/api/pads/"
 _PADS_ITEM_PATH = "/api/pads/{id}"
 
 
-def _is_object_mapping(value: object, /) -> TypeGuard[dict[object, object]]:
+class _Arguments(argparse.Namespace):
+    """Parsed command-line arguments."""
+
+    source: Path
+    target: Path
+
+
+def _is_object_mapping(value: object, /) -> TypeGuard[dict[str, JsonValue]]:
     """Return whether a JSON value is an object mapping."""
-    return isinstance(value, dict)
+    return TypeHint(hint=dict[str, JsonValue]).is_bearable(obj=value)
 
 
-def _as_string_key_mapping(value: object, /) -> dict[str, Any] | None:  # pyrefly: ignore [explicit-any]
+def _as_string_key_mapping(value: object, /) -> dict[str, JsonValue] | None:
     """Return a mapping when ``value`` is a JSON object."""
     if not _is_object_mapping(value):
         return None
-    return {key: item for key, item in value.items() if isinstance(key, str)}
+    return value
 
 
-def apply_postman_corrections(spec: dict[str, Any]) -> list[str]:  # pyrefly: ignore [explicit-any]
+def apply_postman_corrections(spec: dict[str, JsonValue]) -> list[str]:
     """Move a misplaced ``PUT`` onto ``/api/pads/{id}``.
 
     Postman exports have historically placed the modify-pad ``PUT`` under
@@ -43,7 +54,7 @@ def apply_postman_corrections(spec: dict[str, Any]) -> list[str]:  # pyrefly: ig
     collection_value = paths_value.get(_PADS_COLLECTION_PATH)
     if not _is_object_mapping(collection_value):
         return notes
-    put_operation: object | None = collection_value.pop("put", None)
+    put_operation: JsonValue = collection_value.pop("put", None)
     if put_operation is None:
         return notes
     target_value = paths_value.get(_PADS_ITEM_PATH)
@@ -94,14 +105,14 @@ def run_sync(*, arguments: list[str], repo_root: Path) -> int:
         default=default_target,
         help=f"Output path (default: {default_target})",
     )
-    args = parser.parse_args(args=arguments)
-    loaded = json.loads(s=args.source.read_text(encoding="utf-8"))  # pyrefly: ignore [unknown-argument-type]
+    args = parser.parse_args(args=arguments, namespace=_Arguments())
+    loaded: object = json.loads(s=args.source.read_text(encoding="utf-8"))
     spec = _as_string_key_mapping(loaded)
     if spec is None:
         message = "OpenAPI document root must be a JSON object"
         raise SystemExit(message)
     notes = apply_postman_corrections(spec=spec)
-    args.target.write_text(
+    _ = args.target.write_text(
         data=json.dumps(obj=spec, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
