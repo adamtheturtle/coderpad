@@ -1,5 +1,6 @@
 """Async CoderPad Interview API client."""
 
+import asyncio
 import builtins
 import json
 import os
@@ -488,7 +489,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             files = {
                 "question[zip_file]": (
                     zip_file.name,
-                    zip_file.read_bytes(),  # noqa: ASYNC240
+                    await asyncio.to_thread(zip_file.read_bytes),
                     "application/zip",
                 ),
             }
@@ -603,7 +604,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             files = {
                 "question[zip_file]": (
                     zip_file.name,
-                    zip_file.read_bytes(),  # noqa: ASYNC240
+                    await asyncio.to_thread(zip_file.read_bytes),
                     "application/zip",
                 ),
             }
