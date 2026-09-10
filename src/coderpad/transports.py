@@ -3,6 +3,7 @@
 import json as json_module
 from dataclasses import dataclass
 from http import HTTPStatus
+from types import TracebackType
 from typing import Any, Protocol, Self, TypedDict, runtime_checkable
 
 import httpx
@@ -186,7 +187,7 @@ class HTTPXTransport:
         self,
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
-        _exc_tb: object,
+        _exc_tb: TracebackType | None,
     ) -> None:
         """Exit the context manager and close the client."""
         self.close()
@@ -284,7 +285,7 @@ class HTTPX2Transport:
         self,
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
-        _exc_tb: object,
+        _exc_tb: TracebackType | None,
     ) -> None:
         """Exit the context manager and close the client."""
         self.close()
@@ -437,7 +438,7 @@ class AsyncHTTPXTransport:
         self,
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
-        _exc_tb: object,
+        _exc_tb: TracebackType | None,
         /,
     ) -> None:
         """Exit the async context manager and close."""
@@ -536,7 +537,7 @@ class AsyncHTTPX2Transport:
         self,
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
-        _exc_tb: object,
+        _exc_tb: TracebackType | None,
         /,
     ) -> None:
         """Exit the async context manager and close."""

@@ -6,6 +6,7 @@ import os
 from collections.abc import Iterator, Sequence
 from http import HTTPStatus
 from pathlib import Path
+from types import TracebackType
 from typing import Self
 
 import httpx
@@ -998,7 +999,7 @@ class CoderPad:
         self,
         _exc_type: type[BaseException] | None,
         _exc_val: BaseException | None,
-        _exc_tb: object,
+        _exc_tb: TracebackType | None,
     ) -> None:
         """Exit the context manager and close the transport."""
         self.close()
