@@ -11,7 +11,15 @@ from typing import Self
 
 import httpx
 from beartype import beartype
+from pydantic import TypeAdapter
 
+from coderpad._dict_types import (
+    OrganizationDict,
+    OrganizationStatsDict,
+    PadDict,
+    PadEnvironmentDict,
+    PadHistoryEntryDict,
+)
 from coderpad._question_content import (
     validate_mutually_exclusive_question_content,
 )
@@ -208,7 +216,9 @@ class PadsNamespace(_Namespace):
             params=None,
             files=None,
         )
-        return Pad.from_dict(data=response.json())
+        return Pad.from_dict(
+            data=TypeAdapter(type=PadDict).validate_python(response.json()),
+        )
 
     def get(self, *, pad_id: str) -> Pad:
         """Retrieve a pad by id.
@@ -226,7 +236,9 @@ class PadsNamespace(_Namespace):
             data=None,
             files=None,
         )
-        return Pad.from_dict(data=response.json())
+        return Pad.from_dict(
+            data=TypeAdapter(type=PadDict).validate_python(response.json()),
+        )
 
     def update(
         self,
@@ -330,7 +342,9 @@ class PadsNamespace(_Namespace):
             files=None,
         )
         return PadEnvironment.from_dict(
-            data=response.json(),
+            data=TypeAdapter(type=PadEnvironmentDict).validate_python(
+                response.json(),
+            ),
         )
 
     def get_history(self, *, history_url: str) -> PadHistory:
@@ -360,7 +374,13 @@ class PadsNamespace(_Namespace):
         data = response.json()
         if data is None:
             return PadHistory()
-        return PadHistory.from_dict(data=data)
+        return PadHistory.from_dict(
+            data=TypeAdapter(
+                type=dict[str, PadHistoryEntryDict]
+            ).validate_python(
+                data,
+            ),
+        )
 
 
 @beartype
@@ -798,7 +818,9 @@ class OrganizationNamespace(_Namespace):
             files=None,
         )
         return Organization.from_dict(
-            data=response.json(),
+            data=TypeAdapter(type=OrganizationDict).validate_python(
+                response.json(),
+            ),
         )
 
     def get_stats(
@@ -829,7 +851,9 @@ class OrganizationNamespace(_Namespace):
             files=None,
         )
         return OrganizationStats.from_dict(
-            data=response.json(),
+            data=TypeAdapter(type=OrganizationStatsDict).validate_python(
+                response.json(),
+            ),
         )
 
     def get_quota(self) -> Quota:

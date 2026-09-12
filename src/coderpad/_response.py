@@ -5,6 +5,7 @@ from typing import TypeGuard
 
 from beartype import beartype
 from beartype.door import TypeHint
+from pydantic import TypeAdapter
 
 from coderpad.json_types import JsonValue
 
@@ -35,21 +36,21 @@ def _optional_string(value: object) -> str | None:
     raise TypeError(message)
 
 
-@beartype
 def object_response(
-    value: dict[str, JsonValue],
+    value: object,
 ) -> dict[str, JsonValue]:
     """Return a runtime-validated API response object."""
-    return value
+    return TypeAdapter(type=dict[str, JsonValue]).validate_python(value)
 
 
 @beartype
 def page_response(
-    value: dict[str, JsonValue],
+    value: object,
     *,
     item_key: str,
 ) -> Page:
     """Decode and validate a paginated API response."""
+    value = object_response(value=value)
     items = value[item_key]
     if not _is_objects(items):
         message = f"Expected '{item_key}' to be a list of objects."
