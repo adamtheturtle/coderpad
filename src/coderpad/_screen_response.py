@@ -1,16 +1,19 @@
 """Runtime validation for CoderPad Screen response bodies."""
 
+from beartype import beartype
 from pydantic import TypeAdapter
 
 from coderpad.json_types import JsonValue
 
 
+@beartype
 def json_value(*, value: object) -> JsonValue:
     """Return a runtime-validated JSON value from a transport."""
     adapter: TypeAdapter[JsonValue] = TypeAdapter(type=JsonValue)
     return adapter.validate_python(value)
 
 
+@beartype
 def json_object(*, value: object) -> dict[str, JsonValue]:
     """Return a runtime-validated JSON object from a transport."""
     parsed = json_value(value=value)

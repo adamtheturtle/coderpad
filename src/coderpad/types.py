@@ -237,6 +237,7 @@ class PadInterviewerNotification(_APIModel):
         )
 
 
+@beartype
 def _empty_pad_interviewer_notifications() -> list[PadInterviewerNotification]:
     """Return an empty, precisely typed notification list."""
     return []
@@ -423,6 +424,7 @@ class PadHistoryEntry(_APIModel):
         return "".join(updated)
 
 
+@beartype
 def _history_sort_key(
     item: tuple[str, PadHistoryEntryDict],
     /,
@@ -983,6 +985,7 @@ class Quota(_APIModel):
         )
 
 
+@beartype
 def _empty_child_organizations() -> list[dict[str, JsonValue]]:
     """Return an empty list for a response structure not yet typed."""
     return []

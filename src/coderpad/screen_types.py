@@ -18,16 +18,19 @@ class _APIModel(BaseModel):
     )
 
 
+@beartype
 def _json_values(value: JsonValue) -> list[JsonValue]:
     """Return a JSON list from an API value."""
     return value if isinstance(value, list) else []
 
 
+@beartype
 def _mapping(value: JsonValue) -> dict[str, JsonValue] | None:
     """Return a string-keyed mapping from an API value."""
     return value if isinstance(value, dict) else None
 
 
+@beartype
 def _strings(value: JsonValue) -> list[str]:
     """Return a string list from an API value."""
     return [
@@ -35,11 +38,13 @@ def _strings(value: JsonValue) -> list[str]:
     ]
 
 
+@beartype
 def _empty_strings() -> list[str]:
     """Create an empty string list."""
     return []
 
 
+@beartype
 def _optional_int(value: JsonValue) -> int | None:
     """Return an integer API value when present."""
     return (
@@ -49,6 +54,7 @@ def _optional_int(value: JsonValue) -> int | None:
     )
 
 
+@beartype
 def _required_int(value: JsonValue) -> int:
     """Return a required integer API value."""
     if isinstance(value, int) and not isinstance(value, bool):
@@ -57,6 +63,7 @@ def _required_int(value: JsonValue) -> int:
     raise TypeError(msg)
 
 
+@beartype
 def _optional_float(value: JsonValue) -> float | None:
     """Return a numeric API value when present."""
     return (
@@ -66,6 +73,7 @@ def _optional_float(value: JsonValue) -> float | None:
     )
 
 
+@beartype
 def _optional_str(value: JsonValue) -> str | None:
     """Return a string API value when present."""
     return value if isinstance(value, str) else None
