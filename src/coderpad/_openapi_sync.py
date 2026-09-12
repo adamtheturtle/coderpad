@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from typing import TypeGuard
 
+from beartype import beartype
 from beartype.door import TypeHint
 
 from coderpad.json_types import JsonValue
@@ -23,11 +24,13 @@ class _Arguments(argparse.Namespace):
     target: Path
 
 
+@beartype
 def _is_object_mapping(value: object, /) -> TypeGuard[dict[str, JsonValue]]:
     """Return whether a JSON value is an object mapping."""
     return TypeHint(hint=dict[str, JsonValue]).is_bearable(obj=value)
 
 
+@beartype
 def _as_string_key_mapping(value: object, /) -> dict[str, JsonValue] | None:
     """Return a mapping when ``value`` is a JSON object."""
     if not _is_object_mapping(value):
@@ -35,6 +38,7 @@ def _as_string_key_mapping(value: object, /) -> dict[str, JsonValue] | None:
     return value
 
 
+@beartype
 def apply_postman_corrections(spec: dict[str, JsonValue]) -> list[str]:
     """Move a misplaced ``PUT`` onto ``/api/pads/{id}``.
 
@@ -77,6 +81,7 @@ def apply_postman_corrections(spec: dict[str, JsonValue]) -> list[str]:
     return notes
 
 
+@beartype
 def run_sync(*, arguments: list[str], repo_root: Path) -> int:
     """Run the OpenAPI sync entry point.
 

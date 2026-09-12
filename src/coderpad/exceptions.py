@@ -4,6 +4,7 @@ import json
 from http import HTTPStatus
 from typing import ClassVar
 
+from beartype import beartype
 from pydantic import TypeAdapter
 
 from coderpad.json_types import JsonValue
@@ -12,11 +13,13 @@ from coderpad.transports import TransportResponse
 _JSON_VALUE_ADAPTER = TypeAdapter[JsonValue](type=JsonValue)
 
 
+@beartype
 def _json_value(value: object, /) -> JsonValue:
     """Return a runtime-validated decoded JSON value."""
     return _JSON_VALUE_ADAPTER.validate_python(value, strict=True)
 
 
+@beartype
 def _optional_json_string(*, payload: JsonValue, key: str) -> str | None:
     """Return a string field from a JSON object payload."""
     if not isinstance(payload, dict):
@@ -25,6 +28,7 @@ def _optional_json_string(*, payload: JsonValue, key: str) -> str | None:
     return value if isinstance(value, str) else None
 
 
+@beartype
 class CoderPadError(Exception):
     """Base exception for all CoderPad API errors.
 

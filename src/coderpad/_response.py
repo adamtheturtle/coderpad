@@ -10,6 +10,7 @@ from pydantic import TypeAdapter
 from coderpad.json_types import JsonValue
 
 
+@beartype
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Page:
     """A decoded page of API objects and its pagination metadata."""
@@ -20,6 +21,7 @@ class Page:
     prev_page: str | None
 
 
+@beartype
 def _is_objects(
     value: object,
     /,
@@ -28,6 +30,7 @@ def _is_objects(
     return TypeHint(hint=list[dict[str, JsonValue]]).is_bearable(obj=value)
 
 
+@beartype
 def _optional_string(value: object) -> str | None:
     """Return an optional string response value."""
     if value is None or isinstance(value, str):
@@ -36,6 +39,7 @@ def _optional_string(value: object) -> str | None:
     raise TypeError(message)
 
 
+@beartype
 def object_response(
     value: object,
 ) -> dict[str, JsonValue]:
@@ -67,6 +71,7 @@ def page_response(
     )
 
 
+@beartype
 def object_list(value: object) -> list[dict[str, JsonValue]]:
     """Return a runtime-validated list of API response objects."""
     if not _is_objects(value):

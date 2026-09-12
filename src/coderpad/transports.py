@@ -32,6 +32,7 @@ class _HTTPX2ClientKwargs(TypedDict, total=False):
     timeout: httpx2.Timeout | float
 
 
+@beartype
 class HTTPStatusError(Exception):
     """Raised when an HTTP response has an error status code."""
 

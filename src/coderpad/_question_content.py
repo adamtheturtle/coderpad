@@ -3,9 +3,12 @@
 from collections.abc import Sequence
 from pathlib import Path
 
+from beartype import beartype
+
 from coderpad.types import QuestionFileContent
 
 
+@beartype
 def validate_mutually_exclusive_question_content(
     *,
     contents: str | None,
