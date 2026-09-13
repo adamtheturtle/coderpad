@@ -1,10 +1,6 @@
 """Tests for asynchronous CoderPad Screen support."""
 
-# ruff: noqa: C901, PLR0911, PLR2004
-# pylint: disable=too-complex
-
-import json as json_module
-from http import HTTPStatus
+# ruff: noqa: PLR2004
 
 import pytest
 
@@ -12,6 +8,7 @@ from coderpad import SCREEN_EU_BASE_URL, AsyncCoderPad
 from coderpad.exceptions import AuthenticationError
 from coderpad.screen_types import ScreenInvitation
 from coderpad.transports import TransportResponse
+from tests.conftest import ScreenTransportStub
 
 
 class _AsyncScreenTransport:
@@ -19,8 +16,9 @@ class _AsyncScreenTransport:
 
     def __init__(self, *, error: bool) -> None:
         """Create a recording transport."""
-        self.calls: list[dict[str, object]] = []
-        self.error = error
+        self.transport = ScreenTransportStub(
+            error=error, non_object_response=False
+        )
 
     async def __call__(
         self,
@@ -33,119 +31,16 @@ class _AsyncScreenTransport:
         files: dict[str, tuple[str, bytes, str]] | None,
         json: object | None,
     ) -> TransportResponse:
-        """Return a response selected by the request path."""
-        del data, files
-        self.calls.append(
-            {
-                "method": method,
-                "url": url,
-                "headers": headers,
-                "params": params if params is not None else {},
-                "json": json,
-            },
+        """Use the shared Screen response dispatcher asynchronously."""
+        return self.transport(
+            method=method,
+            url=url,
+            headers=headers,
+            params=params,
+            data=data,
+            files=files,
+            json=json,
         )
-        if self.error:
-            return _response(
-                {"code": "Unauthorized", "message": "Invalid API key"},
-                status=HTTPStatus.UNAUTHORIZED,
-            )
-        if url.endswith("/campaigns"):
-            return _response(
-                [{"id": 7, "name": "Backend"}], status=HTTPStatus.OK
-            )
-        if url.endswith("/campaigns/7/actions/send"):
-            return _response(
-                {"id": 11, "test_url": "https://test.example"},
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/tests"):
-            start = 0
-            if params is not None and "start" in params:
-                start = int(params["start"])
-            if start == 0:
-                return _response(
-                    {
-                        "tests": [
-                            {
-                                "id": 11,
-                                "status": "completed",
-                                "candidate_name": "Ada",
-                                "report": dict[str, object](),
-                            },
-                        ],
-                        "pagination": {
-                            "start": 0,
-                            "limit": 1,
-                            "total": 2,
-                            "has_more_items": True,
-                            "next_start": 1,
-                        },
-                    },
-                    status=HTTPStatus.OK,
-                )
-            return _response(
-                {
-                    "tests": [
-                        {
-                            "id": 12,
-                            "status": "completed",
-                            "candidate_name": "Grace",
-                            "report": dict[str, object](),
-                        },
-                    ],
-                    "pagination": {
-                        "start": 1,
-                        "limit": 1,
-                        "total": 2,
-                        "has_more_items": False,
-                        "next_start": None,
-                    },
-                },
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/tests/11/report"):
-            return TransportResponse(
-                status_code=HTTPStatus.OK,
-                headers={"content-type": "application/pdf"},
-                content=b"%PDF report",
-            )
-        if url.endswith("/tests/99"):
-            return _response(
-                {"id": 99, "status": "completed", "report": None},
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/tests/11"):
-            return _response(
-                {
-                    "id": 11,
-                    "status": "completed",
-                    "report": dict[str, object](),
-                },
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/webhook") and method == "GET":
-            return _response(
-                {"url": "https://example.com/hook"}, status=HTTPStatus.OK
-            )
-        return TransportResponse(
-            status_code=HTTPStatus.NO_CONTENT,
-            headers={},
-            content=b"",
-        )
-
-
-def _response(
-    value: object,
-    /,
-    *,
-    status: HTTPStatus,
-) -> TransportResponse:
-    """Create a JSON transport response."""
-    return TransportResponse(
-        status_code=status,
-        headers={"content-type": "application/json"},
-        content=json_module.dumps(obj=value).encode(),
-    )
 
 
 def _client(transport: _AsyncScreenTransport, /) -> AsyncCoderPad:
@@ -196,7 +91,7 @@ async def test_async_screen_matches_sync_surface() -> None:
     assert test.report is not None
     assert report == b"%PDF report"
     assert typed_report.score == test.report.score
-    assert recorder.calls[7]["params"] == {
+    assert recorder.transport.calls[7]["params"] == {
         "report_type": "full",
         "anonymous": "true",
         "include_rank": "false",
@@ -257,5 +152,5 @@ async def test_async_empty_screen_api_key_fails_fast() -> None:
         match="Screen API key is required",
     ):
         await client.screen.campaigns.list()
-    assert not bool(recorder.calls)
+    assert not bool(recorder.transport.calls)
     await client.aclose()
