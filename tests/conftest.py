@@ -3,6 +3,7 @@
 import json as json_module
 from collections.abc import Callable, Generator
 from http import HTTPStatus
+from urllib.parse import urlsplit
 
 import pytest
 import respx
@@ -12,6 +13,7 @@ from coderpad.client import CoderPad
 from coderpad.transports import TransportResponse
 from tests.openapi_mock import (
     JSONMapping,
+    JSONValue,
     add_openapi_to_respx,
     parse_json_mapping,
 )
@@ -167,7 +169,7 @@ def fixture_async_coderpad_client(
     )
 
 
-_TEST = {
+_TEST: JSONMapping = {
     "id": 11,
     "status": "completed",
     "campaign_id": 7,
@@ -195,7 +197,6 @@ _TEST = {
 }
 
 
-# pylint: disable=too-complex
 class ScreenTransportStub:
     """Record requests and return representative Screen responses."""
 
@@ -205,7 +206,7 @@ class ScreenTransportStub:
         self.error = error
         self.non_object_response = non_object_response
 
-    def __call__(  # noqa: C901, PLR0911
+    def __call__(
         self,
         *,
         method: str,
@@ -234,50 +235,24 @@ class ScreenTransportStub:
             )
         if self.non_object_response:
             return _response([], status=HTTPStatus.OK)
-        if url.endswith("/campaigns"):
-            return _response(
-                [
-                    {
-                        "id": 7,
-                        "name": "Backend",
-                        "languages": ["python"],
-                    },
-                ],
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/campaigns/7/actions/send"):
-            return _response(
-                {"id": 11, "test_url": "https://test.example"},
-                status=HTTPStatus.OK,
-            )
         if url.endswith("/tests"):
-            start = 0
-            if params is not None and "start" in params:
-                start = int(params["start"])
-            if start == 0:
-                return _response(
-                    {
-                        "tests": [_TEST],
-                        "pagination": {
-                            "start": 0,
-                            "limit": 1,
-                            "total": 2,
-                            "has_more_items": True,
-                            "next_start": 1,
-                        },
-                    },
-                    status=HTTPStatus.OK,
-                )
-            second = {**_TEST, "id": 12, "candidate_name": "Grace"}
+            assert params is not None
+            start = int(params.get("start", 0))
+            first_page = start == 0
+            test = (
+                _TEST
+                if first_page
+                else {**_TEST, "id": 12, "candidate_name": "Grace"}
+            )
             return _response(
                 {
-                    "tests": [second],
+                    "tests": [test],
                     "pagination": {
-                        "start": 1,
+                        "start": 0 if first_page else 1,
                         "limit": 1,
                         "total": 2,
-                        "has_more_items": False,
-                        "next_start": None,
+                        "has_more_items": first_page,
+                        "next_start": 1 if first_page else None,
                     },
                 },
                 status=HTTPStatus.OK,
@@ -288,17 +263,28 @@ class ScreenTransportStub:
                 headers={"content-type": "application/pdf"},
                 content=b"%PDF report",
             )
-        if url.endswith("/tests/99"):
-            return _response(
-                {**_TEST, "id": 99, "report": None},
-                status=HTTPStatus.OK,
-            )
-        if url.endswith("/tests/11"):
-            return _response(_TEST, status=HTTPStatus.OK)
-        if url.endswith("/webhook") and method == "GET":
-            return _response(
-                {"url": "https://example.com/hook"}, status=HTTPStatus.OK
-            )
+        payloads: dict[str, JSONValue] = {
+            "/assessment/api/v1.1/campaigns": [
+                {"id": 7, "name": "Backend", "languages": ["python"]},
+            ],
+            "/assessment/api/v1.1/campaigns/7/actions/send": {
+                "id": 11,
+                "test_url": "https://test.example",
+            },
+            "/assessment/api/v1.1/tests/99": {
+                **_TEST,
+                "id": 99,
+                "report": None,
+            },
+            "/assessment/api/v1.1/tests/11": _TEST,
+        }
+        if method == "GET":
+            payloads["/assessment/api/v1.1/webhook"] = {
+                "url": "https://example.com/hook",
+            }
+        path = urlsplit(url=url).path
+        if path in payloads:
+            return _response(payloads[path], status=HTTPStatus.OK)
         return TransportResponse(
             status_code=HTTPStatus.NO_CONTENT,
             headers={},
