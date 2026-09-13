@@ -116,15 +116,27 @@ class TestCoderPad:
                 params: dict[str, str | int] | None,
                 data: dict[str, str] | None,
                 files: (dict[str, tuple[str, bytes, str]] | None),
-            ) -> TransportResponse:  # pragma: no cover
+            ) -> TransportResponse:
                 """Make a request."""
-                raise NotImplementedError
+                assert method == "GET"
+                assert url == "https://app.coderpad.io/api/pads/"
+                assert headers["Authorization"] == 'Token token="test-key"'
+                assert params == {}
+                assert data is None
+                assert files is None
+                return TransportResponse(
+                    status_code=HTTPStatus.OK,
+                    headers={},
+                    content=b'{"pads": [], "total": 0}',
+                )
 
         client = CoderPad(
             api_key="test-key",
             transport=_NoCloseTransport(),
         )
+        assert (client.pads.list()).total == 0
         client.close()
+        assert (client.pads.list()).total == 0
 
     @staticmethod
     def test_default_headers_merged_preserving_authorization() -> None:
