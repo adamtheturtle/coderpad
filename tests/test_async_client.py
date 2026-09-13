@@ -103,15 +103,27 @@ class TestAsyncCoderPad:
                 params: (dict[str, str | int] | None),
                 data: dict[str, str] | None,
                 files: (dict[str, tuple[str, bytes, str]] | None),
-            ) -> TransportResponse:  # pragma: no cover
+            ) -> TransportResponse:
                 """Make a request."""
-                raise NotImplementedError
+                assert method == "GET"
+                assert url == "https://app.coderpad.io/api/pads/"
+                assert headers["Authorization"] == 'Token token="test-key"'
+                assert params == {}
+                assert data is None
+                assert files is None
+                return TransportResponse(
+                    status_code=HTTPStatus.OK,
+                    headers={},
+                    content=b'{"pads": [], "total": 0}',
+                )
 
         client = AsyncCoderPad(
             api_key="test-key",
             transport=_NoCloseTransport(),
         )
+        assert (await client.pads.list()).total == 0
         await client.aclose()
+        assert (await client.pads.list()).total == 0
 
     @staticmethod
     @pytest.mark.asyncio
