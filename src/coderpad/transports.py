@@ -4,17 +4,18 @@ import json as json_module
 from dataclasses import dataclass
 from http import HTTPStatus
 from types import TracebackType
-from typing import Protocol, Self, TypedDict, runtime_checkable
+from typing import Protocol, Self, runtime_checkable
 
 import httpx
 import httpx2
 from beartype import beartype
 from pydantic import TypeAdapter
+from typing_extensions import TypedDict
 
 from coderpad.json_types import JsonValue
 
 
-class _HTTPXClientKwargs(TypedDict, total=False):
+class _HTTPXClientKwargs(TypedDict, total=False, closed=True):
     """Optional kwargs forwarded to ``httpx.Client`` / ``AsyncClient``."""
 
     limits: httpx.Limits
@@ -22,7 +23,7 @@ class _HTTPXClientKwargs(TypedDict, total=False):
     timeout: httpx.Timeout | float
 
 
-class _HTTPX2ClientKwargs(TypedDict, total=False):
+class _HTTPX2ClientKwargs(TypedDict, total=False, closed=True):
     """Optional kwargs forwarded to ``httpx2.Client`` /
     ``AsyncClient``.
     """
