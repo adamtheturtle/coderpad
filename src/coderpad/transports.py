@@ -1,6 +1,7 @@
 """Transport abstractions for the CoderPad Interview API."""
 
 import json as json_module
+import sys
 from dataclasses import dataclass
 from http import HTTPStatus
 from types import TracebackType
@@ -10,9 +11,13 @@ import httpx
 import httpx2
 from beartype import beartype
 from pydantic import TypeAdapter
-from typing_extensions import TypedDict
 
 from coderpad.json_types import JsonValue
+
+if sys.version_info >= (3, 15):  # pragma: no cover
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
 
 
 class _HTTPXClientKwargs(TypedDict, total=False, closed=True):
