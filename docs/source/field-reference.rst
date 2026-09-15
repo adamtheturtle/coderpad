@@ -10,10 +10,8 @@ It is especially relevant when syncing resources from source control, where a re
 Questions
 ---------
 
-Writable fields are accepted by
-:meth:`coderpad.client.QuestionsNamespace.create` and
-:meth:`coderpad.client.QuestionsNamespace.update`.  Every other field
-on :class:`~coderpad.types.Question` is populated by the server and returned on read only.
+Writable fields are accepted by :meth:`coderpad.client.QuestionsNamespace.create` and :meth:`coderpad.client.QuestionsNamespace.update`.
+Every other field on :class:`~coderpad.types.Question` is populated by the server and returned on read only.
 
 .. list-table::
    :header-rows: 1
@@ -99,11 +97,8 @@ on :class:`~coderpad.types.Question` is populated by the server and returned on 
 Pads
 ----
 
-Writable fields are accepted by
-:meth:`coderpad.client.PadsNamespace.create` and
-:meth:`coderpad.client.PadsNamespace.update`.  Every other field on
-:class:`~coderpad.types.Pad` is populated by the server and returned
-on read only.
+Writable fields are accepted by :meth:`coderpad.client.PadsNamespace.create` and :meth:`coderpad.client.PadsNamespace.update`.
+Every other field on :class:`~coderpad.types.Pad` is populated by the server and returned on read only.
 
 .. list-table::
    :header-rows: 1
