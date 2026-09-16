@@ -1,5 +1,7 @@
 """Tests for synchronous CoderPad Screen support."""
 
+# Expected Screen payload and status values are clearest as inline literals in
+# these public-interface integration tests.
 # ruff: noqa: PLR2004
 
 import pytest
