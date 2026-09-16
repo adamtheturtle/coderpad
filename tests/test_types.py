@@ -614,6 +614,8 @@ class TestCustomDatabase:
         data = _custom_database_dict()
         result = CustomDatabase.from_dict(data=data)
         assert result.id == data["id"]
+        # This API field intentionally shadows a deprecated Pydantic method;
+        # the model instance contains the response string at runtime.
         assert result.schema == data["schema"]  # pylint: disable=comparison-with-callable
         assert result.schema_json.arrangement == "horizontal"
         assert result.schema_json.tables[0].name == "products"

@@ -1,7 +1,5 @@
 """Tests for synchronous CoderPad Screen support."""
 
-# ruff: noqa: PLR2004
-
 import pytest
 from pydantic import ValidationError
 
@@ -35,6 +33,7 @@ def test_campaigns_and_invitation(
     screen_transport_stub: ScreenTransportStub,
 ) -> None:
     """Campaigns and invitations use Screen authentication and JSON."""
+    expected_invitation_id = 11
     transport = screen_transport_stub
     client = _client(transport, base_url=SCREEN_EU_BASE_URL)
     campaigns = client.screen.campaigns.list()
@@ -49,7 +48,7 @@ def test_campaigns_and_invitation(
     assert campaigns[0].languages == ["python"]
     assert not campaigns[0].pinned
     assert not campaigns[0].archived
-    assert result.id == 11
+    assert result.id == expected_invitation_id
     assert result.test_url == "https://test.example"
     assert transport.calls[0]["headers"] == {"API-Key": "screen-key"}
     assert transport.calls[1]["json"] == {
@@ -81,6 +80,12 @@ def test_tests_filters_pagination_and_decoding(
     screen_transport_stub: ScreenTransportStub,
 ) -> None:
     """Test list filters, pagination, and nested models are preserved."""
+    expected_send_time = 1000
+    expected_question_last_activity_time = 1100
+    expected_report_score = 90
+    expected_technology_score = 95
+    expected_skill_points = 9
+    expected_skill_total_points = 10
     transport = screen_transport_stub
     page = _client(transport, base_url=SCREEN_EU_BASE_URL).screen.tests.list(
         campaign_id=7,
@@ -97,29 +102,32 @@ def test_tests_filters_pagination_and_decoding(
     assert page.pagination is not None
     assert page.pagination.next_start == 1
     assert page.pagination.has_more_items
-    assert page.tests[0].send_time == 1000
+    assert page.tests[0].send_time == expected_send_time
     assert page.tests[0].last_activity_time is None
     assert page.tests[0].test_url is None
-    assert page.tests[0].questions[0].last_activity_time == 1100
+    assert (
+        page.tests[0].questions[0].last_activity_time
+        == expected_question_last_activity_time
+    )
     assert page.tests[0].report is not None
     screen_report = page.tests[0].report
     assert screen_report.duration is None
     assert not bool(screen_report.warnings)
     assert screen_report.points is None
-    assert screen_report.score == 90
+    assert screen_report.score == expected_report_score
     assert screen_report.total_duration is None
     assert screen_report.total_points is None
     assert screen_report.comparative_score is None
     assert screen_report.community_stats == [1, 2, 3]
     technology = screen_report.technologies["Python"]
     assert technology.points is None
-    assert technology.score == 95
+    assert technology.score == expected_technology_score
     assert technology.total_points is None
     assert technology.comparative_score is None
     skill = technology.skills["Language"]
-    assert skill.points == 9
-    assert skill.score == 90
-    assert skill.total_points == 10
+    assert skill.points == expected_skill_points
+    assert skill.score == expected_report_score
+    assert skill.total_points == expected_skill_total_points
     assert transport.calls[-1]["params"] == {
         "campaignId": 7,
         "status": "completed",
@@ -138,6 +146,7 @@ def test_get_actions_report_and_webhook(
     screen_transport_stub: ScreenTransportStub,
 ) -> None:
     """Test retrieval, mutations, PDF bytes, and webhook operations."""
+    expected_score = 90
     transport = screen_transport_stub
     screen = _client(transport, base_url=SCREEN_EU_BASE_URL).screen
     test = screen.tests.get(test_id=11, with_community_stats=True)
@@ -159,7 +168,7 @@ def test_get_actions_report_and_webhook(
     assert test.candidate_name == "Ada"
     assert transport.calls[0]["params"] == {"withCommunityStats": "true"}
     assert report == b"%PDF report"
-    assert typed_report.score == 90
+    assert typed_report.score == expected_score
     assert webhook.url == "https://example.com/hook"
     assert transport.calls[-2]["json"] == "https://example.com/new-hook"
 
