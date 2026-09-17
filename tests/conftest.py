@@ -80,8 +80,7 @@ def fixture_live_variant_response() -> Callable[
                 "next_page": None,
                 "total": 1,
             }
-        # The suite uses only the enumerated URLs; this guards fixture misuse.
-        else:  # pragma: no cover
+        else:
             msg = f"Unexpected test URL: {url}"
             raise AssertionError(msg)
         return TransportResponse(

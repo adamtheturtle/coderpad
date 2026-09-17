@@ -967,6 +967,18 @@ class TestGetPadEnvironment:
     """Tests for ``CoderPad.pads.get_environment``."""
 
     @staticmethod
+    def test_live_response_variant_rejects_unexpected_url(
+        live_variant_response: Callable[..., TransportResponse],
+    ) -> None:
+        """The synthetic response fixture rejects unsupported API URLs."""
+        url = "https://app.coderpad.io/api/unsupported/"
+        with pytest.raises(
+            expected_exception=AssertionError,
+            match="Unexpected test URL",
+        ):
+            _ = live_variant_response(method="GET", url=url)
+
+    @staticmethod
     def test_get_pad_environment(
         coderpad_client: CoderPad,
     ) -> None:
