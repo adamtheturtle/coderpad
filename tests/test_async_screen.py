@@ -1,7 +1,5 @@
 """Tests for asynchronous CoderPad Screen support."""
 
-# ruff: noqa: PLR2004
-
 import pytest
 
 from coderpad import SCREEN_EU_BASE_URL, AsyncCoderPad
@@ -55,39 +53,46 @@ def _client(transport: _AsyncScreenTransport, /) -> AsyncCoderPad:
 @pytest.mark.asyncio
 async def test_async_screen_matches_sync_surface() -> None:
     """The asynchronous namespaces expose equivalent operations."""
+    campaign_id = 7
+    expected_invitation_id = 11
+    expected_test_count = 2
+    test_id = 11
     recorder = _AsyncScreenTransport(error=False)
     client = _client(recorder)
     screen = client.screen
     campaigns = await screen.campaigns.list()
     invitation = await screen.campaigns.send_invitation(
-        campaign_id=7,
+        campaign_id=campaign_id,
         invitation=ScreenInvitation(
             candidate_email="ada@example.com",
             candidate_name="Ada",
         ),
     )
     page = await screen.tests.list(start=0, limit=1)
-    test = await screen.tests.get(test_id=11, with_community_stats=True)
-    await screen.tests.cancel(test_id=11)
-    await screen.tests.resend(test_id=11)
-    await screen.tests.delete(test_id=11)
+    test = await screen.tests.get(
+        test_id=test_id,
+        with_community_stats=True,
+    )
+    await screen.tests.cancel(test_id=test_id)
+    await screen.tests.resend(test_id=test_id)
+    await screen.tests.delete(test_id=test_id)
     report = await screen.tests.report(
-        test_id=11,
+        test_id=test_id,
         report_type="full",
         anonymous=True,
         include_rank=False,
     )
     typed_report = await screen.tests.report_json(
-        test_id=11,
+        test_id=test_id,
         with_community_stats=True,
     )
     webhook = await screen.webhook.get()
     await screen.webhook.set(url="https://example.com/hook")
     await screen.webhook.delete()
-    assert campaigns[0].id == 7
-    assert invitation.id == 11
+    assert campaigns[0].id == campaign_id
+    assert invitation.id == expected_invitation_id
     assert page.pagination is not None
-    assert page.pagination.total == 2
+    assert page.pagination.total == expected_test_count
     assert test.report is not None
     assert report == b"%PDF report"
     assert typed_report.score == test.report.score
