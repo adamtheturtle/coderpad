@@ -106,7 +106,8 @@ def test_apply_postman_corrections_removes_duplicate_put() -> None:
             "/api/pads/{id} already defines put"
         )
     ]
-    assert collection_path == {}
+    expected_collection_path: dict[str, JsonValue] = {}
+    assert collection_path == expected_collection_path
     assert item_path == {"put": {"summary": "canonical"}}
 
 
