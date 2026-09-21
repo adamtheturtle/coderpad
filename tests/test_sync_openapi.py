@@ -32,8 +32,8 @@ def test_apply_postman_corrections_moves_put() -> None:
         "paths": paths,
     }
     notes = apply_postman_corrections(spec=document)
-    assert any("Moved PUT" in note for note in notes)
-    assert "put" not in collection_path
+    assert notes == ["Moved PUT from /api/pads/ to /api/pads/{id}"]
+    assert collection_path == {"get": {"summary": "list"}}
     put_operation = item_path["put"]
     assert isinstance(put_operation, dict)
     assert put_operation.get("summary") == "modify"
@@ -85,7 +85,7 @@ def test_apply_postman_corrections_replaces_non_object_item_path() -> None:
     notes = apply_postman_corrections(
         spec={"openapi": "3.0.0", "paths": paths},
     )
-    assert any("Replaced non-object" in note for note in notes)
+    assert notes == ["Replaced non-object /api/pads/{id} and installed PUT"]
     assert paths["/api/pads/{id}"] == {"put": {"summary": "modify"}}
 
 
@@ -100,8 +100,13 @@ def test_apply_postman_corrections_removes_duplicate_put() -> None:
     notes = apply_postman_corrections(
         spec={"openapi": "3.0.0", "paths": paths},
     )
-    assert any("Removed duplicate PUT" in note for note in notes)
-    assert "put" not in collection_path
+    assert notes == [
+        (
+            "Removed duplicate PUT from /api/pads/; "
+            "/api/pads/{id} already defines put"
+        )
+    ]
+    assert collection_path == {}
     assert item_path == {"put": {"summary": "canonical"}}
 
 
@@ -127,7 +132,7 @@ def test_main_writes_normalized_spec(tmp_path: Path) -> None:
     )
     assert exit_code == 0
     written = json.loads(s=target.read_text(encoding="utf-8"))
-    assert "put" in written["paths"]["/api/pads/{id}"]
+    assert written["paths"]["/api/pads/{id}"] == {"put": {"summary": "modify"}}
 
 
 def test_main_reports_when_no_corrections_needed(
@@ -155,7 +160,11 @@ def test_main_reports_when_no_corrections_needed(
     )
     assert exit_code == 0
     captured = capsys.readouterr()
-    assert "No Postman path corrections needed." in captured.err
+    assert captured.err == (
+        "No Postman path corrections needed.\n"
+        "Keep empirically observed response variants documented in "
+        "docs/source/openapi-spec.rst and covered by fixtures.\n"
+    )
 
 
 def test_main_rejects_non_object_root(tmp_path: Path) -> None:
