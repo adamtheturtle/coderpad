@@ -37,8 +37,8 @@ Every other field on :class:`~coderpad.types.Question` is populated by the serve
      -
    * - ``file_contents``
      - Create and update
-     - For multi-file questions.  Maps to the read-side pad
-       environment files rather than to a single field.
+     - For multi-file questions.
+       Maps to the read-side pad environment files rather than to a single field.
    * - ``zip_file``
      - Create and update
      - Upload alternative to ``file_contents``.
@@ -121,12 +121,12 @@ Every other field on :class:`~coderpad.types.Pad` is populated by the server and
      - Private notes for the interviewer.
    * - ``question_id``
      - Create only
-     - Seeds the pad from an existing question.  Not a field on
-       the read model; see ``question_ids`` instead.
+     - Seeds the pad from an existing question.
+       Not a field on the read model; see ``question_ids`` instead.
    * - ``ended``
      - Update only
-     - Set to ``True`` to end the interview.  Reflected on read as
-       ``ended_at``.
+     - Set to ``True`` to end the interview.
+       Reflected on read as ``ended_at``.
    * - ``deleted``
      - Update only
      - Set to ``True`` to delete the pad.
