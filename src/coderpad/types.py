@@ -2,7 +2,7 @@
 
 import enum
 from collections.abc import Iterable
-from typing import ClassVar, Self, TypeVar
+from typing import ClassVar, Self, TypeVar, override
 
 from beartype import beartype
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -70,6 +70,7 @@ class PaginatedList(list[_T]):
         self.next_page = next_page
         self.prev_page = prev_page
 
+    @override
     def __repr__(self) -> str:
         """Return a concise debug representation."""
         return (
