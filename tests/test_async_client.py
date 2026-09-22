@@ -519,7 +519,7 @@ class TestAsyncCreatePad:
         result = await async_coderpad_client.pads.create(question_id=54321)
         assert bool(result.id)
         request = mock_coderpad_api.calls.last.request
-        assert b"question_id=54321" in request.content
+        assert request.content == b"question_id=54321"
 
 
 class TestAsyncGetPad:
