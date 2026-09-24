@@ -128,7 +128,7 @@ class Transport(Protocol):
             A ``TransportResponse`` populated from the HTTP
             response.
         """
-        ...  # pylint: disable=unnecessary-ellipsis
+        ...
 
 
 @runtime_checkable
@@ -147,7 +147,7 @@ class JSONTransport(Protocol):
         json: object | None,
     ) -> TransportResponse:
         """Make an HTTP request with an optional JSON body."""
-        ...  # pylint: disable=unnecessary-ellipsis
+        ...
 
 
 @beartype
@@ -379,7 +379,7 @@ class AsyncTransport(Protocol):
             A ``TransportResponse`` populated from the HTTP
             response.
         """
-        ...  # pylint: disable=unnecessary-ellipsis
+        ...
 
 
 @runtime_checkable
@@ -398,7 +398,7 @@ class AsyncJSONTransport(Protocol):
         json: object | None,
     ) -> TransportResponse:
         """Make an async HTTP request with an optional JSON body."""
-        ...  # pylint: disable=unnecessary-ellipsis
+        ...
 
 
 @beartype
