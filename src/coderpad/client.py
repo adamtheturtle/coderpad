@@ -28,7 +28,14 @@ from coderpad._response import (
     object_response,
     page_response,
 )
+from coderpad._variant_content import (
+    UNSET,
+    Unset,
+    require_json_transport,
+    variant_attributes,
+)
 from coderpad.exceptions import CoderPadError
+from coderpad.json_types import JsonValue
 from coderpad.screen import SCREEN_US_BASE_URL, ScreenNamespace
 from coderpad.transports import (
     HTTPX2Transport,
@@ -50,6 +57,8 @@ from coderpad.types import (
     PaginatedList,
     Question,
     QuestionFileContent,
+    QuestionVariant,
+    QuestionVariantFileContent,
     Quota,
     SortOrder,
 )
@@ -384,8 +393,166 @@ class PadsNamespace(_Namespace):
 
 
 @beartype
+class QuestionVariantsNamespace:
+    """JSON operations on variants nested under a question.
+
+    The Interview transport must support JSON request bodies.
+    """
+
+    def __init__(
+        self,
+        *,
+        transport: JSONTransport,
+        base_url: str,
+        headers: dict[str, str],
+    ) -> None:
+        """Use the Interview client's transport, origin, and
+        credentials.
+        """
+        self.transport = transport
+        self.base_url = base_url
+        self.headers = headers
+
+    def _variant_request(
+        self,
+        *,
+        method: str,
+        question_id: str | int,
+        variant_id: str | int | None,
+        attributes: dict[str, JsonValue] | None,
+    ) -> TransportResponse:
+        """Send a nested request using the Interview credentials."""
+        path = f"/api/questions/{question_id}/variants"
+        if variant_id is not None:
+            path += f"/{variant_id}"
+        response = self.transport(
+            method=method,
+            url=self.base_url + path,
+            headers=self.headers,
+            params=None,
+            data=None,
+            files=None,
+            json=attributes,
+        )
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
+            raise CoderPadError.from_response(response=response)
+        return response
+
+    def list(
+        self, *, question_id: str | int
+    ) -> builtins.list[QuestionVariant]:
+        """List the question's language and project-template variants."""
+        response = self._variant_request(
+            method="GET",
+            question_id=question_id,
+            variant_id=None,
+            attributes=None,
+        )
+        value = response.json()
+        if isinstance(value, dict):
+            value = object_response(value=value)["variants"]
+        return [
+            QuestionVariant.model_validate(obj=item)
+            for item in object_list(value=value)
+        ]
+
+    def get(
+        self, *, question_id: str | int, variant_id: str | int
+    ) -> QuestionVariant:
+        """Fetch a variant belonging to the question."""
+        response = self._variant_request(
+            method="GET",
+            question_id=question_id,
+            variant_id=variant_id,
+            attributes=None,
+        )
+        return QuestionVariant.model_validate(obj=response.json())
+
+    def create(
+        self,
+        *,
+        question_id: str | int,
+        language: Language | str,
+        contents: str | Unset | None = UNSET,
+        file_contents: Sequence[QuestionVariantFileContent]
+        | str
+        | None = None,
+        solution: str | None = None,
+    ) -> QuestionVariant:
+        """Create a variant, layering project files over the template.
+
+        Omit contents to use the default, pass an empty string for blank
+        code, or None to drop the variant's own code. File contents may
+        be a sequence or a JSON string and cannot accompany contents.
+        """
+        attributes = variant_attributes(
+            language=language,
+            contents=contents,
+            file_contents=file_contents,
+            solution=solution,
+        )
+        response = self._variant_request(
+            method="POST",
+            question_id=question_id,
+            variant_id=None,
+            attributes=attributes,
+        )
+        return QuestionVariant.model_validate(obj=response.json())
+
+    def update(
+        self,
+        *,
+        question_id: str | int,
+        variant_id: str | int,
+        language: Language | str | None = None,
+        contents: str | Unset | None = UNSET,
+        file_contents: Sequence[QuestionVariantFileContent]
+        | str
+        | None = None,
+        solution: str | None = None,
+    ) -> QuestionVariant:
+        """Update supplied fields and return the updated variant.
+
+        Omitted code is preserved; None restores the language default.
+        Changing environment clears code unless replacement code is sent.
+        Files replace the variant's files; [] restores template files.
+        """
+        attributes = variant_attributes(
+            language=language,
+            contents=contents,
+            file_contents=file_contents,
+            solution=solution,
+        )
+        response = self._variant_request(
+            method="PUT",
+            question_id=question_id,
+            variant_id=variant_id,
+            attributes=attributes,
+        )
+        return QuestionVariant.model_validate(obj=response.json())
+
+    def delete(self, *, question_id: str | int, variant_id: str | int) -> None:
+        """Delete a variant without requiring a JSON response body."""
+        _ = self._variant_request(
+            method="DELETE",
+            question_id=question_id,
+            variant_id=variant_id,
+            attributes=None,
+        )
+
+
+@beartype
 class QuestionsNamespace(_Namespace):
     """Namespace for question operations."""
+
+    @property
+    def variants(self) -> QuestionVariantsNamespace:
+        """Access JSON operations on this question library's variants."""
+        return QuestionVariantsNamespace(
+            transport=require_json_transport(transport=self.transport),
+            base_url=self.base_url,
+            headers=self.headers,
+        )
 
     def list(
         self,
