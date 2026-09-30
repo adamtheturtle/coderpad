@@ -2,6 +2,7 @@
 
 import enum
 from collections.abc import Iterable
+from enum import Enum
 from typing import ClassVar, Self, TypeVar, override
 
 from beartype import beartype
@@ -573,6 +574,39 @@ class QuestionFileContent(_APIModel):
 
     path: str
     contents: str
+
+
+class QuestionVariantUnset(Enum):
+    """An omitted variant attribute, distinct from explicit JSON null."""
+
+    OMITTED = "unset"
+
+
+@beartype
+class QuestionVariantFileContent(_APIModel):
+    """A variant starter file, including template overlay flags."""
+
+    path: str
+    contents: str = ""
+    hidden: bool | None = None
+    deleted: bool | None = None
+
+
+@beartype
+class QuestionVariant(_APIModel):
+    """A language or project-template variant of a question."""
+
+    id: int
+    question_id: int
+    language: str
+    project_template_id: int | None = None
+    project_template_slug: str | None = None
+    display: str | None = None
+    contents: str | None = None
+    file_contents: list[QuestionVariantFileContent] | None = None
+    solution: str | None = None
+    created_at: str
+    updated_at: str
 
 
 @beartype
