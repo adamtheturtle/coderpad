@@ -1,1 +1,0 @@
-Validate paginated API response shapes before constructing client models.

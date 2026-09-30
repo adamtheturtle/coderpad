@@ -1,1 +1,0 @@
-Type decoded API error bodies using the shared JSON value domain.
