@@ -2,6 +2,7 @@
 
 import enum
 from collections.abc import Iterable
+from enum import Enum
 from typing import ClassVar, Self, TypeVar, override
 
 from beartype import beartype
@@ -573,6 +574,12 @@ class QuestionFileContent(_APIModel):
 
     path: str
     contents: str
+
+
+class QuestionVariantUnset(Enum):
+    """An omitted variant attribute, distinct from explicit JSON null."""
+
+    OMITTED = "unset"
 
 
 @beartype

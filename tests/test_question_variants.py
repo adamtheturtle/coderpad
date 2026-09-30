@@ -5,10 +5,11 @@ import json
 import pytest
 import respx
 
-from coderpad import QuestionVariantFileContent
+from coderpad import Language, QuestionVariantFileContent
 from coderpad.client import CoderPad
 from coderpad.exceptions import NotFoundError
 from coderpad.json_types import JsonValue
+from coderpad.transports import TransportResponse
 
 _BASE = "https://app.coderpad.io/api/questions/42/variants"
 _VARIANT: dict[str, JsonValue] = {
@@ -186,3 +187,58 @@ def test_variant_error() -> None:
         pytest.raises(expected_exception=NotFoundError),
     ):
         _ = client.questions.variants.get(question_id=42, variant_id=7)
+
+
+class _FormOnlyTransport:
+    """A legacy custom transport that still supports question
+    operations.
+    """
+
+    def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: dict[str, tuple[str, bytes, str]] | None,
+    ) -> TransportResponse:
+        """Return an empty library using the legacy form signature."""
+        del method, url, headers, params, data, files
+        return TransportResponse(
+            status_code=200, headers={}, content=b'{"questions":[],"total":0}'
+        )
+
+
+class _KeywordJSONTransport:
+    """A custom transport accepting JSON through keyword arguments."""
+
+    def __call__(self, **kwargs: object) -> TransportResponse:
+        """Confirm that an enum environment is encoded as its language key."""
+        assert kwargs["json"] == {"language": "ruby"}
+        return TransportResponse(
+            status_code=200,
+            headers={},
+            content=json.dumps(obj=_VARIANT).encode(),
+        )
+
+
+def test_legacy_custom_transport() -> None:
+    """Legacy form operations work and variants fail before a request."""
+    with CoderPad(api_key="key", transport=_FormOnlyTransport()) as client:
+        page = client.questions.list()
+        assert page.total == 0
+        with pytest.raises(expected_exception=TypeError, match="JSON-capable"):
+            _ = client.questions.variants
+
+
+def test_custom_keyword_json_transport() -> None:
+    """Custom keyword transports can create variants with language
+    values.
+    """
+    with CoderPad(api_key="key", transport=_KeywordJSONTransport()) as client:
+        variant = client.questions.variants.create(
+            question_id=42, language=Language.RUBY
+        )
+        assert variant.language == "ruby"

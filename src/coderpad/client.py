@@ -30,7 +30,6 @@ from coderpad._response import (
 )
 from coderpad._variant_content import (
     UNSET,
-    Unset,
     require_json_transport,
     variant_attributes,
 )
@@ -59,6 +58,7 @@ from coderpad.types import (
     QuestionFileContent,
     QuestionVariant,
     QuestionVariantFileContent,
+    QuestionVariantUnset,
     Quota,
     SortOrder,
 )
@@ -473,7 +473,7 @@ class QuestionVariantsNamespace:
         *,
         question_id: str | int,
         language: Language | str,
-        contents: str | Unset | None = UNSET,
+        contents: str | QuestionVariantUnset | None = UNSET,
         file_contents: Sequence[QuestionVariantFileContent]
         | str
         | None = None,
@@ -505,7 +505,7 @@ class QuestionVariantsNamespace:
         question_id: str | int,
         variant_id: str | int,
         language: Language | str | None = None,
-        contents: str | Unset | None = UNSET,
+        contents: str | QuestionVariantUnset | None = UNSET,
         file_contents: Sequence[QuestionVariantFileContent]
         | str
         | None = None,

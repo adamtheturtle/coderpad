@@ -1,30 +1,26 @@
 """JSON request attributes for question variants."""
 
 from collections.abc import Sequence
-from enum import Enum
 from inspect import Parameter, signature
 
 from beartype import beartype
 
 from coderpad.json_types import JsonValue
 from coderpad.transports import AsyncJSONTransport, JSONTransport
-from coderpad.types import Language, QuestionVariantFileContent
+from coderpad.types import (
+    Language,
+    QuestionVariantFileContent,
+    QuestionVariantUnset,
+)
 
-
-class Unset(Enum):
-    """An omitted attribute, distinct from an explicit JSON null."""
-
-    OMITTED = "unset"
-
-
-UNSET = Unset.OMITTED
+UNSET = QuestionVariantUnset.OMITTED
 
 
 @beartype
 def variant_attributes(
     *,
     language: Language | str | None,
-    contents: str | Unset | None,
+    contents: str | QuestionVariantUnset | None,
     file_contents: Sequence[QuestionVariantFileContent] | str | None,
     solution: str | None,
 ) -> dict[str, JsonValue]:
@@ -42,7 +38,7 @@ def variant_attributes(
         data["language"] = (
             language.value if isinstance(language, Language) else language
         )
-    if not isinstance(contents, Unset):
+    if not isinstance(contents, QuestionVariantUnset):
         data["contents"] = contents
     if file_contents is not None:
         data["file_contents"] = (
@@ -80,10 +76,8 @@ def require_async_json_transport(transport: object) -> AsyncJSONTransport:
 
 
 @beartype
-def _accepts_json(transport: object) -> bool:
+def _accepts_json(transport: JSONTransport | AsyncJSONTransport) -> bool:
     """Return whether the callable accepts the JSON keyword."""
-    if not callable(transport):
-        return False
     parameters = signature(obj=transport).parameters
     return "json" in parameters or any(
         parameter.kind == Parameter.VAR_KEYWORD
