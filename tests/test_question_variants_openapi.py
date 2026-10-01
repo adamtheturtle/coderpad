@@ -18,9 +18,7 @@ def test_response_schema_matches_model(
     openapi_spec: JSONMapping,
     model: type[QuestionVariant] | type[QuestionVariantFileContent],
 ) -> None:
-    """Response schemas retain model fields, nullability and
-    requirements.
-    """
+    """The response schema preserves required fields and null values."""
     components = openapi_spec["components"]
     assert isinstance(components, dict)
     schemas = components["schemas"]
