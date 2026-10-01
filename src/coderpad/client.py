@@ -21,6 +21,7 @@ from coderpad._dict_types import (
     PadHistoryEntryDict,
 )
 from coderpad._question_content import (
+    question_upload_files,
     validate_mutually_exclusive_question_content,
 )
 from coderpad._response import (
@@ -601,6 +602,8 @@ class QuestionsNamespace(_Namespace):
         candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
+        directory: Path | None = None,
+        exclude: Sequence[str] = (),
     ) -> Question:
         """Create a new question.
 
@@ -621,6 +624,13 @@ class QuestionsNamespace(_Namespace):
             zip_file: Path to a zip archive containing
                 files for a multi-file question. Cannot be
                 combined with ``file_contents``.
+            directory: Directory to upload using the ZIP importer.
+                Cannot be combined with other content sources.
+                Includes hidden files and rejects symbolic links within
+                the directory. No files are excluded by default.
+            exclude: Patterns matched using ``Path.match`` against relative
+                paths. Matching directories are skipped with their contents.
+                Requires ``directory``.
 
         Returns:
             The created question.
@@ -629,6 +639,8 @@ class QuestionsNamespace(_Namespace):
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
+            directory=directory,
+            exclude=exclude,
         )
         lang = language
         data: dict[str, str] = {
@@ -665,15 +677,11 @@ class QuestionsNamespace(_Namespace):
                     for fc in file_contents
                 ],
             )
-        files: dict[str, tuple[str, bytes, str]] | None = None
-        if zip_file is not None:
-            files = {
-                "question[zip_file]": (
-                    zip_file.name,
-                    zip_file.read_bytes(),
-                    "application/zip",
-                ),
-            }
+        files = question_upload_files(
+            zip_file=zip_file,
+            directory=directory,
+            exclude=exclude,
+        )
         response = self._request(
             method="POST",
             url="/api/questions/",
@@ -718,6 +726,8 @@ class QuestionsNamespace(_Namespace):
         candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
+        directory: Path | None = None,
+        exclude: Sequence[str] = (),
     ) -> None:
         """Modify an existing question.
 
@@ -738,11 +748,20 @@ class QuestionsNamespace(_Namespace):
             zip_file: Path to a zip archive containing
                 files for a multi-file question. Cannot be
                 combined with ``file_contents``.
+            directory: Directory to upload using the ZIP importer.
+                Cannot be combined with other content sources.
+                Includes hidden files and rejects symbolic links within
+                the directory. No files are excluded by default.
+            exclude: Patterns matched using ``Path.match`` against relative
+                paths. Matching directories are skipped with their contents.
+                Requires ``directory``.
         """
         validate_mutually_exclusive_question_content(
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
+            directory=directory,
+            exclude=exclude,
         )
         data: dict[str, str] = {}
         if title is not None:
@@ -780,15 +799,11 @@ class QuestionsNamespace(_Namespace):
                     for fc in file_contents
                 ],
             )
-        files: dict[str, tuple[str, bytes, str]] | None = None
-        if zip_file is not None:
-            files = {
-                "question[zip_file]": (
-                    zip_file.name,
-                    zip_file.read_bytes(),
-                    "application/zip",
-                ),
-            }
+        files = question_upload_files(
+            zip_file=zip_file,
+            directory=directory,
+            exclude=exclude,
+        )
         _ = self._request(
             method="PUT",
             url=f"/api/questions/{question_id}",

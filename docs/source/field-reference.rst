@@ -42,6 +42,13 @@ Every other field on :class:`~coderpad.types.Question` is populated by the serve
    * - ``zip_file``
      - Create and update
      - Upload alternative to ``file_contents``.
+   * - ``directory``
+     - Create and update
+     - Package a local directory and upload it through the ZIP importer.
+       Cannot be combined with ``contents``, ``file_contents``, or ``zip_file``.
+   * - ``exclude``
+     - Create and update
+     - Optional relative path patterns for ``directory`` uploads.
    * - ``candidate_instructions``
      - Read only
      - Write support tracked in issue #196.
@@ -93,6 +100,49 @@ Every other field on :class:`~coderpad.types.Question` is populated by the serve
    * - ``updated_at``
      - Read only
      - Server-managed timestamp.
+
+Directory uploads
+~~~~~~~~~~~~~~~~~
+
+Pass ``directory=Path(...)`` to create or update a multi-file question from local files.
+The client builds a ZIP in memory and sends it using the same multipart field as ``zip_file``.
+It preserves relative paths and file bytes, includes hidden files, and creates no temporary files.
+The asynchronous client performs filesystem operations and compression in a worker thread.
+
+Exclusions are optional and have no defaults.
+Each pattern is matched against a relative path using :meth:`pathlib.PurePath.match`.
+A pattern such as ``node_modules`` matches that directory name at any depth and skips its contents.
+A pattern such as ``*.pyc`` excludes matching files at any depth.
+Patterns containing slashes can target paths such as ``src/generated``.
+Symbolic links inside the directory are rejected unless excluded.
+An empty directory produces an empty ZIP.
+Missing directories and paths that are regular files raise :class:`NotADirectoryError`.
+
+.. code-block:: python
+
+   """Upload a local directory with explicit exclusions."""
+
+   from pathlib import Path
+   from tempfile import TemporaryDirectory
+
+   from coderpad.client import CoderPad
+
+   with TemporaryDirectory() as temporary:
+       directory = Path(temporary)
+       _ = (directory / "main.py").write_text(
+           data="print('Hello')\n", encoding="utf-8"
+       )
+       with CoderPad(api_key="test-key") as client:
+           client.questions.update(
+               question_id="123",
+               directory=directory,
+               exclude=("node_modules", "__pycache__", "*.pyc", "uv.lock"),
+           )
+
+Directory uploads retain the server's ZIP importer behavior.
+Live verification found that ZIP uploads generate a missing ``.cpad`` file for Python and TypeScript projects, including default run and test targets.
+Uploading the same files with ``file_contents`` does not generate that file.
+Keep repository-specific exclusions and source transformations in the caller.
 
 Pads
 ----
