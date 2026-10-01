@@ -11,7 +11,7 @@ This was because the Postman collection used a literal URL rather than a ``:id``
 The spec has been corrected to place the ``PUT`` operation under ``/api/pads/{id}``.
 
 The bundled spec also includes the question variant endpoints, which are absent from the Postman export.
-These additions describe JSON requests, starter files, and nullable response fields observed in the live API.
+These additions describe JSON requests, starter files, and response fields that accept null values in the live API.
 Project variants return ``language: null`` and identify their environment using project template metadata.
 
 Refreshing the bundled spec
@@ -29,7 +29,7 @@ To refresh ``openapi.json``:
 
    The script applies the known Postman path correction above and writes ``openapi.json`` at the repository root.
 #. Keep the empirically observed response fields below in sync with any new live variants, and extend the synthetic fixtures that cover them.
-#. Retain the question variant paths and component schemas when replacing the exported spec.
+#. Retain the question variant paths and component schema definitions when replacing the exported spec.
 
 Empirically observed response fields
 ------------------------------------
