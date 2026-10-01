@@ -33,6 +33,7 @@ CoderPad responses can include fields that are not currently described by the pu
 The client preserves the following structures observed in live API responses:
 
 * binary pad-environment files, whose ``contents`` value is ``null``;
+* project question variants, whose ``language`` value is ``null`` and whose environment is identified by project template metadata;
 * pad interviewer-access restrictions and interviewer notifications;
 * question custom databases and their structured table definitions; and
 * organization identifiers and raw child-organization mappings.

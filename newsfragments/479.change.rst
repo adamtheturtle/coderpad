@@ -1,0 +1,1 @@
+Accept null languages in project question variant responses, preserving their template metadata and starter files in both synchronous and asynchronous clients.
