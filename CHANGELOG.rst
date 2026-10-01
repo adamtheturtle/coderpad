@@ -3,6 +3,11 @@ Changelog
 
 .. towncrier release notes start
 
+2026.10.01.1
+------------
+
+- Add directory uploads to synchronous and asynchronous question creation and updates, preserving ZIP importer behavior without temporary archives.
+
 2026.10.01
 ----------
 
