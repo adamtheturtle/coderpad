@@ -22,6 +22,7 @@ from coderpad._dict_types import (
     PadHistoryEntryDict,
 )
 from coderpad._question_content import (
+    question_upload_files,
     validate_mutually_exclusive_question_content,
 )
 from coderpad._response import (
@@ -608,6 +609,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
+        directory: Path | None = None,
     ) -> Question:
         """Create a new question.
 
@@ -629,6 +631,10 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             zip_file: Path to a zip archive containing
                 files for a multi-file question. Cannot be
                 combined with ``file_contents``.
+            directory: Directory to upload using the ZIP importer.
+                Cannot be combined with other content sources.
+                Includes hidden files and rejects symbolic links within
+                the directory. Uploads all files in the directory.
 
         Returns:
             The created question.
@@ -637,6 +643,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
+            directory=directory,
         )
         lang = language
         data: dict[str, str] = {
@@ -673,15 +680,13 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
                     for fc in file_contents
                 ],
             )
-        files: dict[str, tuple[str, bytes, str]] | None = None
-        if zip_file is not None:
-            files = {
-                "question[zip_file]": (
-                    zip_file.name,
-                    await asyncio.to_thread(zip_file.read_bytes),
-                    "application/zip",
-                ),
-            }
+        files = None
+        if directory is not None or zip_file is not None:
+            files = await asyncio.to_thread(
+                question_upload_files,
+                zip_file=zip_file,
+                directory=directory,
+            )
         response = await self._request(
             method="POST",
             url="/api/questions/",
@@ -726,6 +731,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
+        directory: Path | None = None,
     ) -> None:
         """Modify an existing question.
 
@@ -746,11 +752,16 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             zip_file: Path to a zip archive containing
                 files for a multi-file question. Cannot be
                 combined with ``file_contents``.
+            directory: Directory to upload using the ZIP importer.
+                Cannot be combined with other content sources.
+                Includes hidden files and rejects symbolic links within
+                the directory. Uploads all files in the directory.
         """
         validate_mutually_exclusive_question_content(
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
+            directory=directory,
         )
         data: dict[str, str] = {}
         if title is not None:
@@ -788,15 +799,13 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
                     for fc in file_contents
                 ],
             )
-        files: dict[str, tuple[str, bytes, str]] | None = None
-        if zip_file is not None:
-            files = {
-                "question[zip_file]": (
-                    zip_file.name,
-                    await asyncio.to_thread(zip_file.read_bytes),
-                    "application/zip",
-                ),
-            }
+        files = None
+        if directory is not None or zip_file is not None:
+            files = await asyncio.to_thread(
+                question_upload_files,
+                zip_file=zip_file,
+                directory=directory,
+            )
         await self._request(
             method="PUT",
             url=f"/api/questions/{question_id}",

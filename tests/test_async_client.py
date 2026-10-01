@@ -935,7 +935,7 @@ class TestAsyncCreateQuestion:
         _ = zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
         with pytest.raises(
             expected_exception=ValueError,
-            match="at most one of contents, file_contents, or zip_file",
+            match="at most one of contents, file_contents, zip_file",
         ):
             await async_coderpad_client.questions.create(
                 title="Conflict",
