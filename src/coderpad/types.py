@@ -598,7 +598,7 @@ class QuestionVariant(_APIModel):
 
     id: int
     question_id: int
-    language: str
+    language: str | None
     project_template_id: int | None = None
     project_template_slug: str | None = None
     display: str | None = None

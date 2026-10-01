@@ -16,6 +16,7 @@ permissions: {}
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.13']
         platform: [ubuntu-latest, windows-latest]

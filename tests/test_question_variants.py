@@ -78,6 +78,59 @@ def test_variant_crud() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    argnames="project_template_slug",
+    argvalues=["multifile_python", "multifile_typescript"],
+)
+@respx.mock
+def test_project_variant_crud(project_template_slug: str) -> None:
+    """Project variants preserve null languages and template files."""
+    payload: dict[str, JsonValue] = {
+        **_VARIANT,
+        "language": None,
+        "project_template_id": 12,
+        "project_template_slug": project_template_slug,
+        "display": "Project",
+        "contents": None,
+        "file_contents": [
+            {"path": "README.md", "contents": "Starter project"},
+        ],
+    }
+    _ = respx.get(url=_BASE).respond(json={"variants": [payload]})
+    _ = respx.get(url=_BASE + "/7").respond(json=payload)
+    creating = respx.post(url=_BASE).respond(json=payload)
+    updating = respx.put(url=_BASE + "/7").respond(json=payload)
+    files = [
+        QuestionVariantFileContent(
+            path="README.md", contents="Starter project"
+        ),
+    ]
+    with CoderPad(api_key="variant-key") as client:
+        variants = client.questions.variants.list(question_id=42)
+        variant = client.questions.variants.get(question_id=42, variant_id=7)
+        created = client.questions.variants.create(
+            question_id=42,
+            language=project_template_slug,
+            file_contents=files,
+        )
+        updated = client.questions.variants.update(
+            question_id=42, variant_id=7, file_contents=files
+        )
+    assert variant.model_dump(exclude_unset=True) == payload
+    assert variants == [variant]
+    assert created == variant
+    assert updated == variant
+    assert creating.call_count == 1
+    assert updating.call_count == 1
+    assert json.loads(s=creating.calls.last.request.content) == {
+        "language": project_template_slug,
+        "file_contents": payload["file_contents"],
+    }
+    assert json.loads(s=updating.calls.last.request.content) == {
+        "file_contents": payload["file_contents"],
+    }
+
+
 @pytest.mark.parametrize(argnames="contents", argvalues=["", None])
 @respx.mock
 def test_explicit_code_state(contents: str | None) -> None:

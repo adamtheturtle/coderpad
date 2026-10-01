@@ -30,6 +30,8 @@ All five operations use JSON endpoints nested under the question.
 Custom Interview transports must accept the ``json`` keyword.
 
 Create accepts a language key such as ``ruby`` or a project template slug such as ``react``.
+Project variant responses have ``language=None``.
+Use ``project_template_slug`` and ``project_template_id`` to identify their environment.
 Omitting ``contents`` preserves code on update, ``contents=""`` writes a blank starter file, and ``contents=None`` restores the language default.
 Changing environment clears code unless replacement code or files are supplied.
 
