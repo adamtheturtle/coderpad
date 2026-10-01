@@ -610,7 +610,6 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
         directory: Path | None = None,
-        exclude: Sequence[str] = (),
     ) -> Question:
         """Create a new question.
 
@@ -635,10 +634,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             directory: Directory to upload using the ZIP importer.
                 Cannot be combined with other content sources.
                 Includes hidden files and rejects symbolic links within
-                the directory. No files are excluded by default.
-            exclude: Patterns matched using ``Path.match`` against relative
-                paths. Matching directories are skipped with their contents.
-                Requires ``directory``.
+                the directory. Uploads all files in the directory.
 
         Returns:
             The created question.
@@ -648,7 +644,6 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             file_contents=file_contents,
             zip_file=zip_file,
             directory=directory,
-            exclude=exclude,
         )
         lang = language
         data: dict[str, str] = {
@@ -691,7 +686,6 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
                 question_upload_files,
                 zip_file=zip_file,
                 directory=directory,
-                exclude=exclude,
             )
         response = await self._request(
             method="POST",
@@ -738,7 +732,6 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
         directory: Path | None = None,
-        exclude: Sequence[str] = (),
     ) -> None:
         """Modify an existing question.
 
@@ -762,17 +755,13 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             directory: Directory to upload using the ZIP importer.
                 Cannot be combined with other content sources.
                 Includes hidden files and rejects symbolic links within
-                the directory. No files are excluded by default.
-            exclude: Patterns matched using ``Path.match`` against relative
-                paths. Matching directories are skipped with their contents.
-                Requires ``directory``.
+                the directory. Uploads all files in the directory.
         """
         validate_mutually_exclusive_question_content(
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
             directory=directory,
-            exclude=exclude,
         )
         data: dict[str, str] = {}
         if title is not None:
@@ -816,7 +805,6 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
                 question_upload_files,
                 zip_file=zip_file,
                 directory=directory,
-                exclude=exclude,
             )
         await self._request(
             method="PUT",

@@ -5,6 +5,7 @@ from email import policy
 from email.parser import BytesParser
 from io import BytesIO
 from pathlib import Path
+from shutil import copytree, ignore_patterns
 from zipfile import ZipFile
 
 import pytest
@@ -31,8 +32,7 @@ async def _upload(
     *,
     client: CoderPad | AsyncCoderPad,
     create: bool,
-    directory: Path | None,
-    exclude: Sequence[str],
+    directory: Path,
     contents: str | None,
     file_contents: Sequence[QuestionFileContent] | None,
     zip_file: Path | None,
@@ -44,7 +44,6 @@ async def _upload(
             title="Directory upload",
             language="multifile_python",
             directory=directory,
-            exclude=exclude,
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
@@ -53,7 +52,6 @@ async def _upload(
         result = client.questions.update(
             question_id="123",
             directory=directory,
-            exclude=exclude,
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
@@ -106,7 +104,9 @@ async def test_directory_preserves_files(
         "nested/main.py": "print('caf\u00e9')\r\n".encode(),
         "nested/image.bin": bytes(range(256)),
         "empty.txt": b"",
-        "uv.lock": b"keep unless explicitly excluded",
+        "uv.lock": b"include all files",
+        "node_modules/dependency.js": b"include dependencies",
+        "__pycache__/main.pyc": b"include generated files",
     }
     for name, data in expected.items():
         path = tmp_path / name
@@ -116,7 +116,6 @@ async def test_directory_preserves_files(
         client=upload_client,
         create=create,
         directory=tmp_path,
-        exclude=(),
         contents=None,
         file_contents=None,
         zip_file=None,
@@ -126,14 +125,16 @@ async def test_directory_preserves_files(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(argnames="create", argvalues=[True, False])
-async def test_directory_exclusions(
+async def test_staged_directory(
     upload_client: CoderPad | AsyncCoderPad,
     mock_coderpad_api: respx.MockRouter,
     tmp_path: Path,
     *,
     create: bool,
 ) -> None:
-    """Prune directories and match file patterns at any depth."""
+    """Callers can filter files with ``copytree`` before uploading."""
+    source = tmp_path / "source"
+    source.mkdir()
     paths = [
         "main.py",
         "nested/keep.py",
@@ -145,20 +146,26 @@ async def test_directory_exclusions(
         "nested/private/secret.txt",
     ]
     for name in paths:
-        path = tmp_path / name
+        path = source / name
         path.parent.mkdir(parents=True, exist_ok=True)
         _ = path.write_bytes(data=b"data")
+    directory = Path(
+        copytree(
+            src=source,
+            dst=tmp_path / "upload",
+            ignore=ignore_patterns(
+                "node_modules",
+                "*.egg-info",
+                "*.pyc",
+                "uv.lock",
+                "private",
+            ),
+        )
+    )
     await _upload(
         client=upload_client,
         create=create,
-        directory=tmp_path,
-        exclude=(
-            "node_modules",
-            "*.egg-info",
-            "*.pyc",
-            "uv.lock",
-            "nested/private",
-        ),
+        directory=directory,
         contents=None,
         file_contents=None,
         zip_file=None,
@@ -183,7 +190,6 @@ async def test_empty_directory(
         client=upload_client,
         create=create,
         directory=tmp_path,
-        exclude=(),
         contents=None,
         file_contents=None,
         zip_file=None,
@@ -215,7 +221,6 @@ async def test_invalid_directory(
             client=upload_client,
             create=create,
             directory=path,
-            exclude=(),
             contents=None,
             file_contents=None,
             zip_file=None,
@@ -242,34 +247,9 @@ async def test_conflicting_directory_content(
             client=upload_client,
             create=create,
             directory=tmp_path,
-            exclude=(),
             contents="" if source == "contents" else None,
             file_contents=[] if source == "file_contents" else None,
             zip_file=tmp_path / "unused.zip" if source == "zip_file" else None,
-        )
-    assert len(mock_coderpad_api.calls) == 0
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(argnames="create", argvalues=[True, False])
-async def test_exclusions_require_directory(
-    upload_client: CoderPad | AsyncCoderPad,
-    mock_coderpad_api: respx.MockRouter,
-    *,
-    create: bool,
-) -> None:
-    """Reject exclusions that would otherwise be silently ignored."""
-    with pytest.raises(
-        expected_exception=ValueError, match="exclude requires directory"
-    ):
-        await _upload(
-            client=upload_client,
-            create=create,
-            directory=None,
-            exclude=("node_modules",),
-            contents=None,
-            file_contents=None,
-            zip_file=None,
         )
     assert len(mock_coderpad_api.calls) == 0
 
@@ -285,7 +265,7 @@ async def test_directory_symlinks(
     create: bool,
     target_directory: bool,
 ) -> None:
-    """Reject symbolic links unless explicitly excluded."""
+    """Reject symbolic links before making an upload request."""
     target = tmp_path / "target"
     if target_directory:
         target.mkdir()
@@ -301,19 +281,8 @@ async def test_directory_symlinks(
             client=upload_client,
             create=create,
             directory=directory,
-            exclude=(),
             contents=None,
             file_contents=None,
             zip_file=None,
         )
     assert len(mock_coderpad_api.calls) == 0
-    await _upload(
-        client=upload_client,
-        create=create,
-        directory=directory,
-        exclude=("link",),
-        contents=None,
-        file_contents=None,
-        zip_file=None,
-    )
-    assert _archive_contents(router=mock_coderpad_api) == {}

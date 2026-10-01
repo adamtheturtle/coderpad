@@ -603,7 +603,6 @@ class QuestionsNamespace(_Namespace):
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
         directory: Path | None = None,
-        exclude: Sequence[str] = (),
     ) -> Question:
         """Create a new question.
 
@@ -627,10 +626,7 @@ class QuestionsNamespace(_Namespace):
             directory: Directory to upload using the ZIP importer.
                 Cannot be combined with other content sources.
                 Includes hidden files and rejects symbolic links within
-                the directory. No files are excluded by default.
-            exclude: Patterns matched using ``Path.match`` against relative
-                paths. Matching directories are skipped with their contents.
-                Requires ``directory``.
+                the directory. Uploads all files in the directory.
 
         Returns:
             The created question.
@@ -640,7 +636,6 @@ class QuestionsNamespace(_Namespace):
             file_contents=file_contents,
             zip_file=zip_file,
             directory=directory,
-            exclude=exclude,
         )
         lang = language
         data: dict[str, str] = {
@@ -680,7 +675,6 @@ class QuestionsNamespace(_Namespace):
         files = question_upload_files(
             zip_file=zip_file,
             directory=directory,
-            exclude=exclude,
         )
         response = self._request(
             method="POST",
@@ -727,7 +721,6 @@ class QuestionsNamespace(_Namespace):
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
         directory: Path | None = None,
-        exclude: Sequence[str] = (),
     ) -> None:
         """Modify an existing question.
 
@@ -751,17 +744,13 @@ class QuestionsNamespace(_Namespace):
             directory: Directory to upload using the ZIP importer.
                 Cannot be combined with other content sources.
                 Includes hidden files and rejects symbolic links within
-                the directory. No files are excluded by default.
-            exclude: Patterns matched using ``Path.match`` against relative
-                paths. Matching directories are skipped with their contents.
-                Requires ``directory``.
+                the directory. Uploads all files in the directory.
         """
         validate_mutually_exclusive_question_content(
             contents=contents,
             file_contents=file_contents,
             zip_file=zip_file,
             directory=directory,
-            exclude=exclude,
         )
         data: dict[str, str] = {}
         if title is not None:
@@ -802,7 +791,6 @@ class QuestionsNamespace(_Namespace):
         files = question_upload_files(
             zip_file=zip_file,
             directory=directory,
-            exclude=exclude,
         )
         _ = self._request(
             method="PUT",

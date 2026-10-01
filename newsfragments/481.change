@@ -1,1 +1,1 @@
-Add directory uploads with configurable exclusions to synchronous and asynchronous question creation and updates, preserving ZIP importer behavior without temporary files.
+Add directory uploads to synchronous and asynchronous question creation and updates, preserving ZIP importer behavior without temporary archives.

@@ -46,9 +46,6 @@ Every other field on :class:`~coderpad.types.Question` is populated by the serve
      - Create and update
      - Package a local directory and upload it through the ZIP importer.
        Cannot be combined with ``contents``, ``file_contents``, or ``zip_file``.
-   * - ``exclude``
-     - Create and update
-     - Optional relative path patterns for ``directory`` uploads.
    * - ``candidate_instructions``
      - Read only
      - Write support tracked in issue #196.
@@ -109,34 +106,44 @@ The client builds a ZIP in memory and sends it using the same multipart field as
 It preserves relative paths and file bytes, includes hidden files, and creates no temporary files.
 The asynchronous client performs file operations and compression in a worker thread.
 
-Exclusions are optional and have no defaults.
-Each pattern is matched against a relative path using :meth:`pathlib.PurePath.match`.
-A pattern such as ``node_modules`` matches that directory name at any depth and skips its contents.
-A pattern such as ``*.pyc`` excludes matching files at any depth.
-Patterns containing slashes can target paths such as ``src/generated``.
-Symbolic links inside the directory are rejected unless excluded.
+All files in the supplied directory are uploaded.
+Symbolic links inside the directory are rejected.
 An empty directory produces an empty ZIP.
 Missing directories and paths that are regular files raise :class:`NotADirectoryError`.
 
+To exclude files or transform their contents, prepare a staging directory before uploading.
+Use :func:`shutil.copytree` with its ``ignore`` callback, such as :func:`shutil.ignore_patterns`, and :class:`tempfile.TemporaryDirectory` for cleanup.
+An already-prepared directory can be uploaded directly without copying.
+
 .. code-block:: python
 
-   """Upload a local directory with explicit exclusions."""
+   """Filter a directory, then upload the staged files."""
 
    from pathlib import Path
+   from shutil import copytree, ignore_patterns
    from tempfile import TemporaryDirectory
 
    from coderpad.client import CoderPad
 
    with TemporaryDirectory() as temporary:
-       directory = Path(temporary)
-       _ = (directory / "main.py").write_text(
+       source = Path(temporary) / "source"
+       source.mkdir()
+       _ = (source / "main.py").write_text(
            data="print('Hello')\n", encoding="utf-8"
+       )
+       directory = Path(
+           copytree(
+               src=source,
+               dst=Path(temporary) / "upload",
+               ignore=ignore_patterns(
+                   "node_modules", "__pycache__", "*.pyc", "uv.lock"
+               ),
+           )
        )
        with CoderPad(api_key="test-key") as client:
            client.questions.update(
                question_id="123",
                directory=directory,
-               exclude=("node_modules", "__pycache__", "*.pyc", "uv.lock"),
            )
 
 Directory uploads retain the server's ZIP importer behavior.

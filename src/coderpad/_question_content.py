@@ -17,7 +17,6 @@ def validate_mutually_exclusive_question_content(
     file_contents: Sequence[QuestionFileContent] | None,
     zip_file: Path | None,
     directory: Path | None,
-    exclude: Sequence[str],
 ) -> None:
     """Raise if more than one question content source is set.
 
@@ -26,7 +25,6 @@ def validate_mutually_exclusive_question_content(
         file_contents: Multi-file contents.
         zip_file: Zip archive of multi-file contents.
         directory: Directory to upload as a ZIP archive.
-        exclude: Relative path patterns excluded from directory uploads.
 
     Raises:
         ValueError: If more than one content source is provided.
@@ -47,34 +45,27 @@ def validate_mutually_exclusive_question_content(
             f"zip_file, or directory; got {', '.join(provided)}."
         )
         raise ValueError(msg)
-    if len(exclude) > 0 and directory is None:
-        msg = "exclude requires directory."
-        raise ValueError(msg)
 
 
 @beartype
 def _directory_files(
-    *, directory: Path, prefix: Path, exclude: Sequence[str]
+    *, directory: Path, prefix: Path
 ) -> Iterator[tuple[Path, Path]]:
-    """Yield sorted paths, pruning exclusions and rejecting symbolic links."""
+    """Yield sorted file paths, rejecting symbolic links."""
     for path in sorted(directory.iterdir()):
         relative = prefix / path.name
-        if any(relative.match(path_pattern=pattern) for pattern in exclude):
-            continue
         if path.is_symlink():
             msg = f"Directory uploads do not support symbolic links: {path}"
             raise ValueError(msg)
         if path.is_dir():
-            yield from _directory_files(
-                directory=path, prefix=relative, exclude=exclude
-            )
+            yield from _directory_files(directory=path, prefix=relative)
         else:
             yield path, relative
 
 
 @beartype
 def question_upload_files(
-    *, zip_file: Path | None, directory: Path | None, exclude: Sequence[str]
+    *, zip_file: Path | None, directory: Path | None
 ) -> dict[str, tuple[str, bytes, str]] | None:
     """Build the multipart ZIP field without creating temporary files."""
     if directory is not None:
@@ -86,7 +77,7 @@ def question_upload_files(
                 file=buffer, mode="w", compression=ZIP_DEFLATED
             ) as archive:
                 for path, relative in _directory_files(
-                    directory=directory, prefix=Path(), exclude=exclude
+                    directory=directory, prefix=Path()
                 ):
                     archive.write(
                         filename=path,
