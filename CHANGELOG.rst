@@ -3,6 +3,12 @@ Changelog
 
 .. towncrier release notes start
 
+2026.10.01
+----------
+
+- Accept null languages in project question variant responses, preserving their template metadata and starter files in both synchronous and asynchronous clients.
+  Document the question variant endpoints and their request and response schema definitions in the bundled OpenAPI spec.
+
 2026.09.30
 ----------
 
