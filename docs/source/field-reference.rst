@@ -107,7 +107,7 @@ Directory uploads
 Pass ``directory=Path(...)`` to create or update a multi-file question from local files.
 The client builds a ZIP in memory and sends it using the same multipart field as ``zip_file``.
 It preserves relative paths and file bytes, includes hidden files, and creates no temporary files.
-The asynchronous client performs filesystem operations and compression in a worker thread.
+The asynchronous client performs file operations and compression in a worker thread.
 
 Exclusions are optional and have no defaults.
 Each pattern is matched against a relative path using :meth:`pathlib.PurePath.match`.
