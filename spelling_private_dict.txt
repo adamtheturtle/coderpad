@@ -47,6 +47,7 @@ reportPrivateUsage
 respx
 str
 subclasses
+submodule
 todo
 txt
 ty
