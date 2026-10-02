@@ -25,6 +25,7 @@ from coderpad.screen_types import (
     ScreenTestsPage,
     ScreenWebhook,
 )
+from coderpad.sources import PreparedSource, prepare_source
 from coderpad.types import (
     CandidateInstruction,
     CustomDatabase,
@@ -85,6 +86,7 @@ __all__ = [
     "PadHistoryEntry",
     "PadInterviewerNotification",
     "PaginatedList",
+    "PreparedSource",
     "Question",
     "QuestionFileContent",
     "QuestionVariant",
@@ -107,4 +109,5 @@ __all__ = [
     "SortOrder",
     "Team",
     "TestCase",
+    "prepare_source",
 ]

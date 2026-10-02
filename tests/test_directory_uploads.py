@@ -13,6 +13,7 @@ import respx
 
 from coderpad.async_client import AsyncCoderPad
 from coderpad.client import CoderPad
+from coderpad.sources import prepare_source
 from coderpad.types import Question, QuestionFileContent
 
 
@@ -286,3 +287,40 @@ async def test_directory_symlinks(
             zip_file=None,
         )
     assert len(mock_coderpad_api.calls) == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(argnames="create", argvalues=[True, False])
+async def test_prepared_source_upload(
+    upload_client: CoderPad | AsyncCoderPad,
+    mock_coderpad_api: respx.MockRouter,
+    tmp_path: Path,
+    *,
+    create: bool,
+) -> None:
+    """The previewed selection is the exact ZIP payload in every API."""
+    expected = {"main.py": b"pass\r\n", "data.bin": bytes(range(256))}
+    for name, data in expected.items():
+        _ = (tmp_path / name).write_bytes(data=data)
+    _ = (tmp_path / ".gitignore").write_bytes(data=b"*.pyc\n")
+    _ = (tmp_path / "generated.pyc").write_bytes(data=b"exclude")
+    with prepare_source(
+        directory=tmp_path,
+        respect_gitignore=True,
+        excludes=(".gitignore",),
+    ) as source:
+        assert source.files == tuple(sorted(expected))
+        assert source.directory is not None
+        assert {
+            name: (source.directory / name).read_bytes()
+            for name in source.files
+        } == expected
+        await _upload(
+            client=upload_client,
+            create=create,
+            directory=source.directory,
+            contents=source.contents,
+            file_contents=None,
+            zip_file=None,
+        )
+    assert _archive_contents(router=mock_coderpad_api) == expected

@@ -1,0 +1,2 @@
+Add ``coderpad.sources.prepare_source`` for network-free question source preparation with optional Git ignore rules, exclusions, byte-preserving staging, and selected paths for previews.
+Existing directory uploads retain their behavior.

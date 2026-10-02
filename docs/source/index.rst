@@ -70,6 +70,7 @@ Reference
 
    api-reference
    field-reference
+   source-preparation
    stability
    screen-usage
    openapi-spec
