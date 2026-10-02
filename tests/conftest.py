@@ -120,8 +120,8 @@ def _question_payload() -> dict[str, object]:
 
 @pytest.fixture(name="openapi_spec")
 def fixture_openapi_spec(request: pytest.FixtureRequest) -> JSONMapping:
-    """Load the OpenAPI spec from the repo."""
-    openapi_spec_path = request.config.rootpath / "openapi.json"
+    """Load the pinned shared OpenAPI spec without network access."""
+    openapi_spec_path = request.config.rootpath / "spec" / "openapi.json"
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
     return parse_json_mapping(text=spec_text)
 

@@ -26,7 +26,7 @@ def fixture_mock_coderpad_api(
     request: pytest.FixtureRequest,
 ) -> Generator[respx.MockRouter]:
     """Provide a respx mock router backed by the OpenAPI spec."""
-    openapi_spec_path = request.config.rootpath / "openapi.json"
+    openapi_spec_path = request.config.rootpath / "spec" / "openapi.json"
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
     openapi_spec = parse_json_mapping(text=spec_text)
     _ = os.environ.setdefault(key="CODERPAD_API_KEY", value="test-key")

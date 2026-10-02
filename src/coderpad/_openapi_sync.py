@@ -1,4 +1,4 @@
-"""Maintainer helpers for refreshing the bundled OpenAPI document."""
+"""Maintainer helpers for preparing shared OpenAPI changes for review."""
 
 from __future__ import annotations
 
@@ -82,21 +82,19 @@ def apply_postman_corrections(spec: dict[str, JsonValue]) -> list[str]:
 
 
 @beartype
-def run_sync(*, arguments: list[str], repo_root: Path) -> int:
+def run_sync(*, arguments: list[str]) -> int:
     """Run the OpenAPI sync entry point.
 
     Args:
         arguments: Command-line arguments excluding the program name.
-        repo_root: Repository root used for the default output path.
 
     Returns:
         Process exit code.
     """
-    default_target = repo_root / "openapi.json"
     parser = argparse.ArgumentParser(
         description=(
             "Normalize a Postman-exported CoderPad OpenAPI document "
-            "and write it to the repository openapi.json."
+            "for review in adamtheturtle/coderpad-openapi."
         ),
     )
     _ = parser.add_argument(
@@ -107,8 +105,8 @@ def run_sync(*, arguments: list[str], repo_root: Path) -> int:
     _ = parser.add_argument(
         "--target",
         type=Path,
-        default=default_target,
-        help=f"Output path (default: {default_target})",
+        required=True,
+        help="Output path for the normalized export to review",
     )
     args = parser.parse_args(args=arguments, namespace=_Arguments())
     loaded: object = json.loads(s=args.source.read_text(encoding="utf-8"))
@@ -126,8 +124,8 @@ def run_sync(*, arguments: list[str], repo_root: Path) -> int:
     if not bool(notes):
         _ = sys.stderr.write("No Postman path corrections needed.\n")
     _ = sys.stderr.write(
-        "Keep empirically observed response variants documented in "
-        "docs/source/openapi-spec.rst and covered by fixtures.\n",
+        "Review contract changes in adamtheturtle/coderpad-openapi. "
+        "Retain manually maintained question variant definitions.\n",
     )
     _ = sys.stdout.write(f"{args.target}\n")
     return 0

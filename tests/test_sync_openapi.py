@@ -129,7 +129,6 @@ def test_main_writes_normalized_spec(tmp_path: Path) -> None:
     )
     exit_code = run_sync(
         arguments=[str(object=source), "--target", str(object=target)],
-        repo_root=tmp_path,
     )
     assert exit_code == 0
     written = json.loads(s=target.read_text(encoding="utf-8"))
@@ -157,14 +156,13 @@ def test_main_reports_when_no_corrections_needed(
     )
     exit_code = run_sync(
         arguments=[str(object=source), "--target", str(object=target)],
-        repo_root=tmp_path,
     )
     assert exit_code == 0
     captured = capsys.readouterr()
     assert captured.err == (
         "No Postman path corrections needed.\n"
-        "Keep empirically observed response variants documented in "
-        "docs/source/openapi-spec.rst and covered by fixtures.\n"
+        "Review contract changes in adamtheturtle/coderpad-openapi. "
+        "Retain manually maintained question variant definitions.\n"
     )
 
 
@@ -179,5 +177,12 @@ def test_main_rejects_non_object_root(tmp_path: Path) -> None:
                 "--target",
                 str(object=tmp_path / "out"),
             ],
-            repo_root=tmp_path,
         )
+
+
+def test_main_requires_explicit_target(tmp_path: Path) -> None:
+    """A refresh cannot silently replace the consumer's contract."""
+    with pytest.raises(expected_exception=SystemExit) as exception:
+        _ = run_sync(arguments=[str(object=tmp_path / "export.json")])
+    expected_exit_code = 2
+    assert exception.value.code == expected_exit_code

@@ -8,6 +8,15 @@ CI is the canonical source of truth.
 Install contribution dependencies
 ---------------------------------
 
+Initialize the pinned shared specification before running tests:
+
+.. code-block:: console
+
+   $ git submodule update --init spec
+
+Repeat this after pulling changes to the specification pin.
+See :doc:`openapi-spec` for its ownership and update process.
+
 Install Python dependencies in a virtual environment.
 
 .. code-block:: console
@@ -76,6 +85,7 @@ When you extend the client to support a new empirically observed variant, update
 #. Add a ``newsfragments/<issue>.change.rst`` entry describing the user-visible behavior (see :doc:`release-process`).
 #. Extend the bullet list in :doc:`openapi-spec` under empirically observed response fields.
 #. Add or extend **synthetic** fixtures and tests so the variant is covered without storing account-specific payloads in the repository.
+#. Propose contract changes in ``adamtheturtle/coderpad-openapi``, then update the reviewed specification pin here.
 
 Continuous integration
 ----------------------
