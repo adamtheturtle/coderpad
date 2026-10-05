@@ -3,9 +3,11 @@
 import os
 from collections.abc import Generator
 from doctest import ELLIPSIS
+from pathlib import Path
 
 import pytest
 import respx
+from pyprojroot import find_root, has_file
 from sybil import Sybil
 from sybil.parsers.rest import (
     ClearNamespaceParser,
@@ -22,11 +24,16 @@ _BASE_URL = "https://app.coderpad.io"
 
 
 @pytest.fixture(name="mock_coderpad_api")
-def fixture_mock_coderpad_api(
-    request: pytest.FixtureRequest,
-) -> Generator[respx.MockRouter]:
+def fixture_mock_coderpad_api() -> Generator[respx.MockRouter]:
     """Provide a respx mock router backed by the OpenAPI spec."""
-    openapi_spec_path = request.config.rootpath / "spec" / "openapi.json"
+    openapi_spec_path = (
+        find_root(
+            criterion=has_file(file="pyproject.toml"),
+            start=Path(__file__).resolve(),
+        )
+        / "spec"
+        / "openapi.json"
+    )
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
     openapi_spec = parse_json_mapping(text=spec_text)
     _ = os.environ.setdefault(key="CODERPAD_API_KEY", value="test-key")

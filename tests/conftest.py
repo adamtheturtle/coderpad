@@ -3,10 +3,12 @@
 import json as json_module
 from collections.abc import Callable, Generator
 from http import HTTPStatus
+from pathlib import Path
 from urllib.parse import urlsplit
 
 import pytest
 import respx
+from pyprojroot import find_root, has_file
 
 from coderpad.async_client import AsyncCoderPad
 from coderpad.client import CoderPad
@@ -119,9 +121,16 @@ def _question_payload() -> dict[str, object]:
 
 
 @pytest.fixture(name="openapi_spec")
-def fixture_openapi_spec(request: pytest.FixtureRequest) -> JSONMapping:
+def fixture_openapi_spec() -> JSONMapping:
     """Load the pinned shared OpenAPI spec without network access."""
-    openapi_spec_path = request.config.rootpath / "spec" / "openapi.json"
+    openapi_spec_path = (
+        find_root(
+            criterion=has_file(file="pyproject.toml"),
+            start=Path(__file__).resolve(),
+        )
+        / "spec"
+        / "openapi.json"
+    )
     spec_text = openapi_spec_path.read_text(encoding="utf-8")
     return parse_json_mapping(text=spec_text)
 
