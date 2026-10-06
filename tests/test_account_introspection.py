@@ -51,7 +51,7 @@ def _assert_headers(router: respx.MockRouter) -> None:
 
 @pytest.mark.parametrize(argnames="name", argvalues=[None, "", "Ada"])
 def test_account_introspection(name: str | None) -> None:
-    """Nullable names and empty metadata survive synchronous decoding."""
+    """Optional names and empty metadata survive synchronous decoding."""
     with respx.mock() as router:
         _routes(router=router, name=name)
         with CoderPad(
