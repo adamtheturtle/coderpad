@@ -21,6 +21,7 @@ from coderpad._dict_types import (
     PadHistoryEntryDict,
 )
 from coderpad._question_content import (
+    question_setting_fields,
     question_upload_files,
     validate_mutually_exclusive_question_content,
 )
@@ -599,6 +600,8 @@ class QuestionsNamespace(_Namespace):
         contents: str | None = None,
         solution: str | None = None,
         ai_assist_custom_system_prompt: str | None = None,
+        shared: bool | None = None,
+        custom_database_id: int | None = None,
         candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
@@ -615,6 +618,8 @@ class QuestionsNamespace(_Namespace):
                 ``file_contents``.
             solution: The solution to the question.
             ai_assist_custom_system_prompt: Custom system prompt for AI Assist.
+            shared: Whether to share the question with your organization.
+            custom_database_id: The custom database to attach.
             candidate_instructions: Progressively-revealed
                 instruction blocks shown to the candidate.
             file_contents: Files for a multi-file question.
@@ -652,6 +657,11 @@ class QuestionsNamespace(_Namespace):
             data["question[ai_assist_custom_system_prompt]"] = (
                 ai_assist_custom_system_prompt
             )
+        data.update(
+            question_setting_fields(
+                shared=shared, custom_database_id=custom_database_id
+            )
+        )
         if candidate_instructions is not None:
             data["question[candidate_instructions]"] = json.dumps(
                 obj=[
@@ -714,6 +724,8 @@ class QuestionsNamespace(_Namespace):
         contents: str | None = None,
         solution: str | None = None,
         ai_assist_custom_system_prompt: str | None = None,
+        shared: bool | None = None,
+        custom_database_id: int | None = None,
         candidate_instructions: (Sequence[CandidateInstruction] | None) = None,
         file_contents: (Sequence[QuestionFileContent] | None) = None,
         zip_file: Path | None = None,
@@ -730,6 +742,8 @@ class QuestionsNamespace(_Namespace):
                 ``file_contents``.
             solution: New solution.
             ai_assist_custom_system_prompt: Custom system prompt for AI Assist.
+            shared: Whether to share the question with your organization.
+            custom_database_id: The custom database to attach.
             candidate_instructions: Progressively-revealed
                 instruction blocks shown to the candidate.
             file_contents: Files for a multi-file question.
@@ -765,6 +779,11 @@ class QuestionsNamespace(_Namespace):
             data["question[ai_assist_custom_system_prompt]"] = (
                 ai_assist_custom_system_prompt
             )
+        data.update(
+            question_setting_fields(
+                shared=shared, custom_database_id=custom_database_id
+            )
+        )
         if candidate_instructions is not None:
             data["question[candidate_instructions]"] = json.dumps(
                 obj=[

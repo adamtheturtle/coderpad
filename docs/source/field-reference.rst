@@ -1,5 +1,4 @@
 Writable and read-only fields
-=============================
 
 The :class:`~coderpad.types.Question` and :class:`~coderpad.types.Pad` models expose more fields than the ``create`` and ``update`` methods accept.
 A field that is present when you read a resource is not necessarily a field that you can write.
@@ -247,3 +246,7 @@ Every other field on :class:`~coderpad.types.Pad` is populated by the server and
 
 Candidate instruction steps can carry an optional ``name`` alongside their ``instructions`` and ``default_visible`` values.
 The clients preserve these names when reading or writing questions.
+Pass ``shared=True`` or ``shared=False`` to question creation and updates to set organization sharing explicitly.
+Only the author can change sharing.
+Pass ``custom_database_id`` to associate a question with a custom database.
+Omitted values retain the server defaults or existing settings.

@@ -79,14 +79,12 @@ def test_rejects_unsupported_content_type(
     del mock_coderpad_api
     with pytest.raises(
         expected_exception=AssertionError,
-        match="Unsupported content type 'application/json'",
+        match="Unsupported content type 'application/xml'",
     ):
         _ = httpx.post(
             url=_QUESTIONS_URL,
-            json={
-                "question[title]": "FizzBuzz",
-                "question[language]": "python",
-            },
+            content="<question/>",
+            headers={"Content-Type": "application/xml"},
         )
 
 

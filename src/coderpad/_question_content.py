@@ -1,4 +1,4 @@
-"""Validation and ZIP packaging for question content sources."""
+"""Question request fields, content validation, and ZIP packaging."""
 
 from collections.abc import Iterator, Sequence
 from io import BytesIO
@@ -91,3 +91,16 @@ def question_upload_files(
     else:
         return None
     return {"question[zip_file]": (filename, contents, "application/zip")}
+
+
+@beartype
+def question_setting_fields(
+    *, shared: bool | None, custom_database_id: int | None
+) -> dict[str, str]:
+    """Encode supplied question sharing and custom database settings."""
+    fields: dict[str, str] = {}
+    if shared is not None:
+        fields["question[shared]"] = str(object=shared).lower()
+    if custom_database_id is not None:
+        fields["question[custom_database_id]"] = str(object=custom_database_id)
+    return fields
