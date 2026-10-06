@@ -50,13 +50,13 @@ def fixture_mock_coderpad_api() -> Generator[respx.MockRouter]:
             base_url=_BASE_URL,
         )
         _ = mock_router.get(
-            url="https://www.codingame.com/assessment/api/v1.1/campaigns",
+            url="https://screen.coderpad.io/assessment/api/v1.1/campaigns",
         ).respond(
             json=[{"id": 1, "name": "Example campaign"}],
         )
         _ = mock_router.post(
             url=(
-                "https://www.codingame.com/assessment/api/v1.1/"
+                "https://screen.coderpad.io/assessment/api/v1.1/"
                 "campaigns/1/actions/send"
             ),
         ).respond(
@@ -66,7 +66,7 @@ def fixture_mock_coderpad_api() -> Generator[respx.MockRouter]:
             },
         )
         _ = mock_router.get(
-            url="https://www.codingame.com/assessment/api/v1.1/tests",
+            url="https://screen.coderpad.io/assessment/api/v1.1/tests",
         ).respond(
             json={
                 "tests": [],
