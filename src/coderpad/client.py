@@ -656,6 +656,7 @@ class QuestionsNamespace(_Namespace):
                 next_page=page.next_page,
                 base_url=self.base_url,
                 path="/api/questions/",
+                after_page=page_number,
             )
 
     def create(
@@ -997,6 +998,7 @@ class OrganizationQuestionsNamespace(_Namespace):
                 next_page=page.next_page,
                 base_url=self.base_url,
                 path="/api/organization/questions",
+                after_page=page_number,
             )
 
 

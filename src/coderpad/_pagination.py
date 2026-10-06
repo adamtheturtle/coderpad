@@ -42,12 +42,20 @@ def next_page_position(
 
 
 @beartype
-def next_page_number(*, next_page: str, base_url: str, path: str) -> int:
+def next_page_number(
+    *,
+    next_page: str,
+    base_url: str,
+    path: str,
+    after_page: int,
+) -> int:
     """Follow a numeric link on endpoints without cursor pagination."""
     _, page = next_page_position(
         next_page=next_page, base_url=base_url, path=path
     )
-    if page is None:
-        message = "This endpoint requires a numeric pagination link."
+    if page is None or page <= after_page:
+        message = (
+            "This endpoint requires an advancing numeric pagination link."
+        )
         raise ValueError(message)
     return page

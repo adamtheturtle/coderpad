@@ -117,19 +117,23 @@ def test_explicit_empty_question_filter() -> None:
         assert route.calls.last.request.url.query == b""
 
 
-def test_question_pagination_rejects_cursor() -> None:
+@pytest.mark.parametrize(
+    argnames="next_page", argvalues=["?cursor=opaque", "?page=1"]
+)
+def test_question_pagination_requires_progress(next_page: str) -> None:
     """Question enumeration requires a supported numeric page link."""
     with pytest.raises(
         expected_exception=ValueError, match="numeric"
     ) as error:
         _ = next_page_number(
-            next_page="?cursor=opaque",
+            next_page=next_page,
             base_url=_ORIGIN,
             path="/api/questions/",
+            after_page=1,
         )
     assert (
         str(object=error.value)
-        == "This endpoint requires a numeric pagination link."
+        == "This endpoint requires an advancing numeric pagination link."
     )
 
 
