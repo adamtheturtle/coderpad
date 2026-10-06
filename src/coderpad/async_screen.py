@@ -1,7 +1,7 @@
 """Asynchronous CoderPad Screen API namespaces."""
 
 import builtins
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Sequence
 from http import HTTPStatus
 
 from beartype import beartype
@@ -12,8 +12,13 @@ from coderpad.screen import SCREEN_US_BASE_URL
 from coderpad.screen_types import (
     ScreenAccount,
     ScreenCampaign,
+    ScreenCampaignCreation,
+    ScreenCampaignQuestion,
+    ScreenCampaignSettings,
+    ScreenCreatedCampaign,
     ScreenInvitation,
     ScreenInvitationResult,
+    ScreenRandomQuestionSet,
     ScreenReport,
     ScreenTest,
     ScreenTestsPage,
@@ -86,6 +91,33 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
         return ScreenCampaign.list_from_value(
             value=json_value(value=response.json())
         )
+
+    async def create(
+        self,
+        *,
+        name: str,
+        questions: Sequence[ScreenCampaignQuestion | ScreenRandomQuestionSet],
+        settings: ScreenCampaignSettings | None = None,
+        team_id: str | None = None,
+    ) -> ScreenCreatedCampaign:
+        """Create a campaign once, preserving omitted team defaults.
+
+        Account feature restrictions and incompatible settings are reported
+        by the service. Creation is never automatically retried.
+        """
+        campaign = ScreenCampaignCreation(
+            name=name,
+            questions=list(questions),
+            settings=settings,
+            team_id=team_id,
+        )
+        response = await self._request(
+            method="POST",
+            path="/campaigns",
+            params=None,
+            json=campaign.model_dump(exclude_none=True),
+        )
+        return ScreenCreatedCampaign.model_validate(obj=response.json())
 
     async def send_invitation(
         self,
