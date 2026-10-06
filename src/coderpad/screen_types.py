@@ -1,6 +1,6 @@
 """Types for the CoderPad Screen API."""
 
-from typing import ClassVar, Self, override
+from typing import Annotated, ClassVar, Literal, Self, override
 
 from beartype import beartype
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -415,3 +415,133 @@ class ScreenAccount(_APIModel):
     organization_id: str
     recruiter_id: str
     teams: list[ScreenTeam]
+
+
+class _CampaignRequestModel(_APIModel):
+    """Reject unknown campaign options instead of silently dropping
+    them.
+    """
+
+    model_config: ClassVar[ConfigDict] = ConfigDict(
+        frozen=True,
+        extra="forbid",
+        strict=True,
+    )
+
+
+@beartype
+class ScreenRandomQuestionConfiguration(_CampaignRequestModel):
+    """Criteria for a randomly selected set of Screen questions."""
+
+    domain: str | None = None
+    skills: list[str] | None = None
+    question_type: Literal["QUIZ", "CODE"] | None = None
+    target_duration_minutes: int | None = None
+    target_experience_level: Literal["JUNIOR", "SENIOR", "EXPERT"] | None = (
+        None
+    )
+    included_question_ids: list[str] | None = None
+    excluded_question_ids: list[str] | None = None
+
+    @model_validator(mode="after")
+    def validate_question_selection(self) -> Self:
+        """Keep inclusion and exclusion lists mutually exclusive."""
+        if (
+            self.included_question_ids is not None
+            and self.excluded_question_ids is not None
+        ):
+            message = (
+                "included_question_ids and excluded_question_ids "
+                "are mutually exclusive"
+            )
+            raise ValueError(message)
+        return self
+
+
+@beartype
+class ScreenCampaignQuestion(_CampaignRequestModel):
+    """One explicitly selected question, identified by UUID."""
+
+    type: Literal["QUESTION"] = "QUESTION"
+    question_id: str
+
+
+@beartype
+class ScreenRandomQuestionSet(_CampaignRequestModel):
+    """A random set of questions in campaign order."""
+
+    type: Literal["RANDOM_QUESTION_SET"] = "RANDOM_QUESTION_SET"
+    configuration: ScreenRandomQuestionConfiguration
+
+
+@beartype
+class ScreenCampaignTimer(_CampaignRequestModel):
+    """An optional campaign timer override."""
+
+    mode: Literal["PER_QUESTION", "GLOBAL", "UNLIMITED"] | None = None
+    duration_minutes: int | None = None
+
+
+@beartype
+class ScreenCampaignAccessPeriod(_CampaignRequestModel):
+    """An optional access window using ISO 8601 instants."""
+
+    min_start_time: str | None = None
+    max_end_time: str | None = None
+
+
+@beartype
+class ScreenCampaignFollowUpQuestions(_CampaignRequestModel):
+    """Optional follow-up questions and their answer format."""
+
+    enabled: bool | None = None
+    answer_format: Literal["TEXT", "VIDEO", "AUDIO"] | None = None
+
+
+@beartype
+class ScreenCampaignWebcamProctoring(_CampaignRequestModel):
+    """Optional webcam recording and AI analysis settings."""
+
+    enabled: bool | None = None
+    ai_analysis_enabled: bool | None = None
+
+
+@beartype
+class ScreenCampaignSettings(_CampaignRequestModel):
+    """Campaign overrides, with omitted values inheriting team
+    defaults.
+    """
+
+    languages: list[str] | None = None
+    timer: ScreenCampaignTimer | None = None
+    invitation_expiration_days: int | None = None
+    access_period: ScreenCampaignAccessPeriod | None = None
+    send_candidate_simplified_report: bool | None = None
+    copy_paste_blocked: bool | None = None
+    follow_up_questions: ScreenCampaignFollowUpQuestions | None = None
+    webcam_proctoring: ScreenCampaignWebcamProctoring | None = None
+    full_screen_required: bool | None = None
+    ai_assist_enabled: bool | None = None
+    enabled_coding_agents: str | None = None
+
+
+@beartype
+class ScreenCampaignCreation(_CampaignRequestModel):
+    """A new Screen campaign with ordered question entries."""
+
+    name: str = Field(min_length=3, max_length=64)
+    questions: list[
+        Annotated[
+            ScreenCampaignQuestion | ScreenRandomQuestionSet,
+            Field(discriminator="type"),
+        ]
+    ] = Field(min_length=1)
+    settings: ScreenCampaignSettings | None = None
+    team_id: str | None = None
+
+
+@beartype
+class ScreenCreatedCampaign(_APIModel):
+    """The integer ID returned after campaign creation."""
+
+    id: int

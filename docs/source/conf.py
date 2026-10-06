@@ -79,6 +79,12 @@ intersphinx_mapping = {
 nitpicky = True
 nitpick_ignore: list[tuple[str, str]] = [
     ("py:class", "coderpad.types._T"),
+    # Pydantic adds constraint metadata to generated model signatures.
+    # These internal annotations have no documentation targets.
+    ("py:class", "annotated_types.MinLen"),
+    ("py:class", "annotated_types.MaxLen"),
+    ("py:class", "FieldInfo"),
+    ("py:class", "NoneType"),
     # The HTTP client inventories do not expose these configuration classes;
     # keep the typed annotations without making the docs build fail.
     ("py:class", "httpx.Limits"),

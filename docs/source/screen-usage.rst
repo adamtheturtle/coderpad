@@ -48,3 +48,21 @@ Its fields are ``name``, ``allow_pad_creation``, and ``analytics_id``.
 Use ``client.screen.me()`` to inspect the Screen key owner, including ``organization_id``, ``recruiter_id``, and teams.
 Each call uses the key for its product.
 The asynchronous client exposes the same methods.
+
+Creating campaigns
+------------------
+
+Use ``screen.campaigns.create`` with a name and an ordered list of ``ScreenCampaignQuestion`` or ``ScreenRandomQuestionSet`` entries.
+Question IDs and team IDs are UUID strings.
+The response is ``ScreenCreatedCampaign``, containing the integer campaign ID.
+
+``ScreenRandomQuestionConfiguration`` selects domain, skills, question type, duration, and experience level.
+Its included and excluded question ID lists are mutually exclusive.
+
+``ScreenCampaignSettings`` supports locales, timers, invitation expiration, access windows, follow-up questions, webcam recording, full screen, copy and paste restrictions, simplified reports, AI Assist, and coding agents.
+``enabled_coding_agents`` is sent as a string.
+An empty string disables agents.
+Omitted settings inherit team defaults.
+Explicit false values are retained.
+The service reports account feature restrictions and incompatible settings.
+Campaign creation is never automatically retried.
