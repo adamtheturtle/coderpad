@@ -614,6 +614,7 @@ class CandidateInstruction(_APIModel):
     """Instructions shown to a candidate."""
 
     instructions: str
+    name: str | None = None
     default_visible: bool = False
 
     @field_validator("default_visible", mode="before")
@@ -637,6 +638,7 @@ class CandidateInstruction(_APIModel):
         """
         return cls(
             instructions=data["instructions"],
+            name=data.get("name"),
             default_visible=(
                 "default_visible" in data and data["default_visible"]
             ),

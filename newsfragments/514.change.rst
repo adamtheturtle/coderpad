@@ -1,0 +1,2 @@
+Preserve candidate instruction step names in responses and question writes.
+Omit unnamed steps from the JSON name field.

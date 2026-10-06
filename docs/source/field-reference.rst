@@ -244,3 +244,6 @@ Every other field on :class:`~coderpad.types.Pad` is populated by the server and
    * - ``updated_at``
      - Read only
      - Server-managed timestamp.
+
+Candidate instruction steps can carry an optional ``name`` alongside their ``instructions`` and ``default_visible`` values.
+The clients preserve these names when reading or writing questions.
