@@ -19,7 +19,7 @@ from coderpad.screen_types import (
 )
 from coderpad.transports import JSONTransport, TransportResponse
 
-SCREEN_US_BASE_URL = "https://www.codingame.com"
+SCREEN_US_BASE_URL = "https://screen.coderpad.io"
 SCREEN_EU_BASE_URL = "https://www.codingame.eu"
 _SCREEN_PREFIX = "/assessment/api/v1.1"
 
