@@ -85,7 +85,7 @@ Both synchronous and asynchronous clients support this operation.
 Candidate project archives
 --------------------------
 
-``client.screen.tests.project_archive(test_id=11, question_id=question_uuid)`` returns the project tar.gz bytes with the candidate's changes applied.
+``client.screen.tests.project_archive(test_id=11, question_id=question_uuid)`` returns the project ``tar.gz`` bytes with the candidate's changes applied.
 The question ID accepts a UUID or a UUID string.
 Save or extract these bytes only when your application requests it.
 The SDK does not interpret them as JSON or PDF, extract files, or retry requests.
