@@ -1,5 +1,6 @@
 """Tests for `coderpad` pads models."""
 
+# pytest-beartype resolves fixture parameter annotations at runtime.
 from coderpad._dict_types import (
     FileContentDict,
     PadDict,
@@ -7,6 +8,7 @@ from coderpad._dict_types import (
     PadEventDict,
     PadHistoryEntryDict,
     PadInterviewerNotificationDict,
+    TeamDict,
 )
 from coderpad.types import (
     FileContent,
@@ -18,7 +20,6 @@ from coderpad.types import (
     PadInterviewerNotification,
     PaginatedList,
 )
-from tests.models.helpers import team_dict
 
 
 def _pad_event_dict() -> PadEventDict:
@@ -82,7 +83,7 @@ def _pad_environment_dict() -> PadEnvironmentDict:
     }
 
 
-def _pad_dict() -> PadDict:
+def _pad_dict(*, team_dict: TeamDict) -> PadDict:
     """Sample PadDict."""
     return {
         "id": "pad-1",
@@ -107,7 +108,7 @@ def _pad_dict() -> PadDict:
         "question_ids": [1, 2],
         "pad_environment_ids": [10],
         "active_environment_id": 10,
-        "team": team_dict(),
+        "team": team_dict,
         "restrict_interviewer_access": True,
         "pad_interviewer_notifications": [
             _pad_interviewer_notification_dict(),
@@ -115,9 +116,9 @@ def _pad_dict() -> PadDict:
     }
 
 
-def test_pad_from_dict() -> None:
+def test_pad_from_dict(team_dict: TeamDict) -> None:
     """A Pad can be created from a dictionary."""
-    data = _pad_dict()
+    data = _pad_dict(team_dict=team_dict)
     result = Pad.from_dict(data=data)
     assert result.id == data["id"]
     assert result.title == data["title"]
@@ -146,9 +147,11 @@ def test_pad_from_dict() -> None:
     assert len(result.pad_interviewer_notifications) == 1
 
 
-def test_from_dict_without_empirically_observed_fields() -> None:
+def test_from_dict_without_empirically_observed_fields(
+    team_dict: TeamDict,
+) -> None:
     """A Pad remains compatible with published response fields."""
-    data = _pad_dict()
+    data = _pad_dict(team_dict=team_dict)
     del data["restrict_interviewer_access"]
     del data["pad_interviewer_notifications"]
     result = Pad.from_dict(data=data)

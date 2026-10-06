@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 import pytest
 from pydantic import ValidationError
 
+# pytest-beartype resolves fixture parameter annotations at runtime.
+from coderpad._dict_types import TeamDict
 from coderpad.types import (
     Organization,
     OrganizationStats,
@@ -13,7 +15,6 @@ from coderpad.types import (
     Quota,
     Team,
 )
-from tests.models.helpers import team_dict
 
 if TYPE_CHECKING:
     from coderpad._dict_types import (
@@ -25,9 +26,9 @@ if TYPE_CHECKING:
     )
 
 
-def test_team_from_dict() -> None:
+def test_team_from_dict(team_dict: TeamDict) -> None:
     """A Team can be created from a dictionary."""
-    data = team_dict()
+    data = team_dict
     result = Team.from_dict(data=data)
     assert result.id == data["id"]
     assert result.name == data["name"]
@@ -97,7 +98,7 @@ def test_quota_from_dict() -> None:
     assert result.overages_enabled == data["overages_enabled"]
 
 
-def test_organization_from_dict() -> None:
+def test_organization_from_dict(team_dict: TeamDict) -> None:
     """An Organization can be created from a dictionary."""
     data: OrganizationDict = {
         "id": 123,
@@ -109,7 +110,7 @@ def test_organization_from_dict() -> None:
         "organization_default_language": "python",
         "single_sign_on_supported": True,
         "single_sign_in_url": "https://sso.example.com",
-        "teams": [team_dict()],
+        "teams": [team_dict],
         "child_organizations": [{"id": 456, "name": "Subsidiary"}],
     }
     result = Organization.from_dict(data=data)
