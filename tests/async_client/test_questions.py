@@ -350,3 +350,45 @@ async def test_delete_question(
     await async_coderpad_client.questions.delete(
         question_id="123",
     )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(argnames="shared", argvalues=[None, False, True])
+async def test_question_sharing_and_database(
+    async_coderpad_client: AsyncCoderPad,
+    mock_coderpad_api: respx.MockRouter,
+    *,
+    shared: bool | None,
+) -> None:
+    """Question writes preserve optional sharing and database
+    association.
+    """
+    _ = await async_coderpad_client.questions.create(
+        title="Question",
+        language="python",
+        shared=shared,
+        custom_database_id=12,
+    )
+    create_body = parse_qs(
+        qs=mock_coderpad_api.calls.last.request.content.decode()
+    )
+    expected_create = {
+        "question[title]": ["Question"],
+        "question[language]": ["python"],
+        "question[custom_database_id]": ["12"],
+    }
+    if shared is not None:
+        expected_create["question[shared]"] = [str(object=shared).lower()]
+    assert create_body == expected_create
+    await async_coderpad_client.questions.update(
+        question_id="123",
+        shared=shared,
+        custom_database_id=12,
+    )
+    update_body = parse_qs(
+        qs=mock_coderpad_api.calls.last.request.content.decode()
+    )
+    expected_update = {"question[custom_database_id]": ["12"]}
+    if shared is not None:
+        expected_update["question[shared]"] = [str(object=shared).lower()]
+    assert update_body == expected_update
