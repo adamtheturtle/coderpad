@@ -279,3 +279,12 @@ Absent values remain ``None``.
 Empty transcript and review arrays remain empty lists.
 The outline preserves structured JSON.
 Transcript timestamps are Unix milliseconds, and review reports include their processing status, file paths, and optional report or error text.
+
+Pad pagination
+--------------
+
+Pass ``cursor`` to ``pads.list`` to continue an opaque cursor.
+When supplied, it takes precedence over page and sort.
+``pads.all`` follows the cursor or numeric page in each returned ``next_page`` link.
+Links must refer to the configured API origin and pads endpoint.
+Credentials stay on that origin.

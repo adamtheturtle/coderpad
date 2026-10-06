@@ -21,6 +21,7 @@ from coderpad._dict_types import (
     PadEnvironmentDict,
     PadHistoryEntryDict,
 )
+from coderpad._pagination import next_page_position
 from coderpad._question_content import (
     question_setting_fields,
     question_upload_files,
@@ -150,20 +151,24 @@ class AsyncPadsNamespace(_AsyncNamespace):
         *,
         sort: SortOrder | None = None,
         page: int | None = None,
+        cursor: str | None = None,
     ) -> PaginatedList[Pad]:
         """Retrieve a list of pads.
 
         Args:
             sort: Sort order.
             page: Page number for pagination.
+            cursor: Opaque cursor; overrides page and sort.
 
         Returns:
             The list of pads with pagination metadata.
         """
         params: dict[str, str | int] = {}
-        if sort is not None:
+        if cursor is not None:
+            params["cursor"] = cursor
+        if cursor is None and sort is not None:
             params["sort"] = sort
-        if page is not None:
+        if cursor is None and page is not None:
             params["page"] = page
         response = await self._request(
             method="GET",
@@ -193,14 +198,19 @@ class AsyncPadsNamespace(_AsyncNamespace):
         Yields:
             Each pad from successive pages until ``next_page`` is absent.
         """
-        page_number = 1
+        page_number: int | None = 1
+        cursor: str | None = None
         while True:
-            page = await self.list(sort=sort, page=page_number)
+            page = await self.list(sort=sort, page=page_number, cursor=cursor)
             for pad in page:
                 yield pad
             if page.next_page is None:
                 break
-            page_number += 1
+            cursor, page_number = next_page_position(
+                next_page=page.next_page,
+                base_url=self.base_url,
+                path="/api/pads/",
+            )
 
     async def create(
         self,
