@@ -1,7 +1,6 @@
 """Tests for independent Interview and Screen API-key introspection."""
 
 from http import HTTPStatus
-from typing import TYPE_CHECKING
 
 import pytest
 import respx
@@ -9,9 +8,6 @@ from httpx import Response
 
 from coderpad import SCREEN_US_BASE_URL, AsyncCoderPad, CoderPad
 from coderpad.exceptions import AuthenticationError
-
-if TYPE_CHECKING:
-    from respx.models import Call
 
 
 def _routes(router: respx.MockRouter, *, name: str | None) -> None:
@@ -40,9 +36,8 @@ def _routes(router: respx.MockRouter, *, name: str | None) -> None:
 
 def _assert_headers(router: respx.MockRouter) -> None:
     """Each request uses its own API key and endpoint."""
-    calls: list[Call] = router.calls
-    interview = calls[0].request
-    screen = calls[1].request
+    interview = router.routes[0].calls.last.request
+    screen = router.routes[1].calls.last.request
     assert str(object=interview.url) == "https://app.coderpad.io/api/user"
     assert interview.headers["Authorization"] == 'Token token="interview-key"'
     assert interview.headers.get(key="API-Key") is None

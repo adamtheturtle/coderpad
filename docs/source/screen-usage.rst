@@ -46,5 +46,5 @@ Account introspection
 Use ``client.user.get()`` to inspect the Interview key owner.
 Its fields are ``name``, ``allow_pad_creation``, and ``analytics_id``.
 Use ``client.screen.me()`` to inspect the Screen key owner, including ``organization_id``, ``recruiter_id``, and teams.
-These calls use their respective API keys.
+Each call uses the key for its product.
 The asynchronous client exposes the same methods.
