@@ -39,3 +39,15 @@ def next_page_position(
         return None, int(page[0])
     message = "Pagination link must contain one cursor or positive page."
     raise ValueError(message)
+
+
+@beartype
+def next_page_number(*, next_page: str, base_url: str, path: str) -> int:
+    """Follow a numeric link on endpoints without cursor pagination."""
+    _, page = next_page_position(
+        next_page=next_page, base_url=base_url, path=path
+    )
+    if page is None:
+        message = "This endpoint requires a numeric pagination link."
+        raise ValueError(message)
+    return page

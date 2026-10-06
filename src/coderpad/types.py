@@ -3,7 +3,7 @@
 import enum
 from collections.abc import Iterable
 from enum import Enum
-from typing import ClassVar, Self, TypeVar, override
+from typing import ClassVar, Literal, Self, TypeVar, override
 
 from beartype import beartype
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -87,6 +87,22 @@ class SortOrder(enum.StrEnum):
     CREATED_AT_DESC = "created_at,desc"
     UPDATED_AT_ASC = "updated_at,asc"
     UPDATED_AT_DESC = "updated_at,desc"
+
+
+class QuestionSortOrder(enum.StrEnum):
+    """Question sorting, including title and usage count."""
+
+    CREATED_AT_ASC = "created_at,asc"
+    CREATED_AT_DESC = "created_at,desc"
+    UPDATED_AT_ASC = "updated_at,asc"
+    UPDATED_AT_DESC = "updated_at,desc"
+    TITLE_ASC = "title,asc"
+    TITLE_DESC = "title,desc"
+    USED_ASC = "used,asc"
+    USED_DESC = "used,desc"
+
+
+QuestionPadType = Literal["any", "live", "take_home"]
 
 
 class Language(enum.StrEnum):
