@@ -9,6 +9,7 @@ from beartype import beartype
 from pydantic import TypeAdapter
 
 from coderpad._screen_question import screen_question_path
+from coderpad._screen_question_bank import screen_bank_question_path
 from coderpad._screen_response import json_object, json_value
 from coderpad.exceptions import CoderPadError
 from coderpad.screen_types import (
@@ -21,6 +22,7 @@ from coderpad.screen_types import (
     ScreenCreatedCampaign,
     ScreenInvitation,
     ScreenInvitationResult,
+    ScreenQuestionInsights,
     ScreenRandomQuestionSet,
     ScreenReport,
     ScreenTest,
@@ -385,6 +387,27 @@ class ScreenTestsNamespace(_ScreenNamespace):
 
 
 @beartype
+class ScreenQuestionsNamespace(_ScreenNamespace):
+    """Screen question library reads and statistics."""
+
+    def insights(
+        self,
+        *,
+        question_id: str | UUID,
+        programming_language: str | None = None,
+    ) -> ScreenQuestionInsights:
+        """Retrieve usage, answer, test-case, and score statistics."""
+        path = screen_bank_question_path(question_id=question_id)
+        params: dict[str, str | int] = {}
+        if programming_language is not None:
+            params["programming_language"] = programming_language
+        response = self._request(
+            method="GET", path=path + "/insights", params=params, json=None
+        )
+        return ScreenQuestionInsights.model_validate(obj=response.json())
+
+
+@beartype
 class ScreenWebhookNamespace(_ScreenNamespace):
     """Screen webhook operations."""
 
@@ -441,6 +464,12 @@ class ScreenNamespace(_ScreenNamespace):
             default_headers=default_headers,
         )
         self.tests: ScreenTestsNamespace = ScreenTestsNamespace(
+            transport=transport,
+            api_key=api_key,
+            base_url=base_url,
+            default_headers=default_headers,
+        )
+        self.questions: ScreenQuestionsNamespace = ScreenQuestionsNamespace(
             transport=transport,
             api_key=api_key,
             base_url=base_url,

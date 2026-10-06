@@ -9,6 +9,7 @@ from beartype import beartype
 from pydantic import TypeAdapter
 
 from coderpad._screen_question import screen_question_path
+from coderpad._screen_question_bank import screen_bank_question_path
 from coderpad._screen_response import json_object, json_value
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL
@@ -22,6 +23,7 @@ from coderpad.screen_types import (
     ScreenCreatedCampaign,
     ScreenInvitation,
     ScreenInvitationResult,
+    ScreenQuestionInsights,
     ScreenRandomQuestionSet,
     ScreenReport,
     ScreenTest,
@@ -389,6 +391,27 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
 
 
 @beartype
+class AsyncScreenQuestionsNamespace(_AsyncScreenNamespace):
+    """Screen question library reads and statistics."""
+
+    async def insights(
+        self,
+        *,
+        question_id: str | UUID,
+        programming_language: str | None = None,
+    ) -> ScreenQuestionInsights:
+        """Retrieve usage, answer, test-case, and score statistics."""
+        path = screen_bank_question_path(question_id=question_id)
+        params: dict[str, str | int] = {}
+        if programming_language is not None:
+            params["programming_language"] = programming_language
+        response = await self._request(
+            method="GET", path=path + "/insights", params=params, json=None
+        )
+        return ScreenQuestionInsights.model_validate(obj=response.json())
+
+
+@beartype
 class AsyncScreenWebhookNamespace(_AsyncScreenNamespace):
     """Asynchronous Screen webhook operations."""
 
@@ -451,6 +474,14 @@ class AsyncScreenNamespace(_AsyncScreenNamespace):
             api_key=api_key,
             base_url=base_url,
             default_headers=default_headers,
+        )
+        self.questions: AsyncScreenQuestionsNamespace = (
+            AsyncScreenQuestionsNamespace(
+                transport=transport,
+                api_key=api_key,
+                base_url=base_url,
+                default_headers=default_headers,
+            )
         )
         self.webhook: AsyncScreenWebhookNamespace = (
             AsyncScreenWebhookNamespace(
