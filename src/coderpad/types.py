@@ -246,6 +246,38 @@ def _empty_pad_interviewer_notifications() -> list[PadInterviewerNotification]:
 
 
 @beartype
+class TranscriptEntry(_APIModel):
+    """A transcript or system message with a Unix millisecond
+    timestamp.
+    """
+
+    id: str
+    kind: str
+    text: str
+    timestamp: int
+    speaker_name: str | None = None
+    speaker_role: str | None = None
+
+
+@beartype
+class ReviewReport(_APIModel):
+    """An Interview review report and its processing status."""
+
+    id: str
+    status: str
+    created_at: str
+    updated_at: str
+    title: str | None = None
+    prompt: str | None = None
+    report: str | None = None
+    summary: str | None = None
+    icon: str | None = None
+    error: str | None = None
+    user_id: int | None = None
+    file_paths: list[str] = Field(default_factory=list)
+
+
+@beartype
 class Pad(_APIModel):
     """A CoderPad interview pad.
 
@@ -276,6 +308,11 @@ class Pad(_APIModel):
     active_environment_id: int | None = None
     team: Team
     history: str | None = None
+    interview_highlights: str | None = None
+    interview_outline: JsonValue = None
+    transcript: list[TranscriptEntry] | None = None
+    transcript_source_unavailable: bool | None = None
+    review_reports: list[ReviewReport] | None = None
     restrict_interviewer_access: bool | None = None
     pad_interviewer_notifications: list[PadInterviewerNotification] = Field(
         default_factory=_empty_pad_interviewer_notifications,
@@ -300,6 +337,8 @@ class Pad(_APIModel):
             if raw_notifications is not None
             else _empty_pad_interviewer_notifications()
         )
+        raw_transcript = data.get("transcript")
+        raw_reviews = data.get("review_reports")
         return cls(
             id=data["id"],
             title=data["title"],
@@ -330,6 +369,27 @@ class Pad(_APIModel):
                 "restrict_interviewer_access",
             ),
             pad_interviewer_notifications=notifications,
+            interview_highlights=data.get("interview_highlights"),
+            interview_outline=data.get("interview_outline"),
+            transcript=(
+                None
+                if raw_transcript is None
+                else [
+                    TranscriptEntry.model_validate(obj=item)
+                    for item in raw_transcript
+                ]
+            ),
+            transcript_source_unavailable=data.get(
+                "transcript_source_unavailable"
+            ),
+            review_reports=(
+                None
+                if raw_reviews is None
+                else [
+                    ReviewReport.model_validate(obj=item)
+                    for item in raw_reviews
+                ]
+            ),
         )
 
 
