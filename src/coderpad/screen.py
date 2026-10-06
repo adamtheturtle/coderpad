@@ -9,6 +9,7 @@ from beartype import beartype
 from coderpad._screen_response import json_object, json_value
 from coderpad.exceptions import CoderPadError
 from coderpad.screen_types import (
+    ScreenAccount,
     ScreenCampaign,
     ScreenInvitation,
     ScreenInvitationResult,
@@ -336,6 +337,13 @@ class ScreenWebhookNamespace(_ScreenNamespace):
 @beartype
 class ScreenNamespace(_ScreenNamespace):
     """Root namespace for the synchronous Screen API."""
+
+    def me(self) -> ScreenAccount:
+        """Retrieve the Screen key owner and available teams."""
+        response = self._request(
+            method="GET", path="/me", params=None, json=None
+        )
+        return ScreenAccount.model_validate(obj=response.json())
 
     def __init__(
         self,

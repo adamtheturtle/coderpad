@@ -10,6 +10,7 @@ from coderpad._screen_response import json_object, json_value
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL
 from coderpad.screen_types import (
+    ScreenAccount,
     ScreenCampaign,
     ScreenInvitation,
     ScreenInvitationResult,
@@ -340,6 +341,13 @@ class AsyncScreenWebhookNamespace(_AsyncScreenNamespace):
 @beartype
 class AsyncScreenNamespace(_AsyncScreenNamespace):
     """Root namespace for the asynchronous Screen API."""
+
+    async def me(self) -> ScreenAccount:
+        """Retrieve the Screen key owner and available teams."""
+        response = await self._request(
+            method="GET", path="/me", params=None, json=None
+        )
+        return ScreenAccount.model_validate(obj=response.json())
 
     def __init__(
         self,

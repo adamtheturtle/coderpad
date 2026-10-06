@@ -397,3 +397,21 @@ class ScreenWebhook(_APIModel):
     def from_dict(cls, data: dict[str, JsonValue]) -> Self:
         """Create webhook configuration from an API response."""
         return cls(url=_optional_str(value=data.get("url")))
+
+
+@beartype
+class ScreenTeam(_APIModel):
+    """A team available to the Screen API key owner."""
+
+    id: str
+    name: str
+    is_default: bool
+
+
+@beartype
+class ScreenAccount(_APIModel):
+    """Organization, recruiter, and team identity for a Screen API key."""
+
+    organization_id: str
+    recruiter_id: str
+    teams: list[ScreenTeam]

@@ -1117,3 +1117,12 @@ class OrganizationStats(_APIModel):
                 for item in data["users"]
             ],
         )
+
+
+@beartype
+class User(_APIModel):
+    """The Interview API key owner's display name and capabilities."""
+
+    name: str | None = None
+    allow_pad_creation: bool
+    analytics_id: str

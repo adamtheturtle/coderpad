@@ -39,3 +39,12 @@ When delivery is omitted, the server sends email only if an address is provided.
 Set ``allow_duplicate_invitations=False`` on ``ScreenInvitation`` to ask the server to reject repeated invitations.
 Omission uses the server default, which allows duplicates.
 Explicit ``True`` allows them.
+
+Account introspection
+---------------------
+
+Use ``client.user.get()`` to inspect the Interview key owner.
+Its fields are ``name``, ``allow_pad_creation``, and ``analytics_id``.
+Use ``client.screen.me()`` to inspect the Screen key owner, including ``organization_id``, ``recruiter_id``, and teams.
+Each call uses the key for its product.
+The asynchronous client exposes the same methods.
