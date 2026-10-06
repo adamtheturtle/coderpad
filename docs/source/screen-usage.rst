@@ -28,3 +28,12 @@ The Screen API is available on the same client via ``screen_api_key``.
    )
    if result.test_url is not None:
        _ = sys.stdout.write(result.test_url)
+
+Manual invitations
+------------------
+
+Omit candidate identity to create a test link that you can share yourself.
+Pass ``send_invitation_email=False`` to explicitly disable email delivery.
+A candidate name is optional for both manual and email invitations.
+Explicit email delivery requires a candidate email address.
+When delivery is omitted, the server sends email only if an address is provided.

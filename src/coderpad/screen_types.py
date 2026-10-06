@@ -114,8 +114,9 @@ class ScreenCampaign(_APIModel):
 class ScreenInvitation(_APIModel):
     """An invitation to a Screen campaign.
 
-    ``candidate_email`` and ``candidate_name`` are required by the Screen
-    send-invitation API surface (the user interface collects email plus name).
+    Omit candidate identity to create a link the recruiter can share manually.
+    Email delivery requires ``candidate_email``. Unspecified delivery uses the
+    server default, which sends email only when an address is supplied.
     """
 
     candidate_email: str | None = None
@@ -126,13 +127,17 @@ class ScreenInvitation(_APIModel):
     send_notification_email_on_bounce: bool | None = None
 
     @model_validator(mode="after")
-    def require_email_and_name(self) -> Self:
-        """Require candidate email and name before sending."""
-        if not bool(self.candidate_email):
-            msg = "candidate_email is required"
-            raise ValueError(msg)
-        if not bool(self.candidate_name):
-            msg = "candidate_name is required"
+    def require_delivery_address(self) -> Self:
+        """Require an address when email delivery is explicitly
+        enabled.
+        """
+        if self.send_invitation_email is True and not bool(
+            self.candidate_email
+        ):
+            msg = (
+                "candidate_email is required when "
+                "send_invitation_email is true"
+            )
             raise ValueError(msg)
         return self
 

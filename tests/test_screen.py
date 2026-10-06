@@ -205,18 +205,61 @@ def test_tests_all_iterates_pages() -> None:
     assert transport.calls[1]["params"] == {"limit": 1, "start": 1}
 
 
-def test_invitation_requires_email_and_name() -> None:
-    """ScreenInvitation requires candidate email and name."""
-    with pytest.raises(
-        expected_exception=ValidationError,
-        match="candidate_email",
-    ):
-        _ = ScreenInvitation(candidate_name="Ada")
-    with pytest.raises(
-        expected_exception=ValidationError,
-        match="candidate_name",
-    ):
-        _ = ScreenInvitation(candidate_email="ada@example.com")
+@pytest.mark.parametrize(
+    argnames=("invitation", "expected_payload"),
+    argvalues=[
+        (ScreenInvitation(), {}),
+        (
+            ScreenInvitation(send_invitation_email=False),
+            {"send_invitation_email": False},
+        ),
+        (
+            ScreenInvitation(candidate_name="Ada"),
+            {"candidate_name": "Ada"},
+        ),
+        (
+            ScreenInvitation(candidate_email="ada@example.com"),
+            {"candidate_email": "ada@example.com"},
+        ),
+        (
+            ScreenInvitation(
+                candidate_email="ada@example.com", send_invitation_email=True
+            ),
+            {
+                "candidate_email": "ada@example.com",
+                "send_invitation_email": True,
+            },
+        ),
+    ],
+)
+def test_optional_invitation_identity(
+    screen_transport_stub: ScreenTransportStub,
+    invitation: ScreenInvitation,
+    expected_payload: dict[str, str | bool],
+) -> None:
+    """Manual and email invitations preserve optional fields on the
+    wire.
+    """
+    with _client(screen_transport_stub, base_url=SCREEN_EU_BASE_URL) as client:
+        _ = client.screen.campaigns.send_invitation(
+            campaign_id=7, invitation=invitation
+        )
+    assert screen_transport_stub.calls[0]["json"] == expected_payload
+
+
+def test_email_delivery_requires_an_address() -> None:
+    """Explicit email delivery rejects missing or empty addresses."""
+    for address in [None, ""]:
+        with pytest.raises(
+            expected_exception=ValidationError,
+            match=(
+                "candidate_email is required when "
+                "send_invitation_email is true"
+            ),
+        ):
+            _ = ScreenInvitation(
+                candidate_email=address, send_invitation_email=True
+            )
 
 
 def test_empty_screen_api_key_fails_fast() -> None:

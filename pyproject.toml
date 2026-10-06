@@ -407,7 +407,7 @@ ignore_names = [
     "REACT_NATIVE_WEB",
     # Public Pydantic fields are consumed through model serialization.
     "recruiter_email",
-    "require_email_and_name",
+    "require_delivery_address",
     "rst_prolog",
     "RUBY",
     "RUST",
