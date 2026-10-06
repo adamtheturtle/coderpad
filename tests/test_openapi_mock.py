@@ -10,9 +10,6 @@ from tests.openapi_mock import JSONMapping, add_openapi_to_respx
 _QUESTIONS_URL = "https://app.coderpad.io/api/questions/"
 
 
-# Tests for OpenAPI request-contract validation.
-
-
 def test_supports_inline_extensible_schema() -> None:
     """An inline schema may allow fields beyond declared
     properties.
