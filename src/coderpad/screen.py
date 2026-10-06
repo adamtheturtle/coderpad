@@ -308,7 +308,8 @@ class ScreenTestsNamespace(_ScreenNamespace):
     def project_archive(
         self, *, test_id: int, question_id: str | UUID
     ) -> bytes:
-        """Download a compressed project archive with the candidate's changes applied.
+        """Download a compressed project archive with the candidate's
+        changes applied.
 
         Returns the original binary archive without extracting it or writing
         files. Configure the client transport timeout for slow generation.
