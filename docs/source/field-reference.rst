@@ -288,3 +288,18 @@ When supplied, it takes precedence over page and sort.
 ``pads.all`` follows the cursor or numeric page in each returned ``next_page`` link.
 Links must refer to the configured API origin and pads endpoint.
 Credentials stay on that origin.
+
+Question filters and sorting
+----------------------------
+
+``questions.list`` and ``questions.all`` accept ``text`` and ``pad_types``.
+Pad types are ``any``, ``live``, and ``take_home``.
+Multiple values use repeated ``pad_types[]`` query keys.
+Organization question methods accept ``pad_type`` (``live`` or ``take_home``) and ``language``.
+The server includes questions usable in any pad when applying its usage filters.
+
+``QuestionSortOrder`` supports title, usage count, and creation or update timestamps in either direction.
+Existing ``SortOrder`` timestamp values stay supported.
+Omitted sorting preserves the API default.
+Pad and event sorting continues to use ``SortOrder``.
+Both question enumerators retain filters on every page and follow the returned numeric page link.

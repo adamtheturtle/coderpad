@@ -3,11 +3,12 @@
 from collections.abc import Iterator, Sequence
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import urlencode
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from beartype import beartype
 
-from coderpad.types import QuestionFileContent
+from coderpad.types import QuestionFileContent, QuestionPadType
 
 
 @beartype
@@ -104,3 +105,20 @@ def question_setting_fields(
     if custom_database_id is not None:
         fields["question[custom_database_id]"] = str(object=custom_database_id)
     return fields
+
+
+@beartype
+def question_list_request(
+    *,
+    path: str,
+    params: dict[str, str | int],
+    pad_types: Sequence[QuestionPadType] | None,
+) -> tuple[str, dict[str, str | int] | None]:
+    """Encode repeatable filters without changing scalar transport
+    params.
+    """
+    if pad_types is None:
+        return path, params
+    query = [(key, str(object=value)) for key, value in params.items()]
+    query.extend(("pad_types[]", value) for value in pad_types)
+    return path + "?" + urlencode(query=query), None

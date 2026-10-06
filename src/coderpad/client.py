@@ -7,7 +7,7 @@ from collections.abc import Iterator, Sequence
 from http import HTTPStatus
 from pathlib import Path
 from types import TracebackType
-from typing import Self
+from typing import Literal, Self
 
 import httpx
 from beartype import beartype
@@ -20,8 +20,9 @@ from coderpad._dict_types import (
     PadEnvironmentDict,
     PadHistoryEntryDict,
 )
-from coderpad._pagination import next_page_position
+from coderpad._pagination import next_page_number, next_page_position
 from coderpad._question_content import (
+    question_list_request,
     question_setting_fields,
     question_upload_files,
     validate_mutually_exclusive_question_content,
@@ -59,6 +60,8 @@ from coderpad.types import (
     PaginatedList,
     Question,
     QuestionFileContent,
+    QuestionPadType,
+    QuestionSortOrder,
     QuestionVariant,
     QuestionVariantFileContent,
     QuestionVariantUnset,
@@ -590,14 +593,18 @@ class QuestionsNamespace(_Namespace):
     def list(
         self,
         *,
-        sort: SortOrder | None = None,
+        sort: QuestionSortOrder | SortOrder | None = None,
         page: int | None = None,
+        text: str | None = None,
+        pad_types: Sequence[QuestionPadType] | None = None,
     ) -> PaginatedList[Question]:
         """Retrieve a list of questions.
 
         Args:
             sort: Sort order.
             page: Page number for pagination.
+            text: Search question text.
+            pad_types: Repeatable usage filters.
 
         Returns:
             The list of questions with pagination metadata.
@@ -607,10 +614,17 @@ class QuestionsNamespace(_Namespace):
             params["sort"] = sort
         if page is not None:
             params["page"] = page
+        if text is not None:
+            params["text"] = text
+        path, request_params = question_list_request(
+            path="/api/questions/",
+            params=params,
+            pad_types=pad_types,
+        )
         response = self._request(
             method="GET",
-            url="/api/questions/",
-            params=params,
+            url=path,
+            params=request_params,
             data=None,
             files=None,
         )
@@ -621,6 +635,29 @@ class QuestionsNamespace(_Namespace):
             next_page=page_data.next_page,
             prev_page=page_data.prev_page,
         )
+
+    def all(
+        self,
+        *,
+        sort: QuestionSortOrder | SortOrder | None = None,
+        text: str | None = None,
+        pad_types: Sequence[QuestionPadType] | None = None,
+    ) -> Iterator[Question]:
+        """Yield questions incrementally with filters on every page."""
+        page_number = 1
+        while True:
+            page = self.list(
+                sort=sort, page=page_number, text=text, pad_types=pad_types
+            )
+            yield from page
+            if page.next_page is None:
+                break
+            page_number = next_page_number(
+                next_page=page.next_page,
+                base_url=self.base_url,
+                path="/api/questions/",
+                after_page=page_number,
+            )
 
     def create(
         self,
@@ -898,14 +935,18 @@ class OrganizationQuestionsNamespace(_Namespace):
     def list(
         self,
         *,
-        sort: SortOrder | None = None,
+        sort: QuestionSortOrder | SortOrder | None = None,
         page: int | None = None,
+        pad_type: Literal["live", "take_home"] | None = None,
+        language: Language | str | None = None,
     ) -> PaginatedList[Question]:
         """Retrieve questions for the entire organization.
 
         Args:
             sort: Sort order.
             page: Page number for pagination.
+            pad_type: Filter live or take-home questions.
+            language: Filter question language.
 
         Returns:
             The list of questions with pagination metadata.
@@ -915,6 +956,10 @@ class OrganizationQuestionsNamespace(_Namespace):
             params["sort"] = sort
         if page is not None:
             params["page"] = page
+        if pad_type is not None:
+            params["pad_type"] = pad_type
+        if language is not None:
+            params["language"] = str(object=language)
         response = self._request(
             method="GET",
             url="/api/organization/questions",
@@ -929,6 +974,32 @@ class OrganizationQuestionsNamespace(_Namespace):
             next_page=page_data.next_page,
             prev_page=page_data.prev_page,
         )
+
+    def all(
+        self,
+        *,
+        sort: QuestionSortOrder | SortOrder | None = None,
+        pad_type: Literal["live", "take_home"] | None = None,
+        language: Language | str | None = None,
+    ) -> Iterator[Question]:
+        """Yield questions incrementally with filters on every page."""
+        page_number = 1
+        while True:
+            page = self.list(
+                sort=sort,
+                page=page_number,
+                pad_type=pad_type,
+                language=language,
+            )
+            yield from page
+            if page.next_page is None:
+                break
+            page_number = next_page_number(
+                next_page=page.next_page,
+                base_url=self.base_url,
+                path="/api/organization/questions",
+                after_page=page_number,
+            )
 
 
 @beartype
