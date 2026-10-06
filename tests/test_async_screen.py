@@ -159,3 +159,17 @@ async def test_async_empty_screen_api_key_fails_fast() -> None:
         await client.screen.campaigns.list()
     assert not bool(recorder.transport.calls)
     await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_async_manual_invitation() -> None:
+    """A manual invitation is sent without invented candidate identity."""
+    recorder = _AsyncScreenTransport(error=False)
+    async with _client(recorder) as client:
+        _ = await client.screen.campaigns.send_invitation(
+            campaign_id=7,
+            invitation=ScreenInvitation(send_invitation_email=False),
+        )
+    assert recorder.transport.calls[0]["json"] == {
+        "send_invitation_email": False
+    }

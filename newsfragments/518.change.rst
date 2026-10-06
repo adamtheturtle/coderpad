@@ -1,0 +1,2 @@
+Allow manual Screen invitations without candidate email or name.
+Require an address only when email delivery is explicitly enabled.
