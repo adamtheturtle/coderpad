@@ -65,6 +65,7 @@ from coderpad.types import (
     QuestionVariantUnset,
     Quota,
     SortOrder,
+    User,
 )
 
 
@@ -126,6 +127,18 @@ class _AsyncNamespace:
         if response.status_code >= HTTPStatus.BAD_REQUEST:
             raise CoderPadError.from_response(response=response)
         return response
+
+
+@beartype
+class AsyncUserNamespace(_AsyncNamespace):
+    """Information about the Interview API key owner."""
+
+    async def get(self) -> User:
+        """Retrieve the key owner's display name and capabilities."""
+        response = await self._request(
+            method="GET", url="/api/user", params=None, data=None, files=None
+        )
+        return User.model_validate(obj=response.json())
 
 
 @beartype
@@ -1131,6 +1144,9 @@ class AsyncCoderPad:
             **(default_headers if default_headers is not None else {}),
             "Authorization": f'Token token="{api_key}"',
         }
+        self.user: AsyncUserNamespace = AsyncUserNamespace(
+            transport=resolved_transport, base_url=base_url, headers=headers
+        )
         self.pads: AsyncPadsNamespace = AsyncPadsNamespace(
             transport=resolved_transport,
             base_url=base_url,
