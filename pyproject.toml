@@ -414,6 +414,7 @@ ignore_names = [
     "SCALA",
     "send_invitation_email",
     "send_notification_email_on_bounce",
+    "allow_duplicate_invitations",
     "SOLIDITY",
     "source_suffix",
     "spelling_word_list_filename",

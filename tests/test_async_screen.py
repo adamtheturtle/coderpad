@@ -173,3 +173,33 @@ async def test_async_manual_invitation() -> None:
     assert recorder.transport.calls[0]["json"] == {
         "send_invitation_email": False
     }
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    argnames="allow_duplicates", argvalues=[None, False, True]
+)
+async def test_async_invitation_duplicate_policy(
+    *,
+    allow_duplicates: bool | None,
+) -> None:
+    """Async invitations preserve explicit duplicate policy and
+    omission.
+    """
+    recorder = _AsyncScreenTransport(error=False)
+    async with _client(recorder) as client:
+        _ = await client.screen.campaigns.send_invitation(
+            campaign_id=7,
+            invitation=ScreenInvitation(
+                candidate_email="ada@example.com",
+                candidate_name="Ada",
+                allow_duplicate_invitations=allow_duplicates,
+            ),
+        )
+    expected: dict[str, str | bool] = {
+        "candidate_email": "ada@example.com",
+        "candidate_name": "Ada",
+    }
+    if allow_duplicates is not None:
+        expected["allow_duplicate_invitations"] = allow_duplicates
+    assert recorder.transport.calls[0]["json"] == expected

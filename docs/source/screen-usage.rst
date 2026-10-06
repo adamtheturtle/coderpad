@@ -1,5 +1,4 @@
 Screen API usage
-================
 
 The Screen API is available on the same client via ``screen_api_key``.
 
@@ -37,3 +36,7 @@ Pass ``send_invitation_email=False`` to explicitly disable email delivery.
 A candidate name is optional for both manual and email invitations.
 Explicit email delivery requires a candidate email address.
 When delivery is omitted, the server sends email only if an address is provided.
+Set ``allow_duplicate_invitations=False`` on ``ScreenInvitation`` to ask the
+server to reject repeated invitations.
+Omission uses the server default, which allows duplicates.
+Explicit ``True`` allows them.
