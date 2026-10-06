@@ -1,0 +1,1 @@
+Download candidate Screen project archives as binary ``tar.gz`` data with synchronous and asynchronous clients.

@@ -81,3 +81,14 @@ ISO 8601 creation timestamps are preserved as returned strings.
 It is ``None`` when omitted and an empty list when explicitly empty.
 No output is collapsed into plain text.
 Both synchronous and asynchronous clients support this operation.
+
+Candidate project archives
+--------------------------
+
+``client.screen.tests.project_archive(test_id=11, question_id=question_uuid)`` returns the project ``tar.gz`` bytes with the candidate's changes applied.
+The question ID accepts a UUID or a UUID string.
+Save or extract these bytes only when your application requests it.
+The SDK does not interpret them as JSON or PDF, extract files, or retry requests.
+HTTP errors use the public ``CoderPadError`` contract, and transport errors propagate as they do for PDF downloads.
+For slow project generation, configure the client's ``timeout`` or supply a Screen transport with an appropriate timeout.
+The asynchronous client provides the same operation and supports normal task cancellation.
