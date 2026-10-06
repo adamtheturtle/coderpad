@@ -92,3 +92,15 @@ The SDK does not interpret them as JSON or PDF, extract files, or retry requests
 HTTP errors use the public ``CoderPadError`` contract, and transport errors propagate as they do for PDF downloads.
 For slow project generation, configure the client's ``timeout`` or supply a Screen transport with an appropriate timeout.
 The asynchronous client provides the same operation and supports normal task cancellation.
+
+Question insights
+-----------------
+
+``client.screen.questions.insights(question_id=question_uuid)`` returns a typed ``ScreenQuestionInsights`` response.
+Use ``programming_language`` to request language-specific statistics.
+The question identity accepts a UUID or a UUID string.
+Usage includes view count, last view timestamp, average duration in seconds, timeout ratio, and average score ratio.
+Frequent answers and test-case success retain labeled counts and ratios, while score distribution retains zero, partial, and full score buckets and total candidates.
+Absent statistics remain ``None`` and explicitly empty lists remain empty.
+API errors use the usual error contract, including 400 and 404 responses.
+Both synchronous and asynchronous clients provide the same operation.

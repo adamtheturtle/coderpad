@@ -571,3 +571,53 @@ class ScreenAIConversation(_APIModel):
     subject: str | None = None
     creation_time: str | None = None
     messages: list[ScreenAIMessage] = Field(default_factory=_empty_ai_messages)
+
+
+@beartype
+class ScreenQuestionUsageInsights(_APIModel):
+    """Usage metrics and score ratios returned by Screen."""
+
+    view_count: int | None = None
+    last_view_time: str | None = None
+    average_answer_duration_seconds: int | None = None
+    timeout_rate: float | None = None
+    average_score: float | None = None
+
+
+@beartype
+class ScreenQuestionRepartitionInsights(_APIModel):
+    """A frequent answer or test-case success count and ratio."""
+
+    label: str | None = None
+    count: int | None = None
+    percentage: float | None = None
+    correct: bool | None = None
+
+
+@beartype
+class ScreenQuestionScoreRangeInsights(_APIModel):
+    """The candidate count in a zero, partial, or full score bucket."""
+
+    score_range: (
+        Literal["ZERO_SCORE", "PARTIAL_SCORE", "FULL_SCORE"] | None
+    ) = None
+    candidate_count: int | None = None
+
+
+@beartype
+class ScreenQuestionScoresDistributionInsights(_APIModel):
+    """Score buckets and the total number of candidates represented."""
+
+    distribution: list[ScreenQuestionScoreRangeInsights] | None = None
+    total_candidates: int | None = None
+
+
+@beartype
+class ScreenQuestionInsights(_APIModel):
+    """Optional question statistics with absent and empty values preserved."""
+
+    id: str | None = None
+    usage: ScreenQuestionUsageInsights | None = None
+    frequent_answers: list[ScreenQuestionRepartitionInsights] | None = None
+    testcases_success: list[ScreenQuestionRepartitionInsights] | None = None
+    scores_distribution: ScreenQuestionScoresDistributionInsights | None = None
