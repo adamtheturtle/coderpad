@@ -1,0 +1,321 @@
+"""Tests for `coderpad` questions client."""
+
+import json
+from pathlib import Path
+from urllib.parse import parse_qs
+
+import pytest
+import respx
+
+from coderpad.client import CoderPad
+from coderpad.types import (
+    CandidateInstruction,
+    Language,
+    QuestionFileContent,
+    SortOrder,
+)
+
+
+def test_list_questions(
+    coderpad_client: CoderPad,
+) -> None:
+    """Questions can be listed."""
+    result = coderpad_client.questions.list()
+    assert result.total >= 0
+    assert result[0].ai_assist_custom_system_prompt == "Only provide hints."
+
+
+def test_list_questions_with_params(
+    coderpad_client: CoderPad,
+) -> None:
+    """Questions can be listed with sort and page."""
+    result = coderpad_client.questions.list(
+        sort=SortOrder.UPDATED_AT_DESC,
+        page=1,
+    )
+    assert result.total >= 0
+
+
+def test_create_question(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be created."""
+    result = coderpad_client.questions.create(
+        title="Test Question",
+        language="python",
+    )
+    assert bool(result.id)
+    assert result.ai_assist_custom_system_prompt == "Only provide hints."
+
+
+def test_create_question_all_params(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be created with all parameters."""
+    result = coderpad_client.questions.create(
+        title="Test Question",
+        language="python",
+        description="A description",
+        contents="def solve(): pass",
+        solution="def solve(): return 42",
+        ai_assist_custom_system_prompt="Only provide hints.",
+        candidate_instructions=[
+            CandidateInstruction(
+                instructions="Part 1",
+                default_visible=True,
+            ),
+            CandidateInstruction(instructions="Part 2"),
+        ],
+    )
+    assert bool(result.id)
+
+
+def test_create_question_with_language_enum(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be created with a Language enum."""
+    result = coderpad_client.questions.create(
+        title="Test Question",
+        language=Language.PYTHON,
+    )
+    assert bool(result.id)
+
+
+def test_create_question_with_file_contents(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be created with file contents."""
+    result = coderpad_client.questions.create(
+        title="Multi-file Question",
+        language=Language.MULTIFILE_PYTHON,
+        file_contents=[
+            QuestionFileContent(
+                path="main.py",
+                contents="print('hello')",
+            ),
+            QuestionFileContent(
+                path="lib/utils.py",
+                contents="def helper(): pass",
+            ),
+        ],
+    )
+    assert bool(result.id)
+
+
+def test_create_question_with_zip_file(
+    coderpad_client: CoderPad,
+    tmp_path: Path,
+) -> None:
+    """A question can be created with a zip file."""
+    zip_path = tmp_path / "project.zip"
+    _ = zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+    result = coderpad_client.questions.create(
+        title="Zip Question",
+        language=Language.MULTIFILE_JAVA,
+        zip_file=zip_path,
+    )
+    assert bool(result.id)
+
+
+def test_create_question_candidate_instructions_body(
+    coderpad_client: CoderPad,
+    mock_coderpad_api: respx.MockRouter,
+) -> None:
+    """Candidate instructions are serialized into the form body."""
+    _ = coderpad_client.questions.create(
+        title="Live Question",
+        language="python",
+        ai_assist_custom_system_prompt="Only provide hints.",
+        candidate_instructions=[
+            CandidateInstruction(
+                instructions="Part 1",
+                default_visible=True,
+            ),
+            CandidateInstruction(instructions="Part 2"),
+        ],
+    )
+    request = mock_coderpad_api.calls.last.request
+    sent = parse_qs(qs=request.content.decode())
+    assert sent["question[ai_assist_custom_system_prompt]"] == [
+        "Only provide hints.",
+    ]
+    assert json.loads(
+        s=sent["question[candidate_instructions]"][0],
+    ) == [
+        {"instructions": "Part 1", "default_visible": True},
+        {"instructions": "Part 2", "default_visible": False},
+    ]
+
+
+def test_create_question_rejects_multiple_content_sources(
+    coderpad_client: CoderPad,
+    tmp_path: Path,
+) -> None:
+    """Creating with multiple content sources raises ValueError."""
+    zip_path = tmp_path / "project.zip"
+    _ = zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+    with pytest.raises(
+        expected_exception=ValueError,
+        match="at most one of contents, file_contents, zip_file",
+    ):
+        _ = coderpad_client.questions.create(
+            title="Conflict",
+            language="python",
+            contents="print(1)",
+            file_contents=[
+                QuestionFileContent(path="main.py", contents="x"),
+            ],
+        )
+    with pytest.raises(expected_exception=ValueError, match="zip_file"):
+        _ = coderpad_client.questions.create(
+            title="Conflict",
+            language="python",
+            contents="print(1)",
+            zip_file=zip_path,
+        )
+
+
+def test_get_question(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be retrieved by id."""
+    result = coderpad_client.questions.get(
+        question_id="123",
+    )
+    assert bool(result.id)
+    assert result.ai_assist_custom_system_prompt == "Only provide hints."
+
+
+def test_update_question(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be updated."""
+    coderpad_client.questions.update(
+        question_id="123",
+        title="Updated Question",
+    )
+
+
+def test_update_question_no_title(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be updated without a title."""
+    coderpad_client.questions.update(
+        question_id="123",
+        language="ruby",
+    )
+
+
+def test_update_question_all_params(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be updated with all parameters."""
+    coderpad_client.questions.update(
+        question_id="123",
+        title="Updated",
+        language="ruby",
+        description="New desc",
+        contents="puts 'hi'",
+        solution="puts 'answer'",
+        ai_assist_custom_system_prompt="Only provide hints.",
+        candidate_instructions=[
+            CandidateInstruction(
+                instructions="Part 1",
+                default_visible=True,
+            ),
+            CandidateInstruction(instructions="Part 2"),
+        ],
+    )
+
+
+def test_update_question_with_file_contents(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be updated with file contents."""
+    coderpad_client.questions.update(
+        question_id="123",
+        file_contents=[
+            QuestionFileContent(
+                path="main.py",
+                contents="print('updated')",
+            ),
+        ],
+    )
+
+
+def test_update_question_with_zip_file(
+    coderpad_client: CoderPad,
+    tmp_path: Path,
+) -> None:
+    """A question can be updated with a zip file."""
+    zip_path = tmp_path / "project.zip"
+    _ = zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+    coderpad_client.questions.update(
+        question_id="123",
+        zip_file=zip_path,
+    )
+
+
+def test_update_question_candidate_instructions_body(
+    coderpad_client: CoderPad,
+    mock_coderpad_api: respx.MockRouter,
+) -> None:
+    """Candidate instructions are serialized into the form body."""
+    coderpad_client.questions.update(
+        question_id="123",
+        candidate_instructions=[
+            CandidateInstruction(
+                instructions="Part 1",
+                default_visible=True,
+            ),
+            CandidateInstruction(instructions="Part 2"),
+        ],
+    )
+    request = mock_coderpad_api.calls.last.request
+    sent = parse_qs(qs=request.content.decode())
+    assert json.loads(
+        s=sent["question[candidate_instructions]"][0],
+    ) == [
+        {"instructions": "Part 1", "default_visible": True},
+        {"instructions": "Part 2", "default_visible": False},
+    ]
+
+
+def test_update_question_ai_assist_system_prompt_body(
+    coderpad_client: CoderPad,
+    mock_coderpad_api: respx.MockRouter,
+) -> None:
+    """AI Assist's system prompt is serialized into the form body."""
+    coderpad_client.questions.update(
+        question_id="123",
+        ai_assist_custom_system_prompt="Only provide hints.",
+    )
+    request = mock_coderpad_api.calls.last.request
+    sent = parse_qs(qs=request.content.decode())
+    assert sent["question[ai_assist_custom_system_prompt]"] == [
+        "Only provide hints.",
+    ]
+
+
+def test_update_question_rejects_multiple_content_sources(
+    coderpad_client: CoderPad,
+    tmp_path: Path,
+) -> None:
+    """Updating with multiple content sources raises ValueError."""
+    zip_path = tmp_path / "project.zip"
+    _ = zip_path.write_bytes(data=b"PK\x03\x04fake-zip")
+    with pytest.raises(expected_exception=ValueError, match="at most one"):
+        coderpad_client.questions.update(
+            question_id="1",
+            contents="print(1)",
+            zip_file=zip_path,
+        )
+
+
+def test_delete_question(
+    coderpad_client: CoderPad,
+) -> None:
+    """A question can be deleted."""
+    coderpad_client.questions.delete(
+        question_id="123",
+    )

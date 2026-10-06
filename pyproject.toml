@@ -149,7 +149,7 @@ lint.per-file-ignores."docs/source/*.py" = [
     # Allow asserts in docs.
     "S101",
 ]
-lint.per-file-ignores."tests/*.py" = [
+lint.per-file-ignores."tests/**/*.py" = [
     # Allow asserts in tests.
     "S101",
 ]
