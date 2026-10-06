@@ -104,3 +104,29 @@ Frequent answers and test-case success retain labeled counts and ratios, while s
 Absent statistics remain ``None`` and explicitly empty lists remain empty.
 API errors use the usual error contract, including 400 and 404 responses.
 Both synchronous and asynchronous clients provide the same operation.
+
+Detailed test results
+---------------------
+
+``client.screen.tests.get(test_id=11)`` returns a ``ScreenTest`` with optional session ``timer_type``, organization, candidate language, and approval status.
+Its ``questions`` contains ``ScreenDetailedQuestion`` objects with string UUID IDs when the server returns detailed reports.
+``tests.list`` continues to decode integer IDs as ``ScreenTestQuestion`` summaries.
+When report permissions hide the questions, the list is empty.
+
+Detailed questions retain version, type, title, domain, scores, answer and grading status, timestamps in milliseconds, and elapsed time in seconds.
+A missing value stays ``None``.
+Explicit zero, false, and empty lists remain distinct.
+The server returns question time limits only for ``PER_QUESTION`` timers.
+Question warnings retain an open ``type`` identifier, ``level``, and ``message``.
+Session warnings remain the existing string list on ``ScreenReport``.
+Report and question activity fields distinguish recruiter cheating flags from platform warnings.
+
+``question.answer`` exposes typed code, game, text, MCQ, file, project, and video blocks.
+``question.evaluation`` exposes rubric and AI reviews, project tests, validation methods, output comparisons, SQL comparisons, accepted text answers, and correct choice indexes.
+Order is preserved for choices, recordings, criteria, and test cases.
+Recorded outcomes and points already include recruiter overrides.
+Optional blocks stay absent until available, including pending reviews and unavailable recordings.
+File, video, and transcript URLs are temporary.
+Project archive downloads require the independent Screen key.
+No answer content or media is downloaded automatically.
+The same models are returned by synchronous and asynchronous clients.
