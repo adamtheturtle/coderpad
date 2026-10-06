@@ -1,0 +1,2 @@
+Add the optional ``allow_duplicate_invitations`` Screen invitation policy.
+Preserve omission and explicit false or true in both clients.

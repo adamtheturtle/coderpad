@@ -335,6 +335,7 @@ ignore_names = [
     "_fixture_*",
     # Pydantic invokes field validators declaratively.
     "_none_is_not_visible",
+    "allow_duplicate_invitations",
     # Language enum members (public API)
     "ANGULAR",
     # Sphinx

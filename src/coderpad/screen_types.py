@@ -125,6 +125,7 @@ class ScreenInvitation(_APIModel):
     tags: str | None = None
     send_invitation_email: bool | None = None
     send_notification_email_on_bounce: bool | None = None
+    allow_duplicate_invitations: bool | None = None
 
     @model_validator(mode="after")
     def require_delivery_address(self) -> Self:
