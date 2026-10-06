@@ -27,6 +27,34 @@ class PadInterviewerNotificationDict(TypedDict):
     updated_at: str
 
 
+class TranscriptEntryDict(TypedDict):
+    """One transcript or system message with millisecond timing."""
+
+    id: str
+    kind: str
+    text: str
+    timestamp: int
+    speaker_name: NotRequired[str | None]
+    speaker_role: NotRequired[str | None]
+
+
+class ReviewReportDict(TypedDict):
+    """An Interview review report, which may still be processing."""
+
+    id: str
+    status: str
+    created_at: str
+    updated_at: str
+    title: NotRequired[str | None]
+    prompt: NotRequired[str | None]
+    report: NotRequired[str | None]
+    summary: NotRequired[str | None]
+    icon: NotRequired[str | None]
+    error: NotRequired[str | None]
+    user_id: NotRequired[int | None]
+    file_paths: NotRequired[list[str]]
+
+
 class PadDict(TypedDict):
     """A CoderPad interview pad."""
 
@@ -53,6 +81,11 @@ class PadDict(TypedDict):
     pad_environment_ids: list[int]
     active_environment_id: int | None
     team: TeamDict
+    interview_highlights: NotRequired[str | None]
+    interview_outline: NotRequired[JsonValue]
+    transcript: NotRequired[list[TranscriptEntryDict] | None]
+    transcript_source_unavailable: NotRequired[bool | None]
+    review_reports: NotRequired[list[ReviewReportDict] | None]
     restrict_interviewer_access: NotRequired[bool]
     pad_interviewer_notifications: NotRequired[
         list[PadInterviewerNotificationDict]

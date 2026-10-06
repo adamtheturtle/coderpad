@@ -54,9 +54,11 @@ from coderpad.types import (
     QuestionVariantSummary,
     QuestionVariantUnset,
     Quota,
+    ReviewReport,
     SortOrder,
     Team,
     TestCase,
+    TranscriptEntry,
     User,
 )
 
@@ -97,6 +99,7 @@ __all__ = [
     "QuestionVariantUnset",
     "Quota",
     "RateLimitError",
+    "ReviewReport",
     "ScreenAccount",
     "ScreenCampaign",
     "ScreenInvitation",
@@ -114,5 +117,6 @@ __all__ = [
     "SortOrder",
     "Team",
     "TestCase",
+    "TranscriptEntry",
     "User",
 ]

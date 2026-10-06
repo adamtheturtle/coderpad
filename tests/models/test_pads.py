@@ -305,3 +305,77 @@ def test_paginated_list_prev_page_defaults_none() -> None:
     """PaginatedList defaults prev_page to None."""
     page = PaginatedList(["a"], total=1)
     assert page.prev_page is None
+
+
+def test_pad_analytics(team_dict: TeamDict) -> None:
+    """Optional analytics preserve structured content and optional review
+    fields.
+    """
+    data = _pad_dict(team_dict=team_dict)
+    data["interview_highlights"] = "Explained the tradeoffs."
+    data["interview_outline"] = {"sections": [{"title": "Implementation"}]}
+    data["transcript"] = [
+        {
+            "id": "entry-1",
+            "kind": "system_message",
+            "text": "Recording started",
+            "timestamp": 1790000000123,
+            "speaker_name": None,
+            "speaker_role": None,
+        }
+    ]
+    data["transcript_source_unavailable"] = False
+    data["review_reports"] = [
+        {
+            "id": "review-1",
+            "status": "failed",
+            "report": None,
+            "error": "Unavailable",
+            "prompt": "Review solution",
+            "summary": None,
+            "icon": None,
+            "user_id": None,
+            "file_paths": ["main.py"],
+            "created_at": "2026-10-06T12:00:00Z",
+            "updated_at": "2026-10-06T12:00:01Z",
+        }
+    ]
+    for pad in [Pad.from_dict(data=data), Pad.model_validate(obj=data)]:
+        assert pad.interview_highlights == data["interview_highlights"]
+        assert pad.interview_outline == data["interview_outline"]
+        assert pad.transcript is not None
+        assert [entry.model_dump() for entry in pad.transcript] == data[
+            "transcript"
+        ]
+        assert pad.transcript[0].speaker_name is None
+        assert pad.transcript[0].speaker_role is None
+        assert pad.transcript_source_unavailable is False
+        assert pad.review_reports is not None
+        assert pad.review_reports[0].error == "Unavailable"
+        assert pad.review_reports[0].file_paths == ["main.py"]
+        assert pad.review_reports[0].report is None
+        assert pad.review_reports[0].prompt == "Review solution"
+        assert pad.review_reports[0].summary is None
+        assert pad.review_reports[0].icon is None
+        assert pad.review_reports[0].user_id is None
+
+
+def test_pad_analytics_availability(team_dict: TeamDict) -> None:
+    """Absent and empty analytics preserve source availability."""
+    absent = Pad.from_dict(data=_pad_dict(team_dict=team_dict))
+    assert absent.interview_highlights is None
+    assert absent.interview_outline is None
+    assert absent.transcript is None
+    assert absent.review_reports is None
+    assert absent.transcript_source_unavailable is None
+    data = _pad_dict(team_dict=team_dict)
+    data["transcript"] = []
+    data["review_reports"] = []
+    data["transcript_source_unavailable"] = True
+    unavailable = Pad.from_dict(data=data)
+    # Empty lists differ from absent analytics.
+    # pylint: disable-next=use-implicit-booleaness-not-comparison
+    assert unavailable.transcript == []
+    # pylint: disable-next=use-implicit-booleaness-not-comparison
+    assert unavailable.review_reports == []
+    assert unavailable.transcript_source_unavailable is True

@@ -269,3 +269,13 @@ An empty overlay uses the unmodified template.
 ZIP uploads replace template files except the preserved ``.cpad`` directory, which cannot be deleted.
 On parent-question updates, the API ignores deleted entries.
 This differs from variant updates, where an empty file list restores the template.
+
+Interview analytics
+-------------------
+
+Individual pads can include ``interview_highlights``, ``interview_outline``, ``transcript``, ``transcript_source_unavailable``, and ``review_reports``.
+These values depend on account features and permissions.
+Absent values remain ``None``.
+Empty transcript and review arrays remain empty lists.
+The outline preserves structured JSON.
+Transcript timestamps are Unix milliseconds, and review reports include their processing status, file paths, and optional report or error text.
