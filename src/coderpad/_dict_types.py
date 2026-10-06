@@ -166,6 +166,25 @@ class CustomDatabaseDict(TypedDict):
     schema_json: CustomDatabaseSchemaDict
 
 
+class QuestionFileContentDict(TypedDict):
+    """A parent question starter file or template removal."""
+
+    path: str
+    contents: NotRequired[str | None]
+    hidden: NotRequired[bool | None]
+    deleted: NotRequired[bool | None]
+
+
+class QuestionVariantSummaryDict(TypedDict):
+    """A variant summary without its code."""
+
+    id: int
+    language: NotRequired[str | None]
+    project_template_id: NotRequired[int | None]
+    project_template_slug: NotRequired[str | None]
+    display: NotRequired[str | None]
+
+
 class QuestionDict(TypedDict):
     """A CoderPad question."""
 
@@ -186,6 +205,8 @@ class QuestionDict(TypedDict):
     author_name: str
     organization_name: str
     custom_files: list[CustomFileDict]
+    file_contents: NotRequired[list[QuestionFileContentDict] | None]
+    question_variants: NotRequired[list[QuestionVariantSummaryDict] | None]
     created_at: str
     updated_at: str
     public_take_home_setting_id: NotRequired[int]

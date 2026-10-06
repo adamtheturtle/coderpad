@@ -250,3 +250,22 @@ Pass ``shared=True`` or ``shared=False`` to question creation and updates to set
 Only the author can change sharing.
 Pass ``custom_database_id`` to associate a question with a custom database.
 Omitted values retain the server defaults or existing settings.
+
+Project question starter files
+------------------------------
+
+``Question.file_contents`` contains starter overlays.
+These differ from ``custom_files``, which contains downloadable attachments.
+``Question.question_variants`` contains lightweight summaries, without code or timestamps.
+Use the variants endpoint to retrieve full variants.
+
+``QuestionFileContent`` accepts a required path and optional contents, ``hidden``, and ``deleted`` flags.
+A removal entry can contain just its path and ``deleted=True``.
+Omitted flags stay omitted.
+Empty contents stay empty.
+
+On creation, structured files overlay template files.
+An empty overlay uses the unmodified template.
+ZIP uploads replace template files except the preserved ``.cpad`` directory, which cannot be deleted.
+On parent-question updates, the API ignores deleted entries.
+This differs from variant updates, where an empty file list restores the template.

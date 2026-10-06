@@ -692,13 +692,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             )
         if file_contents is not None:
             data["question[file_contents]"] = json.dumps(
-                obj=[
-                    {
-                        "path": fc.path,
-                        "contents": fc.contents,
-                    }
-                    for fc in file_contents
-                ],
+                obj=[fc.model_dump(exclude_none=True) for fc in file_contents],
             )
         files = None
         if directory is not None or zip_file is not None:
@@ -817,13 +811,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
             )
         if file_contents is not None:
             data["question[file_contents]"] = json.dumps(
-                obj=[
-                    {
-                        "path": fc.path,
-                        "contents": fc.contents,
-                    }
-                    for fc in file_contents
-                ],
+                obj=[fc.model_dump(exclude_none=True) for fc in file_contents],
             )
         files = None
         if directory is not None or zip_file is not None:

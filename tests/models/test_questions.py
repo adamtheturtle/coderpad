@@ -250,3 +250,55 @@ def test_candidate_instruction_name() -> None:
         CandidateInstruction.from_dict(data={"instructions": "Do it"}).name
         is None
     )
+
+
+def test_project_question_metadata() -> None:
+    """Starter overlays and lightweight summaries survive both
+    decoders.
+    """
+    data = _question_dict()
+    data["file_contents"] = [
+        {"path": "hidden.py", "contents": "answer = 42", "hidden": True},
+        {"path": "obsolete.py", "deleted": True},
+    ]
+    data["question_variants"] = [
+        {
+            "id": 42,
+            "language": None,
+            "project_template_id": 7,
+            "project_template_slug": "python-project",
+            "display": "Python",
+        },
+    ]
+    for question in [
+        Question.from_dict(data=data),
+        Question.model_validate(obj=data),
+    ]:
+        assert question.file_contents is not None
+        assert [
+            file.model_dump(exclude_none=True)
+            for file in question.file_contents
+        ] == data["file_contents"]
+        assert data["question_variants"] is not None
+        assert question.question_variants is not None
+        assert (
+            question.question_variants[0].model_dump()
+            == data["question_variants"][0]
+        )
+        assert len(question.custom_files) == 1
+
+
+def test_empty_project_question_metadata() -> None:
+    """An empty overlay differs from absent starter metadata."""
+    data = _question_dict()
+    absent = Question.from_dict(data=data)
+    assert absent.file_contents is None
+    assert absent.question_variants is None
+    data["file_contents"] = []
+    data["question_variants"] = []
+    question = Question.from_dict(data=data)
+    # Empty collections differ from absent metadata.
+    # pylint: disable-next=use-implicit-booleaness-not-comparison
+    assert question.file_contents == []
+    # pylint: disable-next=use-implicit-booleaness-not-comparison
+    assert question.question_variants == []
