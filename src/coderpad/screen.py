@@ -305,6 +305,21 @@ class ScreenTestsNamespace(_ScreenNamespace):
             type=builtins.list[ScreenAIConversation]
         ).validate_python(data.get("conversations", []))
 
+    def project_archive(
+        self, *, test_id: int, question_id: str | UUID
+    ) -> bytes:
+        """Download a compressed project archive with the candidate's changes applied.
+
+        Returns the original binary archive without extracting it or writing
+        files. Configure the client transport timeout for slow generation.
+        HTTP and transport errors use the same contract as report downloads.
+        """
+        path = screen_question_path(test_id=test_id, question_id=question_id)
+        response = self._request(
+            method="GET", path=path + "/project", params=None, json=None
+        )
+        return response.content
+
     def report(
         self,
         *,
