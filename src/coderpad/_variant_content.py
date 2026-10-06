@@ -60,7 +60,7 @@ def require_json_transport(transport: object) -> JSONTransport:
         transport=transport
     ):
         return transport
-    message = "Question variants require a JSON-capable transport."
+    message = "This operation requires a JSON-capable transport."
     raise TypeError(message)
 
 
@@ -71,7 +71,7 @@ def require_async_json_transport(transport: object) -> AsyncJSONTransport:
         transport=transport
     ):
         return transport
-    message = "Question variants require a JSON-capable transport."
+    message = "This operation requires a JSON-capable transport."
     raise TypeError(message)
 
 

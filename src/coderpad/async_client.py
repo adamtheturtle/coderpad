@@ -21,6 +21,7 @@ from coderpad._dict_types import (
     PadEnvironmentDict,
     PadHistoryEntryDict,
 )
+from coderpad._pad_content import pad_json_attributes, pad_settings_fields
 from coderpad._pagination import next_page_number, next_page_position
 from coderpad._question_content import (
     question_list_request,
@@ -149,6 +150,37 @@ class AsyncUserNamespace(_AsyncNamespace):
 class AsyncPadsNamespace(_AsyncNamespace):
     """Namespace for async pad operations."""
 
+    async def _pad_request(
+        self,
+        *,
+        method: str,
+        url: str,
+        data: dict[str, str],
+        allowed_interviewer_emails: Sequence[str] | None,
+    ) -> TransportResponse:
+        """Use JSON for replacement lists, including an explicit empty
+        list.
+        """
+        if allowed_interviewer_emails is None:
+            return await self._request(
+                method=method, url=url, data=data, params=None, files=None
+            )
+        transport = require_async_json_transport(transport=self.transport)
+        response = await transport(
+            method=method,
+            url=self.base_url + url,
+            headers=self.headers,
+            params=None,
+            data=None,
+            files=None,
+            json=pad_json_attributes(
+                data=data, emails=allowed_interviewer_emails
+            ),
+        )
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
+            raise CoderPadError.from_response(response=response)
+        return response
+
     async def list(
         self,
         *,
@@ -231,6 +263,16 @@ class AsyncPadsNamespace(_AsyncNamespace):
         contents: str | None = None,
         notes: str | None = None,
         question_id: str | int | None = None,
+        private: bool | None = None,
+        execution_enabled: bool | None = None,
+        user_email: str | None = None,
+        restrict_interviewer_access: bool | None = None,
+        allowed_interviewer_emails: Sequence[str] | None = None,
+        disable_coaching_tips: bool | None = None,
+        team_id: str | None = None,
+        take_home: bool | None = None,
+        take_home_time_limit: int | None = None,
+        ai_assist_enabled: bool | None = None,
     ) -> Pad:
         """Create a new pad.
 
@@ -241,6 +283,17 @@ class AsyncPadsNamespace(_AsyncNamespace):
             notes: Private notes for the interviewer.
             question_id: Id of an existing question to seed
                 the pad from.
+            private: Enable the waiting room.
+            execution_enabled: Allow code execution; sent as a string.
+            user_email: Organization user to make the owner.
+            restrict_interviewer_access: Restrict joining as an interviewer.
+            allowed_interviewer_emails: Replace the allowed list;
+                an empty list clears it.
+            disable_coaching_tips: Disable coaching tips.
+            team_id: Team for the new pad.
+            take_home: Create a take-home pad.
+            take_home_time_limit: Time limit in minutes.
+            ai_assist_enabled: Enable AI Assist.
 
         Returns:
             The created pad.
@@ -257,12 +310,26 @@ class AsyncPadsNamespace(_AsyncNamespace):
             data["notes"] = notes
         if question_id is not None:
             data["question_id"] = str(object=question_id)
-        response = await self._request(
+        data.update(
+            pad_settings_fields(
+                settings={
+                    "private": private,
+                    "execution_enabled": execution_enabled,
+                    "user_email": user_email,
+                    "restrict_interviewer_access": restrict_interviewer_access,
+                    "disable_coaching_tips": disable_coaching_tips,
+                    "team_id": team_id,
+                    "take_home": take_home,
+                    "take_home_time_limit": take_home_time_limit,
+                    "ai_assist_enabled": ai_assist_enabled,
+                }
+            )
+        )
+        response = await self._pad_request(
             method="POST",
             url="/api/pads/",
             data=data,
-            params=None,
-            files=None,
+            allowed_interviewer_emails=allowed_interviewer_emails,
         )
         return Pad.from_dict(
             data=TypeAdapter(type=PadDict).validate_python(response.json()),
@@ -298,6 +365,12 @@ class AsyncPadsNamespace(_AsyncNamespace):
         notes: str | None = None,
         ended: bool | None = None,
         deleted: bool | None = None,
+        private: bool | None = None,
+        execution_enabled: bool | None = None,
+        user_email: str | None = None,
+        restrict_interviewer_access: bool | None = None,
+        allowed_interviewer_emails: Sequence[str] | None = None,
+        disable_coaching_tips: bool | None = None,
     ) -> None:
         """Modify an existing pad.
 
@@ -309,6 +382,13 @@ class AsyncPadsNamespace(_AsyncNamespace):
             notes: New private notes.
             ended: Set to ``True`` to end the interview.
             deleted: Set to ``True`` to delete the pad.
+            private: Enable the waiting room.
+            execution_enabled: Allow code execution; sent as a string.
+            user_email: Organization user to make the owner.
+            restrict_interviewer_access: Restrict joining as an interviewer.
+            allowed_interviewer_emails: Replace the allowed list;
+                an empty list clears it.
+            disable_coaching_tips: Disable coaching tips.
         """
         data: dict[str, str] = {}
         if title is not None:
@@ -324,12 +404,22 @@ class AsyncPadsNamespace(_AsyncNamespace):
             data["ended"] = "true" if ended else "false"
         if deleted is not None:
             data["deleted"] = "true" if deleted else "false"
-        await self._request(
+        data.update(
+            pad_settings_fields(
+                settings={
+                    "private": private,
+                    "execution_enabled": execution_enabled,
+                    "user_email": user_email,
+                    "restrict_interviewer_access": restrict_interviewer_access,
+                    "disable_coaching_tips": disable_coaching_tips,
+                }
+            )
+        )
+        _ = await self._pad_request(
             method="PUT",
             url=f"/api/pads/{pad_id}",
             data=data,
-            params=None,
-            files=None,
+            allowed_interviewer_emails=allowed_interviewer_emails,
         )
 
     async def get_events(

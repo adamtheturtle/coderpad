@@ -329,6 +329,7 @@ class Pad(_APIModel):
     transcript: list[TranscriptEntry] | None = None
     transcript_source_unavailable: bool | None = None
     review_reports: list[ReviewReport] | None = None
+    allowed_interviewer_emails: list[str] | None = None
     restrict_interviewer_access: bool | None = None
     pad_interviewer_notifications: list[PadInterviewerNotification] = Field(
         default_factory=_empty_pad_interviewer_notifications,
@@ -384,6 +385,7 @@ class Pad(_APIModel):
             restrict_interviewer_access=data.get(
                 "restrict_interviewer_access",
             ),
+            allowed_interviewer_emails=data.get("allowed_interviewer_emails"),
             pad_interviewer_notifications=notifications,
             interview_highlights=data.get("interview_highlights"),
             interview_outline=data.get("interview_outline"),
