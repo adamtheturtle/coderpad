@@ -392,3 +392,49 @@ async def test_question_sharing_and_database(
     if shared is not None:
         expected_update["question[shared]"] = [str(object=shared).lower()]
     assert update_body == expected_update
+
+
+@pytest.mark.asyncio
+async def test_project_question_file_overlays(
+    async_coderpad_client: AsyncCoderPad,
+    mock_coderpad_api: respx.MockRouter,
+) -> None:
+    """Parent files preserve hidden, removal, and path-only entries."""
+    files = [
+        QuestionFileContent(
+            path="hidden.py", contents="secret", hidden=True, deleted=False
+        ),
+        QuestionFileContent(path="obsolete.py", deleted=True),
+        QuestionFileContent(path="empty.py", contents="", hidden=False),
+    ]
+    _ = await async_coderpad_client.questions.create(
+        title="Project", language="python", file_contents=files
+    )
+    create_body = parse_qs(
+        qs=mock_coderpad_api.calls.last.request.content.decode()
+    )
+    expected = [
+        {
+            "path": "hidden.py",
+            "contents": "secret",
+            "hidden": True,
+            "deleted": False,
+        },
+        {"path": "obsolete.py", "deleted": True},
+        {"path": "empty.py", "contents": "", "hidden": False},
+    ]
+    assert json.loads(s=create_body["question[file_contents]"][0]) == expected
+    await async_coderpad_client.questions.update(
+        question_id="123", file_contents=files
+    )
+    update_body = parse_qs(
+        qs=mock_coderpad_api.calls.last.request.content.decode()
+    )
+    assert json.loads(s=update_body["question[file_contents]"][0]) == expected
+    await async_coderpad_client.questions.update(
+        question_id="123", file_contents=[]
+    )
+    empty_body = parse_qs(
+        qs=mock_coderpad_api.calls.last.request.content.decode()
+    )
+    assert empty_body == {"question[file_contents]": ["[]"]}

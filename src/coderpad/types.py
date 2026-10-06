@@ -573,7 +573,20 @@ class QuestionFileContent(_APIModel):
     """
 
     path: str
-    contents: str
+    contents: str | None = None
+    hidden: bool | None = None
+    deleted: bool | None = None
+
+
+@beartype
+class QuestionVariantSummary(_APIModel):
+    """A variant summary without code or creation timestamps."""
+
+    id: int
+    language: str | None = None
+    project_template_id: int | None = None
+    project_template_slug: str | None = None
+    display: str | None = None
 
 
 class QuestionVariantUnset(Enum):
@@ -865,6 +878,8 @@ class Question(_APIModel):
     author_name: str
     organization_name: str
     custom_files: list[CustomFile]
+    file_contents: list[QuestionFileContent] | None = None
+    question_variants: list[QuestionVariantSummary] | None = None
     created_at: str
     updated_at: str
     public_take_home_setting_id: int | None = None
@@ -888,6 +903,8 @@ class Question(_APIModel):
         """
         raw_test_cases = data.get("test_cases")
         raw_custom_database = data.get("custom_database")
+        raw_files = data.get("file_contents")
+        raw_variants = data.get("question_variants")
         return cls(
             id=data["id"],
             title=data["title"],
@@ -924,6 +941,18 @@ class Question(_APIModel):
                 TestCase.from_dict(data=item) for item in raw_test_cases
             ]
             if raw_test_cases is not None
+            else None,
+            file_contents=[
+                QuestionFileContent.model_validate(obj=item)
+                for item in raw_files
+            ]
+            if raw_files is not None
+            else None,
+            question_variants=[
+                QuestionVariantSummary.model_validate(obj=item)
+                for item in raw_variants
+            ]
+            if raw_variants is not None
             else None,
             custom_database=CustomDatabase.from_dict(
                 data=raw_custom_database,

@@ -1,0 +1,1 @@
+Preserve parent-question starter file overlays and variant summaries, including hidden files and template removals.
