@@ -3,13 +3,17 @@
 import builtins
 from collections.abc import Iterator, Sequence
 from http import HTTPStatus
+from uuid import UUID
 
 from beartype import beartype
+from pydantic import TypeAdapter
 
+from coderpad._screen_question import screen_question_path
 from coderpad._screen_response import json_object, json_value
 from coderpad.exceptions import CoderPadError
 from coderpad.screen_types import (
     ScreenAccount,
+    ScreenAIConversation,
     ScreenCampaign,
     ScreenCampaignCreation,
     ScreenCampaignQuestion,
@@ -278,6 +282,28 @@ class ScreenTestsNamespace(_ScreenNamespace):
         _ = self._request(
             method="DELETE", path=f"/tests/{test_id}", params=None, json=None
         )
+
+    def ai_assist_conversations(
+        self, *, test_id: int, question_id: str | UUID
+    ) -> builtins.list[ScreenAIConversation]:
+        """Retrieve PROJECT question conversations after completion or
+        review.
+
+        Conversation and message order and structured output are preserved.
+        A missing project question raises the normal 404 error, and a test
+        that is still running raises the normal 409 error.
+        """
+        path = screen_question_path(test_id=test_id, question_id=question_id)
+        response = self._request(
+            method="GET",
+            path=path + "/ai-assist-conversations",
+            params=None,
+            json=None,
+        )
+        data = json_object(value=response.json())
+        return TypeAdapter(
+            type=builtins.list[ScreenAIConversation]
+        ).validate_python(data.get("conversations", []))
 
     def report(
         self,

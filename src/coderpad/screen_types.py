@@ -545,3 +545,29 @@ class ScreenCreatedCampaign(_APIModel):
     """The integer ID returned after campaign creation."""
 
     id: int
+
+
+@beartype
+class ScreenAIMessage(_APIModel):
+    """An ordered candidate or assistant message with original JSON output."""
+
+    id: str
+    role: Literal["USER", "ASSISTANT"]
+    creation_time: str | None = None
+    output_items: list[JsonValue] | None = None
+
+
+@beartype
+def _empty_ai_messages() -> list[ScreenAIMessage]:
+    """Create an empty ordered message list."""
+    return []
+
+
+@beartype
+class ScreenAIConversation(_APIModel):
+    """A candidate PROJECT question conversation with AI Assist."""
+
+    id: str
+    subject: str | None = None
+    creation_time: str | None = None
+    messages: list[ScreenAIMessage] = Field(default_factory=_empty_ai_messages)

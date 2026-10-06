@@ -66,3 +66,18 @@ Omitted settings inherit team defaults.
 Explicit false values are retained.
 The service reports account feature restrictions and incompatible settings.
 Campaign creation is never automatically retried.
+
+AI Assist conversations
+-----------------------
+
+``client.screen.tests.ai_assist_conversations(test_id=11, question_id=question_uuid)`` returns ordered ``ScreenAIConversation`` values and ordered ``ScreenAIMessage`` values for a PROJECT question.
+The question ID accepts a UUID or a UUID string.
+Conversations become available after completion or while awaiting manual review.
+The normal API error contract applies to missing project questions (404) and unfinished sessions (409).
+
+Message roles retain ``USER`` or ``ASSISTANT``.
+ISO 8601 creation timestamps are preserved as returned strings.
+``output_items`` retains structured JSON, including unknown nested fields, text chunks, reasoning, and tool-call metadata.
+It is ``None`` when omitted and an empty list when explicitly empty.
+No output is collapsed into plain text.
+Both synchronous and asynchronous clients support this operation.
