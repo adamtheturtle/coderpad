@@ -66,6 +66,7 @@ async def test_create_question_all_params(
         candidate_instructions=[
             CandidateInstruction(
                 instructions="Part 1",
+                name="First step",
                 default_visible=True,
             ),
             CandidateInstruction(instructions="Part 2"),
@@ -137,6 +138,7 @@ async def test_create_question_candidate_instructions_body(
         candidate_instructions=[
             CandidateInstruction(
                 instructions="Part 1",
+                name="First step",
                 default_visible=True,
             ),
             CandidateInstruction(instructions="Part 2"),
@@ -150,7 +152,11 @@ async def test_create_question_candidate_instructions_body(
     assert json.loads(
         s=sent["question[candidate_instructions]"][0],
     ) == [
-        {"instructions": "Part 1", "default_visible": True},
+        {
+            "instructions": "Part 1",
+            "name": "First step",
+            "default_visible": True,
+        },
         {"instructions": "Part 2", "default_visible": False},
     ]
 
@@ -234,6 +240,7 @@ async def test_update_question_all_params(
         candidate_instructions=[
             CandidateInstruction(
                 instructions="Part 1",
+                name="First step",
                 default_visible=True,
             ),
             CandidateInstruction(instructions="Part 2"),
@@ -282,6 +289,7 @@ async def test_update_question_candidate_instructions_body(
         candidate_instructions=[
             CandidateInstruction(
                 instructions="Part 1",
+                name="First step",
                 default_visible=True,
             ),
             CandidateInstruction(instructions="Part 2"),
@@ -292,7 +300,11 @@ async def test_update_question_candidate_instructions_body(
     assert json.loads(
         s=sent["question[candidate_instructions]"][0],
     ) == [
-        {"instructions": "Part 1", "default_visible": True},
+        {
+            "instructions": "Part 1",
+            "name": "First step",
+            "default_visible": True,
+        },
         {"instructions": "Part 2", "default_visible": False},
     ]
 

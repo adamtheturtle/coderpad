@@ -237,3 +237,16 @@ def test_custom_database_from_dict() -> None:
     assert result.schema_json.arrangement == "horizontal"
     assert result.schema_json.tables[0].name == "products"
     assert result.schema_json.tables[0].columns[0].nn
+
+
+def test_candidate_instruction_name() -> None:
+    """Step names retain their exact text, including empty names."""
+    for name in [None, "", "Part one"]:
+        instruction = CandidateInstruction.from_dict(
+            data={"instructions": "Do the thing", "name": name}
+        )
+        assert instruction.name == name
+    assert (
+        CandidateInstruction.from_dict(data={"instructions": "Do it"}).name
+        is None
+    )

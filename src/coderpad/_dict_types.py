@@ -109,6 +109,7 @@ class CandidateInstructionDict(TypedDict):
     """Instructions shown to a candidate."""
 
     instructions: str
+    name: NotRequired[str | None]
     default_visible: NotRequired[bool]
 
 

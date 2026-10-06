@@ -663,10 +663,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         if candidate_instructions is not None:
             data["question[candidate_instructions]"] = json.dumps(
                 obj=[
-                    {
-                        "instructions": ci.instructions,
-                        "default_visible": ci.default_visible,
-                    }
+                    ci.model_dump(exclude_none=True)
                     for ci in candidate_instructions
                 ],
             )
@@ -782,10 +779,7 @@ class AsyncQuestionsNamespace(_AsyncNamespace):
         if candidate_instructions is not None:
             data["question[candidate_instructions]"] = json.dumps(
                 obj=[
-                    {
-                        "instructions": ci.instructions,
-                        "default_visible": ci.default_visible,
-                    }
+                    ci.model_dump(exclude_none=True)
                     for ci in candidate_instructions
                 ],
             )
