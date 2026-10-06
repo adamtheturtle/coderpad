@@ -86,6 +86,7 @@ class PadDict(TypedDict):
     transcript: NotRequired[list[TranscriptEntryDict] | None]
     transcript_source_unavailable: NotRequired[bool | None]
     review_reports: NotRequired[list[ReviewReportDict] | None]
+    allowed_interviewer_emails: NotRequired[list[str] | None]
     restrict_interviewer_access: NotRequired[bool]
     pad_interviewer_notifications: NotRequired[
         list[PadInterviewerNotificationDict]

@@ -303,3 +303,19 @@ Existing ``SortOrder`` timestamp values stay supported.
 Omitted sorting preserves the API default.
 Pad and event sorting continues to use ``SortOrder``.
 Both question enumerators retain filters on every page and follow the returned numeric page link.
+
+Pad access and creation controls
+--------------------------------
+
+``pads.create`` and ``pads.update`` accept ``private`` (the waiting room), ``execution_enabled``, ``user_email`` (ownership), ``restrict_interviewer_access``, ``allowed_interviewer_emails``, and ``disable_coaching_tips``.
+Omitted values preserve server defaults, and explicit ``False`` values are sent.
+``execution_enabled`` is sent as the string ``"true"`` or ``"false"``.
+The email list replaces existing access: omit it to preserve the list, or pass ``[]`` to clear it.
+Access-list writes use a JSON body through the default transport.
+Custom transports must support JSON for these requests.
+Scalar-only mutations continue to use form bodies.
+
+Only creation accepts ``team_id``, ``take_home``, ``take_home_time_limit`` (in minutes), and ``ai_assist_enabled``.
+Omitting the time limit or AI setting inherits the question or organization configuration.
+``Pad.allowed_interviewer_emails`` retains the returned list, including an empty list, and is ``None`` when the API omits that metadata.
+These fields are available on both synchronous and asynchronous clients.
