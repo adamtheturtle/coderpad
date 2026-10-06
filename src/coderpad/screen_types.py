@@ -991,3 +991,12 @@ class ScreenQuestionInsights(_APIModel):
     frequent_answers: list[ScreenQuestionRepartitionInsights] | None = None
     testcases_success: list[ScreenQuestionRepartitionInsights] | None = None
     scores_distribution: ScreenQuestionScoresDistributionInsights | None = None
+
+
+@beartype
+class ScreenTemporaryFile(_APIModel):
+    """A temporary upload identifier to use promptly when saving a
+    question.
+    """
+
+    id: str
