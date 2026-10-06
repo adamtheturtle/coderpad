@@ -200,6 +200,7 @@ class AsyncPadsNamespace(_AsyncNamespace):
         """
         page_number: int | None = 1
         cursor: str | None = None
+        seen: set[tuple[str | None, int | None]] = {(None, 1)}
         while True:
             page = await self.list(sort=sort, page=page_number, cursor=cursor)
             for pad in page:
@@ -211,6 +212,13 @@ class AsyncPadsNamespace(_AsyncNamespace):
                 base_url=self.base_url,
                 path="/api/pads/",
             )
+            position = (cursor, page_number)
+            if position in seen:
+                message = (
+                    "Pagination link repeats a previously requested position."
+                )
+                raise ValueError(message)
+            seen.add(position)
 
     async def create(
         self,

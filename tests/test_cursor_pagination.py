@@ -152,3 +152,41 @@ async def test_explicit_cursor_overrides_page_and_sort() -> None:
             "cursor": [_CURSOR]
         }
         assert route.call_count == expected_call_count
+
+
+@pytest.mark.asyncio
+async def test_repeated_cursor_is_rejected() -> None:
+    """A repeated position stops both iterators before a third request."""
+    expected_call_count = 4
+    with respx.mock() as router:
+        route = router.get(url=_ORIGIN + "/api/pads/").mock(
+            return_value=Response(
+                status_code=200,
+                json={
+                    "pads": [],
+                    "total": 0,
+                    "next_page": _ORIGIN + "/api/pads/?cursor=repeat",
+                },
+            )
+        )
+        with CoderPad(api_key="key", base_url=_ORIGIN) as client:
+            with pytest.raises(
+                expected_exception=ValueError, match="repeats"
+            ) as error:
+                _ = list(client.pads.all())
+            assert (
+                str(object=error.value)
+                == "Pagination link repeats a previously requested position."
+            )
+        async with AsyncCoderPad(
+            api_key="key", base_url=_ORIGIN
+        ) as async_client:
+            with pytest.raises(
+                expected_exception=ValueError, match="repeats"
+            ) as error:
+                _ = [pad async for pad in async_client.pads.all()]
+            assert (
+                str(object=error.value)
+                == "Pagination link repeats a previously requested position."
+            )
+        assert route.call_count == expected_call_count

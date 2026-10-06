@@ -198,6 +198,7 @@ class PadsNamespace(_Namespace):
         """
         page_number: int | None = 1
         cursor: str | None = None
+        seen: set[tuple[str | None, int | None]] = {(None, 1)}
         while True:
             page = self.list(sort=sort, page=page_number, cursor=cursor)
             yield from page
@@ -208,6 +209,13 @@ class PadsNamespace(_Namespace):
                 base_url=self.base_url,
                 path="/api/pads/",
             )
+            position = (cursor, page_number)
+            if position in seen:
+                message = (
+                    "Pagination link repeats a previously requested position."
+                )
+                raise ValueError(message)
+            seen.add(position)
 
     def create(
         self,
