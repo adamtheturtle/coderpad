@@ -14,6 +14,8 @@ from coderpad.exceptions import (
 from coderpad.screen import SCREEN_EU_BASE_URL, SCREEN_US_BASE_URL
 from coderpad.screen_types import (
     ScreenAccount,
+    ScreenAIConversation,
+    ScreenAIMessage,
     ScreenCampaign,
     ScreenCampaignAccessPeriod,
     ScreenCampaignCreation,
@@ -114,6 +116,8 @@ __all__ = [
     "Quota",
     "RateLimitError",
     "ReviewReport",
+    "ScreenAIConversation",
+    "ScreenAIMessage",
     "ScreenAccount",
     "ScreenCampaign",
     "ScreenCampaignAccessPeriod",
