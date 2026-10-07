@@ -29,7 +29,7 @@ The Screen API is available on the same client via ``screen_api_key``.
        _ = sys.stdout.write(result.test_url)
 
 Manual invitations
-===========
+==================
 
 Omit candidate identity to create a test link that you can share yourself.
 Pass ``send_invitation_email=False`` to explicitly disable email delivery.
@@ -41,7 +41,7 @@ Omission uses the server default, which allows duplicates.
 Explicit ``True`` allows them.
 
 Account introspection
-==============
+=====================
 
 Use ``client.user.get()`` to inspect the Interview key owner.
 Its fields are ``name``, ``allow_pad_creation``, and ``analytics_id``.
@@ -50,7 +50,7 @@ Each call uses the key for its product.
 The asynchronous client exposes the same methods.
 
 Creating campaigns
-===========
+==================
 
 Use ``screen.campaigns.create`` with a name and an ordered list of ``ScreenCampaignQuestion`` or ``ScreenRandomQuestionSet`` entries.
 Question IDs and team IDs are UUID strings.
@@ -68,7 +68,7 @@ The service reports account feature restrictions and incompatible settings.
 Campaign creation is never automatically retried.
 
 AI Assist conversations
-================
+=======================
 
 ``client.screen.tests.ai_assist_conversations(test_id=11, question_id=question_uuid)`` returns ordered ``ScreenAIConversation`` values and ordered ``ScreenAIMessage`` values for a PROJECT question.
 The question ID accepts a UUID or a UUID string.
@@ -83,7 +83,7 @@ No output is collapsed into plain text.
 Both synchronous and asynchronous clients support this operation.
 
 Candidate project archives
-===================
+==========================
 
 ``client.screen.tests.project_archive(test_id=11, question_id=question_uuid)`` returns the project ``tar.gz`` bytes with the candidate's changes applied.
 The question ID accepts a UUID or a UUID string.
@@ -94,7 +94,7 @@ For slow project generation, configure the client's ``timeout`` or supply a Scre
 The asynchronous client provides the same operation and supports normal task cancellation.
 
 Question insights
-==========
+=================
 
 ``client.screen.questions.insights(question_id=question_uuid)`` returns a typed ``ScreenQuestionInsights`` response.
 Use ``programming_language`` to request language-specific statistics.
@@ -132,7 +132,7 @@ No answer content or media is downloaded automatically.
 The same models are returned by synchronous and asynchronous clients.
 
 Question library reads and writes
-==========================
+=================================
 
 ``client.screen.questions.list`` returns a ``ScreenQuestionsPage`` of ``ScreenQuestionSummary`` values and offset pagination metadata.
 Use ``ScreenQuestionFilters`` for type, minimum and maximum duration, difficulty, domain, skill, programming language, question-bank origin, product, sort field, and order.
