@@ -59,3 +59,16 @@ The server prevents deleting ``.cpad`` and requires at least one remaining file.
 .. automodule:: coderpad.exceptions
    :undoc-members:
    :members:
+
+Screen question library models
+-------------------------------
+
+.. automodule:: coderpad.screen_question_types
+   :undoc-members:
+   :members:
+   :exclude-members: __init__, model_config
+
+.. automodule:: coderpad.screen_question_inputs
+   :undoc-members:
+   :members:
+   :exclude-members: __init__, model_config

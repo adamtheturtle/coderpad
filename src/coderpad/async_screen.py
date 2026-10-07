@@ -9,10 +9,24 @@ from beartype import beartype
 from pydantic import TypeAdapter
 
 from coderpad._screen_question import screen_question_path
-from coderpad._screen_question_bank import screen_bank_question_path
+from coderpad._screen_question_bank import (
+    next_question_start,
+    screen_bank_question_path,
+    screen_created_question,
+    screen_question_params,
+    screen_questions_page,
+)
 from coderpad._screen_response import json_object, json_value
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL
+from coderpad.screen_question_inputs import ScreenQuestionSave
+from coderpad.screen_question_types import (
+    ScreenCreatedQuestion,
+    ScreenQuestionDetails,
+    ScreenQuestionFilters,
+    ScreenQuestionsPage,
+    ScreenQuestionSummary,
+)
 from coderpad.screen_types import (
     ScreenAccount,
     ScreenAIConversation,
@@ -393,6 +407,81 @@ class AsyncScreenTestsNamespace(_AsyncScreenNamespace):
 @beartype
 class AsyncScreenQuestionsNamespace(_AsyncScreenNamespace):
     """Screen question library reads and statistics."""
+
+    async def list(
+        self,
+        *,
+        filters: ScreenQuestionFilters | None = None,
+        start: int | None = None,
+        limit: int | None = None,
+    ) -> ScreenQuestionsPage:
+        """List summaries with offset pagination and explicit filters."""
+        response = await self._request(
+            method="GET",
+            path="/questions",
+            json=None,
+            params=screen_question_params(
+                filters=filters, start=start, limit=limit
+            ),
+        )
+        return screen_questions_page(value=response.json())
+
+    async def all(
+        self,
+        *,
+        filters: ScreenQuestionFilters | None = None,
+        start: int = 0,
+        limit: int | None = None,
+    ) -> AsyncIterator[ScreenQuestionSummary]:
+        """Iterate summaries while retaining filters and rejecting repeated
+        offsets.
+        """
+        while True:
+            page = await self.list(filters=filters, start=start, limit=limit)
+            for question in page.questions:
+                yield question
+            next_start = next_question_start(page=page, current=start)
+            if next_start is None:
+                break
+            start = next_start
+
+    async def get(self, *, question_id: str | UUID) -> ScreenQuestionDetails:
+        """Retrieve a complete question by UUID."""
+        response = await self._request(
+            method="GET",
+            path=screen_bank_question_path(question_id=question_id),
+            params=None,
+            json=None,
+        )
+        return ScreenQuestionDetails.model_validate(obj=response.json())
+
+    async def create(
+        self, *, question: ScreenQuestionSave
+    ) -> ScreenCreatedQuestion:
+        """Create a question once, returning details and the Location
+        header.
+        """
+        response = await self._request(
+            method="POST",
+            path="/questions",
+            params=None,
+            json=question.model_dump(exclude_none=True, exclude_unset=True),
+        )
+        return screen_created_question(response=response)
+
+    async def update(
+        self, *, question_id: str | UUID, question: ScreenQuestionSave
+    ) -> ScreenQuestionDetails:
+        """Save new content using only explicit writable fields, without
+        retries.
+        """
+        response = await self._request(
+            method="PUT",
+            path=screen_bank_question_path(question_id=question_id),
+            params=None,
+            json=question.model_dump(exclude_none=True, exclude_unset=True),
+        )
+        return ScreenQuestionDetails.model_validate(obj=response.json())
 
     async def insights(
         self,

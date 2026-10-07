@@ -2,7 +2,7 @@ Screen API usage
 
 The Screen API is available on the same client via ``screen_api_key``.
 
-.. code-block:: python
+.. code:: python
 
    """Screen API usage example."""
 
@@ -29,7 +29,7 @@ The Screen API is available on the same client via ``screen_api_key``.
        _ = sys.stdout.write(result.test_url)
 
 Manual invitations
-------------------
+==================
 
 Omit candidate identity to create a test link that you can share yourself.
 Pass ``send_invitation_email=False`` to explicitly disable email delivery.
@@ -41,7 +41,7 @@ Omission uses the server default, which allows duplicates.
 Explicit ``True`` allows them.
 
 Account introspection
----------------------
+=====================
 
 Use ``client.user.get()`` to inspect the Interview key owner.
 Its fields are ``name``, ``allow_pad_creation``, and ``analytics_id``.
@@ -50,7 +50,7 @@ Each call uses the key for its product.
 The asynchronous client exposes the same methods.
 
 Creating campaigns
-------------------
+==================
 
 Use ``screen.campaigns.create`` with a name and an ordered list of ``ScreenCampaignQuestion`` or ``ScreenRandomQuestionSet`` entries.
 Question IDs and team IDs are UUID strings.
@@ -68,7 +68,7 @@ The service reports account feature restrictions and incompatible settings.
 Campaign creation is never automatically retried.
 
 AI Assist conversations
------------------------
+=======================
 
 ``client.screen.tests.ai_assist_conversations(test_id=11, question_id=question_uuid)`` returns ordered ``ScreenAIConversation`` values and ordered ``ScreenAIMessage`` values for a PROJECT question.
 The question ID accepts a UUID or a UUID string.
@@ -83,7 +83,7 @@ No output is collapsed into plain text.
 Both synchronous and asynchronous clients support this operation.
 
 Candidate project archives
---------------------------
+==========================
 
 ``client.screen.tests.project_archive(test_id=11, question_id=question_uuid)`` returns the project ``tar.gz`` bytes with the candidate's changes applied.
 The question ID accepts a UUID or a UUID string.
@@ -94,7 +94,7 @@ For slow project generation, configure the client's ``timeout`` or supply a Scre
 The asynchronous client provides the same operation and supports normal task cancellation.
 
 Question insights
------------------
+=================
 
 ``client.screen.questions.insights(question_id=question_uuid)`` returns a typed ``ScreenQuestionInsights`` response.
 Use ``programming_language`` to request language-specific statistics.
@@ -130,3 +130,33 @@ File, video, and transcript URLs are temporary.
 Project archive downloads require the independent Screen key.
 No answer content or media is downloaded automatically.
 The same models are returned by synchronous and asynchronous clients.
+
+Question library reads and writes
+=================================
+
+``client.screen.questions.list`` returns a ``ScreenQuestionsPage`` of ``ScreenQuestionSummary`` values and offset pagination metadata.
+Use ``ScreenQuestionFilters`` for type, minimum and maximum duration, difficulty, domain, skill, programming language, question-bank origin, product, sort field, and order.
+For example, ``ScreenQuestionFilters(programming_language="C++", from_coderpad_question_bank=False, order="desc")`` keeps false values explicit.
+``start`` and ``limit`` are separate page arguments.
+``client.screen.questions.all(filters=filters, limit=50)`` preserves those filters on every page and rejects offsets that do not advance.
+
+``client.screen.questions.get(question_id=question_uuid)`` accepts a UUID or UUID string and returns ``ScreenQuestionDetails``.
+Summary titles and detail statements retain their locale maps.
+Details expose type-specific content and evaluation settings, including project environments, additional resources, source archive URLs, and version metadata.
+Read models include legacy GAME, MULTI, CLASH, and COURSE kinds as well as CODE, MCQ, TEXT, FILE_UPLOAD, PROJECT, and VIDEO.
+Unknown response properties are ignored for compatibility with additive API changes.
+
+Create or update using ``ScreenQuestionSave`` with a writable type and explicit fields.
+Response identifiers, versions, timestamps, and other server-owned fields are rejected by save models, including nested available-language lists, project download URLs, and project test-report configuration.
+Use ``ScreenCodeInput``, ``ScreenProjectInput``, and the other input models for writable content and evaluation settings.
+Omitted or ``None`` fields stay absent, while false, zero, and empty lists are retained.
+The service validates locale coverage, question-type rules, permissions, and account capabilities.
+
+``client.screen.questions.create(question=payload)`` returns ``ScreenCreatedQuestion`` with ``question`` details and the optional ``location`` response header.
+``client.screen.questions.update(question_id=question_uuid, question=payload)`` uses PUT and returns updated details.
+Project creation accepts the upload ID through ``ScreenProjectInput(temporary_file_id=upload_id)``.
+The service accepts this archive reference only for creation.
+Updating a project archive requires the question editor.
+Creation and updates make one request and never automatically retry.
+API errors retain the normal public error contract, including validation, permission, missing-question, and conflict responses.
+The asynchronous client provides the same operations, and its ``all`` method is an asynchronous iterator.

@@ -1,0 +1,2 @@
+Add Screen question library reads, filtered pagination, and typed creation and updates.
+Keep response metadata separate from writable fields and preserve creation Location headers.
