@@ -3,6 +3,55 @@ Changelog
 
 .. towncrier release notes start
 
+2026.10.07
+----------
+
+- Use a pinned ``coderpad-openapi`` Git submodule for the API contract.
+  Contributors must initialize ``spec`` before running tests.
+  The Postman normalization script now requires an explicit ``--target`` for changes proposed to the shared specification.
+
+- Create Screen campaigns with typed question selections and optional settings that preserve team defaults.
+
+- Add Screen question library reads, filtered pagination, and typed creation and updates.
+  Keep response metadata separate from writable fields and preserve creation Location headers.
+
+- Retrieve typed Screen question usage, answer, test-case, and score distribution insights.
+
+- Upload raw Screen project archive bytes with exact content length, the 52428800 byte size limit, and typed temporary-file identifiers.
+
+- Retrieve typed candidate Screen AI Assist conversations and preserve structured message output.
+
+- Download candidate Screen project archives as binary ``tar.gz`` data with synchronous and asynchronous clients.
+
+- Decode UUID question reports alongside integer question summaries.
+  Expose typed answers, evaluations, warnings, session timers, and recruiter activity indicators.
+
+- Add the optional ``allow_duplicate_invitations`` Screen invitation policy.
+  Preserve omission and explicit false or true in both clients.
+
+- Add typed Interview ``user.get()`` and Screen ``me()`` account introspection to both synchronous and asynchronous clients.
+
+- Support pad access lists, ownership, waiting-room and execution controls, and take-home, team, and AI Assist creation settings.
+
+- Preserve optional Interview highlights, structured outlines, transcripts, transcript availability, and review reports on pad retrieval.
+
+- Add optional question sharing and custom database association to create and update requests in both clients.
+
+- Preserve parent-question starter file overlays and variant summaries, including hidden files and template removals.
+
+- Preserve candidate instruction step names in responses and question writes.
+  Omit unnamed steps from the JSON name field.
+
+- Filter and incrementally enumerate Interview questions, including repeatable pad types and question-specific title and usage sorting.
+
+- Use ``https://screen.coderpad.io`` as the default US Screen API origin.
+  Explicit base URL overrides and the EU origin remain supported.
+
+- Follow opaque pad cursors and exact legacy page links while keeping API credentials scoped to the configured origin.
+
+- Allow manual Screen invitations without candidate email or name.
+  Require an address only when email delivery is explicitly enabled.
+
 2026.10.01.1
 ------------
 

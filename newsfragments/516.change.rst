@@ -1,2 +1,0 @@
-Use ``https://screen.coderpad.io`` as the default US Screen API origin.
-Explicit base URL overrides and the EU origin remain supported.

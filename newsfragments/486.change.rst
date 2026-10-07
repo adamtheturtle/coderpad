@@ -1,3 +1,0 @@
-Use a pinned ``coderpad-openapi`` Git submodule for the API contract.
-Contributors must initialize ``spec`` before running tests.
-The Postman normalization script now requires an explicit ``--target`` for changes proposed to the shared specification.

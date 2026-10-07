@@ -1,1 +1,0 @@
-Add typed Interview ``user.get()`` and Screen ``me()`` account introspection to both synchronous and asynchronous clients.

@@ -1,1 +1,0 @@
-Follow opaque pad cursors and exact legacy page links while keeping API credentials scoped to the configured origin.

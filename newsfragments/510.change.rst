@@ -1,1 +1,0 @@
-Support pad access lists, ownership, waiting-room and execution controls, and take-home, team, and AI Assist creation settings.

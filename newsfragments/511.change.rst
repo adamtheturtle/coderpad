@@ -1,1 +1,0 @@
-Preserve optional Interview highlights, structured outlines, transcripts, transcript availability, and review reports on pad retrieval.

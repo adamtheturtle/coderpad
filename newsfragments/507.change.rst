@@ -1,2 +1,0 @@
-Decode UUID question reports alongside integer question summaries.
-Expose typed answers, evaluations, warnings, session timers, and recruiter activity indicators.

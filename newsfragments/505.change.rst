@@ -1,1 +1,0 @@
-Retrieve typed candidate Screen AI Assist conversations and preserve structured message output.
