@@ -8,6 +8,11 @@ from uuid import UUID
 from beartype import beartype
 from pydantic import TypeAdapter
 
+from coderpad._binary_content import (
+    require_binary_transport,
+    screen_archive_headers,
+    validate_screen_archive,
+)
 from coderpad._screen_question import screen_question_path
 from coderpad._screen_question_bank import (
     next_question_start,
@@ -16,7 +21,11 @@ from coderpad._screen_question_bank import (
     screen_question_params,
     screen_questions_page,
 )
-from coderpad._screen_response import json_object, json_value
+from coderpad._screen_response import (
+    json_object,
+    json_value,
+    require_screen_api_key,
+)
 from coderpad.exceptions import CoderPadError
 from coderpad.screen_question_inputs import ScreenQuestionSave
 from coderpad.screen_question_types import (
@@ -39,6 +48,7 @@ from coderpad.screen_types import (
     ScreenQuestionInsights,
     ScreenRandomQuestionSet,
     ScreenReport,
+    ScreenTemporaryFile,
     ScreenTest,
     ScreenTestsPage,
     ScreenWebhook,
@@ -80,12 +90,7 @@ class _ScreenNamespace:
         json: object | None,
     ) -> TransportResponse:
         """Make a Screen request and map HTTP failures."""
-        if not bool(self.api_key):
-            msg = (
-                "Screen API key is required; pass screen_api_key when "
-                "creating the client."
-            )
-            raise ValueError(msg)
+        require_screen_api_key(api_key=self.api_key)
         response = self.transport(
             method=method,
             url=self.base_url + _SCREEN_PREFIX + path,
@@ -494,6 +499,32 @@ class ScreenQuestionsNamespace(_ScreenNamespace):
 
 
 @beartype
+class ScreenTemporaryFilesNamespace(_ScreenNamespace):
+    """Raw temporary uploads for Screen project questions."""
+
+    def upload(self, *, content: bytes) -> ScreenTemporaryFile:
+        """Upload raw bytes once and return their temporary identifier."""
+        validate_screen_archive(content=content)
+        require_screen_api_key(api_key=self.api_key)
+        transport = require_binary_transport(transport=self.transport)
+        response = transport(
+            method="POST",
+            url=self.base_url + _SCREEN_PREFIX + "/temporary-file",
+            headers=screen_archive_headers(
+                headers=self.headers, content=content
+            ),
+            params=None,
+            data=None,
+            files=None,
+            json=None,
+            content=content,
+        )
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
+            raise CoderPadError.from_response(response=response)
+        return ScreenTemporaryFile.model_validate(obj=response.json())
+
+
+@beartype
 class ScreenWebhookNamespace(_ScreenNamespace):
     """Screen webhook operations."""
 
@@ -560,6 +591,14 @@ class ScreenNamespace(_ScreenNamespace):
             api_key=api_key,
             base_url=base_url,
             default_headers=default_headers,
+        )
+        self.temporary_files: ScreenTemporaryFilesNamespace = (
+            ScreenTemporaryFilesNamespace(
+                transport=transport,
+                api_key=api_key,
+                base_url=base_url,
+                default_headers=default_headers,
+            )
         )
         self.webhook: ScreenWebhookNamespace = ScreenWebhookNamespace(
             transport=transport,

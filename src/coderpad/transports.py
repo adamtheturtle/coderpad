@@ -150,6 +150,48 @@ class JSONTransport(Protocol):
         ...
 
 
+@runtime_checkable
+class BinaryTransport(Protocol):
+    """Optional transport capability for raw binary Screen uploads."""
+
+    def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: dict[str, tuple[str, bytes, str]] | None,
+        json: object | None,
+        content: bytes,
+    ) -> TransportResponse:
+        """Send a raw body without JSON or multipart encoding."""
+        ...
+
+
+@runtime_checkable
+class AsyncBinaryTransport(Protocol):
+    """Optional async transport capability for raw binary Screen
+    uploads.
+    """
+
+    async def __call__(
+        self,
+        *,
+        method: str,
+        url: str,
+        headers: dict[str, str],
+        params: dict[str, str | int] | None,
+        data: dict[str, str] | None,
+        files: dict[str, tuple[str, bytes, str]] | None,
+        json: object | None,
+        content: bytes,
+    ) -> TransportResponse:
+        """Send an asynchronous raw body without re-encoding it."""
+        ...
+
+
 @beartype
 class HTTPXTransport:
     """HTTP transport using the ``httpx`` library.
@@ -216,6 +258,7 @@ class HTTPXTransport:
         data: dict[str, str] | None,
         files: (dict[str, tuple[str, bytes, str]] | None),
         json: object | None = None,
+        content: bytes | None = None,
     ) -> TransportResponse:
         """Make an HTTP request using ``httpx``.
 
@@ -227,6 +270,7 @@ class HTTPXTransport:
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
             json: A JSON-compatible request body.
+            content: Raw binary request body.
 
         Returns:
             A ``TransportResponse`` populated from the httpx
@@ -240,6 +284,7 @@ class HTTPXTransport:
             data=data,
             files=files,
             json=json,
+            content=content,
         )
         return TransportResponse(
             status_code=response.status_code,
@@ -314,6 +359,7 @@ class HTTPX2Transport:
         data: dict[str, str] | None,
         files: (dict[str, tuple[str, bytes, str]] | None),
         json: object | None = None,
+        content: bytes | None = None,
     ) -> TransportResponse:
         """Make an HTTP request using ``httpx2``.
 
@@ -325,6 +371,7 @@ class HTTPX2Transport:
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
             json: A JSON-compatible request body.
+            content: Raw binary request body.
 
         Returns:
             A ``TransportResponse`` populated from the HTTPX2 response.
@@ -337,6 +384,7 @@ class HTTPX2Transport:
             data=data,
             files=files,
             json=json,
+            content=content,
         )
         return TransportResponse(
             status_code=response.status_code,
@@ -468,6 +516,7 @@ class AsyncHTTPXTransport:
         data: dict[str, str] | None,
         files: (dict[str, tuple[str, bytes, str]] | None),
         json: object | None = None,
+        content: bytes | None = None,
     ) -> TransportResponse:
         """Make an async HTTP request using ``httpx``.
 
@@ -479,6 +528,7 @@ class AsyncHTTPXTransport:
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
             json: A JSON-compatible request body.
+            content: Raw binary request body.
 
         Returns:
             A ``TransportResponse`` populated from the httpx
@@ -492,6 +542,7 @@ class AsyncHTTPXTransport:
             data=data,
             files=files,
             json=json,
+            content=content,
         )
         return TransportResponse(
             status_code=response.status_code,
@@ -567,6 +618,7 @@ class AsyncHTTPX2Transport:
         data: dict[str, str] | None,
         files: (dict[str, tuple[str, bytes, str]] | None),
         json: object | None = None,
+        content: bytes | None = None,
     ) -> TransportResponse:
         """Make an asynchronous HTTP request using ``httpx2``.
 
@@ -578,6 +630,7 @@ class AsyncHTTPX2Transport:
             data: Form data to send in the request body.
             files: Files to upload as multipart form data.
             json: A JSON-compatible request body.
+            content: Raw binary request body.
 
         Returns:
             A ``TransportResponse`` populated from the HTTPX2 response.
@@ -590,6 +643,7 @@ class AsyncHTTPX2Transport:
             data=data,
             files=files,
             json=json,
+            content=content,
         )
         return TransportResponse(
             status_code=response.status_code,

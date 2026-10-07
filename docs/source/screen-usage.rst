@@ -160,3 +160,15 @@ Updating a project archive requires the question editor.
 Creation and updates make one request and never automatically retry.
 API errors retain the normal public error contract, including validation, permission, missing-question, and conflict responses.
 The asynchronous client provides the same operations, and its ``all`` method is an asynchronous iterator.
+
+Temporary project uploads
+-------------------------
+
+``client.screen.temporary_files.upload(content=archive_bytes)`` sends the original archive bytes as ``application/gzip`` and sets the exact ``Content-Length``.
+It rejects bodies larger than 52,428,800 bytes before networking.
+The returned ``ScreenTemporaryFile.id`` should be used promptly as ``project_details.temporary_file_id`` when saving a Screen project question.
+Unused uploads are eventually deleted by the service.
+Upload permission errors use the normal API error contract, and writes are never retried automatically.
+Both synchronous and asynchronous default transports support raw bodies.
+Custom Screen transports need the ``content`` keyword for uploads.
+Existing JSON-only operations continue to accept JSON-only custom transports.

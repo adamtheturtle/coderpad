@@ -21,3 +21,16 @@ def json_object(*, value: object) -> dict[str, JsonValue]:
         message = "Expected an object response."
         raise TypeError(message)
     return parsed
+
+
+@beartype
+def require_screen_api_key(*, api_key: str) -> None:
+    """Require the independent Screen credential before making a
+    request.
+    """
+    if not bool(api_key):
+        message = (
+            "Screen API key is required; pass screen_api_key when "
+            "creating the client."
+        )
+        raise ValueError(message)
