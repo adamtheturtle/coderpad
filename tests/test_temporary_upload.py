@@ -51,7 +51,9 @@ def _assert_upload(*, request: httpx.Request, content: bytes) -> None:
 
 
 @pytest.mark.parametrize(
-    argnames="content", argvalues=[b"", _ARCHIVE, b"x" * _LIMIT]
+    argnames="content",
+    argvalues=[b"", _ARCHIVE, b"x" * _LIMIT],
+    ids=["empty", "binary", "maximum-size"],
 )
 def test_upload(content: bytes) -> None:
     """Uploads include the exact limit and never JSON-encode archive bytes."""
@@ -73,7 +75,9 @@ def test_upload(content: bytes) -> None:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    argnames="content", argvalues=[b"", _ARCHIVE, b"x" * _LIMIT]
+    argnames="content",
+    argvalues=[b"", _ARCHIVE, b"x" * _LIMIT],
+    ids=["empty", "binary", "maximum-size"],
 )
 async def test_async_upload(content: bytes) -> None:
     """Async uploads preserve the same size boundary and exact body
