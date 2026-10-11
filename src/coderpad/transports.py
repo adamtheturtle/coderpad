@@ -14,11 +14,11 @@ from pydantic import TypeAdapter
 
 from coderpad.json_types import JsonValue
 
-# Coverage currently runs through Python 3.14; Python 3.15 uses the equivalent
-# standard-library TypedDict implementation once that interpreter is supported.
+# Python 3.15 provides closed TypedDicts in the standard library.
+# Each CI interpreter exercises the import available on its Python version.
 if sys.version_info >= (3, 15):  # pragma: no cover
     from typing import TypedDict
-else:
+else:  # pragma: no cover
     from typing_extensions import TypedDict
 
 
