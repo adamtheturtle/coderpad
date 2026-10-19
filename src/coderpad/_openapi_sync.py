@@ -17,12 +17,30 @@ _PADS_COLLECTION_PATH = "/api/pads/"
 _PADS_ITEM_PATH = "/api/pads/{id}"
 
 
-class _Arguments(argparse.Namespace):
+class SyncArguments(argparse.Namespace):
     """Parsed command-line arguments."""
 
-    # argparse initializes both required fields in parse_args.
-    source: Path  # pyrefly: ignore[uninitialized-instance-variable]
-    target: Path  # pyrefly: ignore[uninitialized-instance-variable]
+    def __init__(self) -> None:
+        """Initialize the namespace before argparse fills required
+        fields.
+        """
+        super().__init__()
+        self.source: Path | None = None
+        self.target: Path | None = None
+
+    def paths(self) -> tuple[Path, Path]:
+        """Return both paths once the required arguments are populated.
+
+        Returns:
+            The input and output paths.
+
+        Raises:
+            ValueError: A required argument has not been populated.
+        """
+        if self.source is None or self.target is None:
+            message = "source and target paths are required"
+            raise ValueError(message)
+        return self.source, self.target
 
 
 @beartype
@@ -109,14 +127,15 @@ def run_sync(*, arguments: list[str]) -> int:
         required=True,
         help="Output path for the normalized export to review",
     )
-    args = parser.parse_args(args=arguments, namespace=_Arguments())
-    loaded: object = json.loads(s=args.source.read_text(encoding="utf-8"))
+    args = parser.parse_args(args=arguments, namespace=SyncArguments())
+    source, target = args.paths()
+    loaded: object = json.loads(s=source.read_text(encoding="utf-8"))
     spec = _as_string_key_mapping(loaded)
     if spec is None:
         message = "OpenAPI document root must be a JSON object"
         raise SystemExit(message)
     notes = apply_postman_corrections(spec=spec)
-    _ = args.target.write_text(
+    _ = target.write_text(
         data=json.dumps(obj=spec, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
@@ -128,5 +147,5 @@ def run_sync(*, arguments: list[str]) -> int:
         "Review contract changes in adamtheturtle/coderpad-openapi. "
         "Retain manually maintained question variant definitions.\n",
     )
-    _ = sys.stdout.write(f"{args.target}\n")
+    _ = sys.stdout.write(f"{target}\n")
     return 0
