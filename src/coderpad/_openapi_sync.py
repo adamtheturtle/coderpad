@@ -20,8 +20,9 @@ _PADS_ITEM_PATH = "/api/pads/{id}"
 class _Arguments(argparse.Namespace):
     """Parsed command-line arguments."""
 
-    source: Path
-    target: Path
+    # argparse initializes both required fields in parse_args.
+    source: Path  # pyrefly: ignore[uninitialized-instance-variable]
+    target: Path  # pyrefly: ignore[uninitialized-instance-variable]
 
 
 @beartype
