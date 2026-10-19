@@ -8,7 +8,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from coderpad._openapi_sync import apply_postman_corrections, run_sync
+from coderpad._openapi_sync import (
+    SyncArguments,
+    apply_postman_corrections,
+    run_sync,
+)
 
 if TYPE_CHECKING:
     from coderpad.json_types import JsonValue
@@ -186,3 +190,37 @@ def test_main_requires_explicit_target(tmp_path: Path) -> None:
         _ = run_sync(arguments=[str(object=tmp_path / "export.json")])
     expected_exit_code = 2
     assert exception.value.code == expected_exit_code
+
+
+def test_main_requires_source(tmp_path: Path) -> None:
+    """A missing input path is rejected before the namespace is used."""
+    with pytest.raises(expected_exception=SystemExit) as exception:
+        _ = run_sync(arguments=["--target", str(object=tmp_path / "out")])
+    expected_exit_code = 2
+    assert exception.value.code == expected_exit_code
+
+
+@pytest.mark.parametrize(
+    argnames=("source", "target"),
+    argvalues=[
+        (None, None),
+        (Path("source.json"), None),
+        (None, Path("target.json")),
+    ],
+)
+def test_incomplete_arguments_have_no_paths(
+    source: Path | None,
+    target: Path | None,
+) -> None:
+    """An incomplete namespace cannot supply paths to the sync
+    operation.
+    """
+    arguments = SyncArguments()
+    arguments.source = source
+    arguments.target = target
+
+    with pytest.raises(
+        expected_exception=ValueError,
+        match="source and target paths are required",
+    ):
+        _ = arguments.paths()
