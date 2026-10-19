@@ -21,9 +21,7 @@ class SyncArguments(argparse.Namespace):
     """Parsed command-line arguments."""
 
     def __init__(self) -> None:
-        """Initialize the namespace before argparse fills required
-        fields.
-        """
+        """Initialize the namespace before parsing required fields."""
         super().__init__()
         self.source: Path | None = None
         self.target: Path | None = None
