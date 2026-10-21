@@ -903,8 +903,8 @@ class CustomDatabase(_APIModel):
     # the fields as incompatible method overrides. Pydantic plans to remove
     # both deprecated methods in v3:
     # https://github.com/pydantic/pydantic/issues/10033#issuecomment-2308952116.
-    schema: str  # type: ignore[assignment]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]
-    schema_json: CustomDatabaseSchema  # type: ignore[assignment]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]
+    schema: str  # type: ignore[assignment]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
+    schema_json: CustomDatabaseSchema  # type: ignore[assignment]  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-attribute-override]
 
     @classmethod
     def from_dict(
