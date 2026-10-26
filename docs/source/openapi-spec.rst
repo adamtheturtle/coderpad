@@ -15,8 +15,7 @@ Initialize the dependency before running tests:
    $ git submodule update --init spec
 
 CI resolves the submodule during checkout.
-Tests and documentation examples read the local file without downloading it.
-Installed SDK operations do not depend on the specification.
+Tests and documentation examples read the local file without downloading it, while installed SDK operations run independently of the specification.
 
 The original specification was created from the CoderPad API at ``https://app.coderpad.io``.
 
