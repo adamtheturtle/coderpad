@@ -87,8 +87,7 @@ Candidate project archives
 
 ``client.screen.tests.project_archive(test_id=11, question_id=question_uuid)`` returns the project ``tar.gz`` bytes with the candidate's changes applied.
 The question ID accepts a UUID or a UUID string.
-Save or extract these bytes only when your application requests it.
-The SDK does not interpret them as JSON or PDF, extract files, or retry requests.
+Your application decides whether to save or extract the bytes, which the SDK returns without interpreting them as JSON or PDF or retrying requests.
 HTTP errors use the public ``CoderPadError`` contract, and transport errors propagate as they do for PDF downloads.
 For slow project generation, configure the client's ``timeout`` or supply a Screen transport with an appropriate timeout.
 The asynchronous client provides the same operation and supports normal task cancellation.
@@ -164,8 +163,7 @@ The asynchronous client provides the same operations, and its ``all`` method is 
 Temporary project uploads
 -------------------------
 
-``client.screen.temporary_files.upload(content=archive_bytes)`` sends the original archive bytes as ``application/gzip`` and sets the exact ``Content-Length``.
-It rejects bodies larger than 52,428,800 bytes before networking.
+``client.screen.temporary_files.upload(content=archive_bytes)`` rejects bodies larger than 52,428,800 bytes before networking and sends accepted bytes as ``application/gzip`` with the exact ``Content-Length``.
 The returned ``ScreenTemporaryFile.id`` should be used promptly as ``project_details.temporary_file_id`` when saving a Screen project question.
 Unused uploads are eventually deleted by the service.
 Upload permission errors use the normal API error contract, and writes are never retried automatically.

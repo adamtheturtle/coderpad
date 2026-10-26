@@ -38,7 +38,8 @@ Changing environment clears code unless replacement code or files are supplied.
 ``file_contents`` accepts a sequence of ``QuestionVariantFileContent`` models or a JSON string.
 File paths are already decoded in responses.
 ``hidden`` and ``deleted`` flags are preserved.
-Files overlay the template on create and replace variant files on update; ``file_contents=[]`` resets a template variant on update.
+Files overlay the template on create and replace variant files on update.
+To reset a template variant on update, pass ``file_contents=[]``.
 The server prevents deleting ``.cpad`` and requires at least one remaining file.
 ``contents`` and ``file_contents`` cannot be combined, including explicit null code.
 ``solution`` sets the variant's reference solution.
