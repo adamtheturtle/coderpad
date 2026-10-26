@@ -56,6 +56,12 @@ The server prevents deleting ``.cpad`` and requires at least one remaining file.
 .. automodule:: coderpad.json_types
    :undoc-members:
    :members:
+   :exclude-members: JsonValue
+
+.. py:data:: JsonValue
+   :module: coderpad.json_types
+
+   A JSON value as defined by :data:`pydantic.types.JsonValue`.
 
 .. automodule:: coderpad.exceptions
    :undoc-members:
