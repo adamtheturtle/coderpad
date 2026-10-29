@@ -28,6 +28,7 @@ from coderpad._screen_response import (
 )
 from coderpad.exceptions import CoderPadError
 from coderpad.screen import SCREEN_US_BASE_URL
+from coderpad.screen_campaign_details import ScreenCampaignDetails
 from coderpad.screen_question_inputs import ScreenQuestionSave
 from coderpad.screen_question_types import (
     ScreenCreatedQuestion,
@@ -116,6 +117,19 @@ class AsyncScreenCampaignsNamespace(_AsyncScreenNamespace):
         return ScreenCampaign.list_from_value(
             value=json_value(value=response.json())
         )
+
+    async def get(self, *, campaign_id: int) -> ScreenCampaignDetails:
+        """Retrieve a campaign's ordered questions, settings, and team."""
+        if isinstance(campaign_id, bool) or campaign_id <= 0:
+            message = "campaign_id must be a positive integer"
+            raise ValueError(message)
+        response = await self._request(
+            method="GET",
+            path=f"/campaigns/{campaign_id}",
+            params=None,
+            json=None,
+        )
+        return ScreenCampaignDetails.model_validate(obj=response.json())
 
     async def create(
         self,
