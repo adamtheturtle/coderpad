@@ -49,6 +49,15 @@ Use ``client.screen.me()`` to inspect the Screen key owner, including ``organiza
 Each call uses the key for its product.
 The asynchronous client exposes the same methods.
 
+Campaign definitions
+====================
+
+Use ``client.screen.campaigns.get(campaign_id=121)`` to retrieve a ``ScreenCampaignDetails``.
+It contains ordered explicit questions and random question sets, settings, and the team ID.
+Optional settings preserve omitted, false, and empty values, and read models ignore additive server fields.
+These definitions differ from candidate sessions returned by ``screen.tests``.
+Both synchronous and asynchronous clients support the operation.
+
 Creating campaigns
 ==================
 

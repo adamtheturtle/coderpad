@@ -73,3 +73,7 @@ Screen question library models
    :undoc-members:
    :members:
    :exclude-members: __init__, model_config
+
+.. automodule:: coderpad.screen_campaign_details
+   :members:
+   :exclude-members: __init__, model_config
