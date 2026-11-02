@@ -494,6 +494,8 @@ ignore_names = [
     "send_candidate_simplified_report",
     "send_invitation_email",
     "send_notification_email_on_bounce",
+    # Sphinx extension entry point, called by the documentation builder.
+    "setup",
     "show_function_signature_in_statement",
     "SOLIDITY",
     "source_suffix",
