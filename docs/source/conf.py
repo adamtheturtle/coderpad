@@ -4,6 +4,8 @@ import importlib.metadata
 from pathlib import Path
 
 from packaging.specifiers import SpecifierSet
+from sphinx.addnodes import pending_xref
+from sphinx.application import Sphinx
 from sphinx_pyproject import SphinxConfig
 
 _pyproject_file = Path(__file__).parent.parent.parent / "pyproject.toml"
@@ -76,6 +78,7 @@ html_theme_options = {
 htmlhelp_basename = "CODERPADPYdoc"
 intersphinx_mapping = {
     "python": (f"https://docs.python.org/{minimum_python_version}", None),
+    "pydantic": ("https://pydantic.dev/docs/validation/latest/", None),
 }
 nitpicky = True
 nitpick_ignore: list[tuple[str, str]] = [
@@ -115,3 +118,22 @@ rst_prolog = f"""
 .. |github-owner| replace:: adamtheturtle
 .. |github-repository| replace:: coderpad
 """
+
+
+def _json_value_reference(
+    _app: object, _env: object, node: pending_xref, _contnode: object
+) -> None:
+    """Resolve the JSON type alias through its data inventory entry."""
+    if (
+        node.attributes.get("refdomain") == "py"
+        and node.attributes.get("reftype") == "class"
+        and node.attributes.get("reftarget") == "pydantic.types.JsonValue"
+    ):
+        node["reftype"] = "data"
+
+
+def setup(app: Sphinx) -> None:
+    """Correct the alias role before external references are resolved."""
+    _ = app.connect(
+        event="missing-reference", callback=_json_value_reference, priority=400
+    )

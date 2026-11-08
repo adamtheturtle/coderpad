@@ -4,6 +4,7 @@ import json as json_module
 from collections.abc import Callable, Generator
 from http import HTTPStatus
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
 
 import pytest
@@ -15,10 +16,12 @@ from coderpad.client import CoderPad
 from coderpad.transports import TransportResponse
 from tests.openapi_mock import (
     JSONMapping,
-    JSONValue,
     add_openapi_to_respx,
     parse_json_mapping,
 )
+
+if TYPE_CHECKING:
+    from coderpad.json_types import JsonValue
 
 _BASE_URL = "https://app.coderpad.io"
 _LIVE_VARIANT_ORGANIZATION_ID = 42
@@ -272,7 +275,7 @@ class ScreenTransportStub:
                 headers={"content-type": "application/pdf"},
                 content=b"%PDF report",
             )
-        payloads: dict[str, JSONValue] = {
+        payloads: dict[str, JsonValue] = {
             "/assessment/api/v1.1/campaigns": [
                 {"id": 7, "name": "Backend", "languages": ["python"]},
             ],
