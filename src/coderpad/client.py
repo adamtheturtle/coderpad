@@ -319,6 +319,8 @@ class PadsNamespace(_Namespace):
             zip_file: Project ZIP archive replacing the template files.
             directory: Project directory uploaded as a ZIP archive.
                 Content sources and question_id are mutually exclusive.
+                ZIP and directory uploads cannot set an interviewer access
+                list; use file_contents when setting that list.
             notes: Private notes for the interviewer.
             question_id: Id of an existing question to seed
                 the pad from.
@@ -383,12 +385,17 @@ class PadsNamespace(_Namespace):
                     for file in file_contents
                 ]
             )
+        if allowed_interviewer_emails is not None and (
+            zip_file is not None or directory is not None
+        ):
+            message = (
+                "Use file_contents to combine project creation with "
+                "allowed_interviewer_emails; ZIP uploads do not support "
+                "replacement access lists."
+            )
+            raise ValueError(message)
         archive = question_upload_files(zip_file=zip_file, directory=directory)
         if archive is not None:
-            if allowed_interviewer_emails is not None:
-                data["allowed_interviewer_emails"] = json.dumps(
-                    obj=list(allowed_interviewer_emails)
-                )
             response = self._request(
                 method="POST",
                 url="/api/pads/",

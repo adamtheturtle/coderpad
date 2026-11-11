@@ -41,11 +41,31 @@ async def test_project_pad(
     project = tmp_path / "project"
     project.mkdir()
     _ = (project / "main.py").write_text(data="print(1)")
-    with respx.mock() as router:
+    with respx.mock(assert_all_called=False) as router:
         route = router.post(url="https://app.coderpad.io/api/pads/").mock(
             return_value=httpx.Response(status_code=200, json=payload)
         )
         client = client_type(api_key="test-key")
+        if emails is not None and source in {"zip", "directory"}:
+            with pytest.raises(
+                expected_exception=ValueError, match="access lists"
+            ):
+                await _create(
+                    client=client,
+                    language="multifile_python",
+                    contents=None,
+                    question_id=None,
+                    file_contents=None,
+                    zip_file=archive if source == "zip" else None,
+                    directory=project if source == "directory" else None,
+                    allowed_interviewer_emails=emails,
+                )
+            if isinstance(client, AsyncCoderPad):
+                await client.aclose()
+            else:
+                client.close()
+            assert len(router.calls) == 0
+            return
         pad = await _create(
             client=client,
             contents=None,
