@@ -8,6 +8,7 @@ from http import HTTPStatus
 from pathlib import Path
 from types import TracebackType
 from typing import Literal, Self
+from urllib.parse import quote
 
 import httpx
 from beartype import beartype
@@ -130,6 +131,40 @@ class _Namespace:
         if response.status_code >= HTTPStatus.BAD_REQUEST:
             raise CoderPadError.from_response(response=response)
         return response
+
+
+@beartype
+class LanguagesNamespace(_Namespace):
+    """Discover available environments and their starter code.
+
+    Return catalogue JSON unchanged, retaining new environment metadata.
+    """
+
+    def list(self) -> JsonValue:
+        """Retrieve the available language and project environments."""
+        response = self._request(
+            method="GET",
+            url="/api/languages",
+            params=None,
+            data=None,
+            files=None,
+        )
+        return TypeAdapter(type=JsonValue).validate_python(response.json())
+
+    def get(self, *, language: str) -> JsonValue:
+        """Retrieve starter code and environment context for an identifier."""
+        if language == "" or language in {".", ".."}:
+            message = "language must be a nonempty environment identifier."
+            raise ValueError(message)
+        identifier = quote(string=language, safe="")
+        response = self._request(
+            method="GET",
+            url=f"/api/languages/{identifier}",
+            params=None,
+            data=None,
+            files=None,
+        )
+        return TypeAdapter(type=JsonValue).validate_python(response.json())
 
 
 @beartype
@@ -258,6 +293,9 @@ class PadsNamespace(_Namespace):
         title: str | None = None,
         language: Language | str | None = None,
         contents: str | None = None,
+        file_contents: Sequence[QuestionFileContent] | None = None,
+        zip_file: Path | None = None,
+        directory: Path | None = None,
         notes: str | None = None,
         question_id: str | int | None = None,
         private: bool | None = None,
@@ -276,7 +314,11 @@ class PadsNamespace(_Namespace):
         Args:
             title: Title for the pad.
             language: Programming language for the pad.
-            contents: Initial contents of the pad editor.
+            contents: Initial contents of a single-file pad.
+            file_contents: Project starter files layered over the template.
+            zip_file: Project ZIP archive replacing the template files.
+            directory: Project directory uploaded as a ZIP archive.
+                Content sources and question_id are mutually exclusive.
             notes: Private notes for the interviewer.
             question_id: Id of an existing question to seed
                 the pad from.
@@ -295,6 +337,18 @@ class PadsNamespace(_Namespace):
         Returns:
             The created pad.
         """
+        validate_mutually_exclusive_question_content(
+            contents=contents,
+            file_contents=file_contents,
+            zip_file=zip_file,
+            directory=directory,
+        )
+        if question_id is not None and any(
+            value is not None
+            for value in (contents, file_contents, zip_file, directory)
+        ):
+            message = "question_id cannot be combined with starter content."
+            raise ValueError(message)
         data: dict[str, str] = {}
         if title is not None:
             data["title"] = title
@@ -322,12 +376,33 @@ class PadsNamespace(_Namespace):
                 }
             )
         )
-        response = self._pad_request(
-            method="POST",
-            url="/api/pads/",
-            data=data,
-            allowed_interviewer_emails=allowed_interviewer_emails,
-        )
+        if file_contents is not None:
+            data["file_contents"] = json.dumps(
+                obj=[
+                    file.model_dump(exclude_none=True)
+                    for file in file_contents
+                ]
+            )
+        archive = question_upload_files(zip_file=zip_file, directory=directory)
+        if archive is not None:
+            if allowed_interviewer_emails is not None:
+                data["allowed_interviewer_emails"] = json.dumps(
+                    obj=list(allowed_interviewer_emails)
+                )
+            response = self._request(
+                method="POST",
+                url="/api/pads/",
+                params=None,
+                data={f"pad[{name}]": value for name, value in data.items()},
+                files={"pad[zip_file]": archive["question[zip_file]"]},
+            )
+        else:
+            response = self._pad_request(
+                method="POST",
+                url="/api/pads/",
+                data=data,
+                allowed_interviewer_emails=allowed_interviewer_emails,
+            )
         return Pad.from_dict(
             data=TypeAdapter(type=PadDict).validate_python(response.json()),
         )
@@ -1287,6 +1362,9 @@ class CoderPad:
             **(default_headers if default_headers is not None else {}),
             "Authorization": f'Token token="{api_key}"',
         }
+        self.languages: LanguagesNamespace = LanguagesNamespace(
+            transport=resolved_transport, base_url=base_url, headers=headers
+        )
         self.user: UserNamespace = UserNamespace(
             transport=resolved_transport, base_url=base_url, headers=headers
         )

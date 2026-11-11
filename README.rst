@@ -132,3 +132,15 @@ See the `full documentation <https://adamtheturtle.github.io/coderpad/>`__.
 .. |PyPI| image:: https://badge.fury.io/py/coderpad-py.svg
    :target: https://badge.fury.io/py/coderpad-py
 .. |minimum-python-version| replace:: 3.12
+
+Environment discovery
+---------------------
+
+Use ``client.languages.list()`` to discover available environments and ``client.languages.get(language="multifile_python")`` to retrieve starter code and environment context before authoring a project.
+Both methods return the complete catalogue JSON and are also available on ``AsyncCoderPad``.
+
+Create a project pad with ``client.pads.create(language="multifile_python")``.
+Pass ``file_contents`` using ``QuestionFileContent`` overlays, or pass a ``zip_file`` or ``directory`` path to replace the template files.
+A question ID and starter content are mutually exclusive.
+Project pad responses can have null language and contents.
+Retrieve files through ``client.pads.get_environment(environment_id=...)`` using the pad's environment IDs.
