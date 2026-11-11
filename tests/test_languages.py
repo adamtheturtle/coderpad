@@ -1,4 +1,4 @@
-"""Catalogue requests preserve new metadata and keep identifiers in one
+"""Catalog requests preserve new metadata and keep identifiers in one
 path segment.
 """
 
@@ -14,10 +14,10 @@ from coderpad.json_types import JsonValue
 @pytest.mark.parametrize(
     argnames="client_type", argvalues=[CoderPad, AsyncCoderPad]
 )
-async def test_language_catalogue(
+async def test_language_catalog(
     client_type: type[CoderPad] | type[AsyncCoderPad],
 ) -> None:
-    """Return complete catalogue and starter metadata without narrowing
+    """Return complete catalog and starter metadata without narrowing
     fields.
     """
     payload = {

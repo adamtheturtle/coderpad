@@ -29,7 +29,7 @@ async def test_project_pad(
     emails: list[str] | None,
     tmp_path: Path,
 ) -> None:
-    """Exercise every content transport with nullable project response
+    """Exercise every content transport with null project response
     fields.
     """
     payload = pad_payload()

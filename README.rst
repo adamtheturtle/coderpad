@@ -137,7 +137,7 @@ Environment discovery
 ---------------------
 
 Use ``client.languages.list()`` to discover available environments and ``client.languages.get(language="multifile_python")`` to retrieve starter code and environment context before authoring a project.
-Both methods return the complete catalogue JSON and are also available on ``AsyncCoderPad``.
+Both methods return the complete catalog JSON and are also available on ``AsyncCoderPad``.
 
 Create a project pad with ``client.pads.create(language="multifile_python")``.
 Pass ``file_contents`` using ``QuestionFileContent`` overlays, or pass a ``zip_file`` or ``directory`` path to replace the template files.

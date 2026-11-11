@@ -137,7 +137,7 @@ class _Namespace:
 class LanguagesNamespace(_Namespace):
     """Discover available environments and their starter code.
 
-    Return catalogue JSON unchanged, retaining new environment metadata.
+    Return catalog JSON unchanged, retaining new environment metadata.
     """
 
     def list(self) -> JsonValue:

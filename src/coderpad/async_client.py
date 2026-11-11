@@ -139,7 +139,7 @@ class _AsyncNamespace:
 class AsyncLanguagesNamespace(_AsyncNamespace):
     """Discover available environments and their starter code.
 
-    Return catalogue JSON unchanged, retaining new environment metadata.
+    Return catalog JSON unchanged, retaining new environment metadata.
     """
 
     async def list(self) -> JsonValue:
