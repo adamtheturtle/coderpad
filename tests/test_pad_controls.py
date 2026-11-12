@@ -14,6 +14,7 @@ from coderpad.client import CoderPad
 from coderpad.exceptions import CoderPadError
 from coderpad.json_types import JsonValue
 from coderpad.types import Pad
+from tests.pad_fixtures import pad_payload
 
 _EMAIL_CASES: list[list[str] | None] = [
     None,
@@ -21,36 +22,6 @@ _EMAIL_CASES: list[list[str] | None] = [
     ["first@example.com", "second@example.com"],
 ]
 _URL = "https://app.coderpad.io/api/pads/"
-
-
-def _pad_payload() -> dict[str, JsonValue]:
-    """Provide a complete pad with optional access metadata."""
-    return {
-        "id": "abcdefgh",
-        "title": "Interview",
-        "state": "active",
-        "owner_email": "owner@example.com",
-        "language": "python3",
-        "private": False,
-        "execution_enabled": False,
-        "contents": "",
-        "participants": [],
-        "events": "",
-        "notes": "",
-        "created_at": "2026-10-06T12:00:00Z",
-        "updated_at": "2026-10-06T12:00:00Z",
-        "ended_at": None,
-        "url": "https://app.coderpad.io/abcdefgh",
-        "playback": "https://app.coderpad.io/abcdefgh/playback",
-        "drawing": None,
-        "type": "interview",
-        "question_ids": [123],
-        "pad_environment_ids": [],
-        "active_environment_id": None,
-        "team": {"id": "team-1", "name": "Backend"},
-        "allowed_interviewer_emails": [],
-        "restrict_interviewer_access": False,
-    }
 
 
 def _assert_request(
@@ -122,7 +93,7 @@ def test_pad_controls(
         route = router.request(
             method="POST" if operation == "create" else "PUT",
             url=_URL if operation == "create" else _URL + "abcdefgh",
-        ).respond(status_code=200, json=_pad_payload())
+        ).respond(status_code=200, json=pad_payload())
         with CoderPad(api_key="synthetic-key") as client:
             if operation == "create":
                 pad = client.pads.create(
@@ -181,7 +152,7 @@ async def test_async_pad_controls(
         route = router.request(
             method="POST" if operation == "create" else "PUT",
             url=_URL if operation == "create" else _URL + "abcdefgh",
-        ).respond(status_code=200, json=_pad_payload())
+        ).respond(status_code=200, json=pad_payload())
         async with AsyncCoderPad(api_key="synthetic-key") as client:
             if operation == "create":
                 pad = await client.pads.create(
@@ -273,7 +244,7 @@ async def test_async_pad_control_errors(operation: str) -> None:
 @pytest.mark.parametrize(argnames="emails", argvalues=_EMAIL_CASES)
 def test_pad_access_metadata(emails: list[str] | None) -> None:
     """Both pad decoders preserve optional response lists exactly."""
-    payload = _pad_payload()
+    payload = pad_payload()
     payload["allowed_interviewer_emails"] = (
         None if emails is None else list[JsonValue](emails)
     )
