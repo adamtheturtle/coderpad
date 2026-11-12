@@ -3,7 +3,7 @@
 import importlib.metadata
 from pathlib import Path
 
-from packaging.specifiers import SpecifierSet
+from packaging.specifiers import Specifier, SpecifierSet
 from sphinx.addnodes import pending_xref
 from sphinx.application import Sphinx
 from sphinx_pyproject import SphinxConfig
@@ -46,9 +46,12 @@ project_copyright = f"%Y, {author}"
 # https://sphinx-copybutton.readthedocs.io/en/latest/use.html#automatic-exclusion-of-prompts-from-the-copies.
 copybutton_exclude = ".linenos, .gp"
 
-project_metadata = importlib.metadata.metadata(distribution_name=project)
+project_metadata: importlib.metadata.PackageMetadata = (
+    importlib.metadata.metadata(distribution_name=project)
+)
 requires_python = project_metadata["Requires-Python"]
-specifiers = SpecifierSet(specifiers=requires_python)
+specifiers: SpecifierSet = SpecifierSet(specifiers=requires_python)
+specifier: Specifier
 (specifier,) = specifiers
 if specifier.operator != ">=":
     msg = (

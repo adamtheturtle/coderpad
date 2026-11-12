@@ -1,7 +1,7 @@
 """Setup for Sybil."""
 
 import os
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from doctest import ELLIPSIS
 from pathlib import Path
 
@@ -9,6 +9,7 @@ import pytest
 import respx
 from pyprojroot import find_root, has_file
 from sybil import Sybil
+from sybil.integration.pytest import pytest_integration as _pytest_integration
 from sybil.parsers.rest import (
     ClearNamespaceParser,
     DocTestParser,
@@ -82,12 +83,16 @@ def fixture_mock_coderpad_api() -> Generator[respx.MockRouter]:
         yield mock_router
 
 
-pytest_collect_file = Sybil(
-    parsers=[
-        ClearNamespaceParser(),
-        DocTestParser(optionflags=ELLIPSIS),
-        PythonCodeBlockParser(),
-    ],
-    patterns=["*.rst", "*.py"],
-    fixtures=["mock_coderpad_api"],
-).pytest()
+pytest_collect_file: Callable[[Path, pytest.Collector], pytest.File | None] = (
+    _pytest_integration(
+        Sybil(
+            parsers=[
+                ClearNamespaceParser(),
+                DocTestParser(optionflags=ELLIPSIS),
+                PythonCodeBlockParser(),
+            ],
+            patterns=["*.rst", "*.py"],
+            fixtures=["mock_coderpad_api"],
+        )
+    )
+)
