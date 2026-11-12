@@ -67,9 +67,9 @@ class PaginatedList(list[_T]):
             prev_page: URL for the previous page, or ``None``.
         """
         super().__init__(iterable)
-        self.total = total
-        self.next_page = next_page
-        self.prev_page = prev_page
+        self.total: int = total
+        self.next_page: str | None = next_page
+        self.prev_page: str | None = prev_page
 
     @override
     def __repr__(self) -> str:

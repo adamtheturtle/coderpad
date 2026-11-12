@@ -58,8 +58,8 @@ class HTTPStatusError(Exception):
         """
         message = f"HTTP {status_code}"
         super().__init__(message)
-        self.status_code = status_code
-        self.content = content
+        self.status_code: int = status_code
+        self.content: bytes = content
 
 
 @beartype
@@ -215,9 +215,9 @@ class HTTPXTransport:
             timeout: Optional timeout passed to ``httpx.Client``.
                 When omitted, the default ``httpx`` timeout is used.
         """
-        self.limits = limits
-        self.proxy = proxy
-        self.timeout = timeout
+        self.limits: httpx.Limits | None = limits
+        self.proxy: str | httpx.Proxy | None = proxy
+        self.timeout: httpx.Timeout | float | None = timeout
         client_kwargs: _HTTPXClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits
@@ -316,9 +316,9 @@ class HTTPX2Transport:
             timeout: Optional timeout passed to ``httpx2.Client``.
                 When omitted, the default ``httpx2`` timeout is used.
         """
-        self.limits = limits
-        self.proxy = proxy
-        self.timeout = timeout
+        self.limits: httpx2.Limits | None = limits
+        self.proxy: str | httpx2.Proxy | None = proxy
+        self.timeout: httpx2.Timeout | float | None = timeout
         client_kwargs: _HTTPX2ClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits
@@ -472,9 +472,9 @@ class AsyncHTTPXTransport:
             timeout: Optional timeout passed to ``httpx.AsyncClient``.
                 When omitted, the default ``httpx`` timeout is used.
         """
-        self.limits = limits
-        self.proxy = proxy
-        self.timeout = timeout
+        self.limits: httpx.Limits | None = limits
+        self.proxy: str | httpx.Proxy | None = proxy
+        self.timeout: httpx.Timeout | float | None = timeout
         client_kwargs: _HTTPXClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits
@@ -574,9 +574,9 @@ class AsyncHTTPX2Transport:
             timeout: Optional timeout passed to ``httpx2.AsyncClient``.
                 When omitted, the default ``httpx2`` timeout is used.
         """
-        self.limits = limits
-        self.proxy = proxy
-        self.timeout = timeout
+        self.limits: httpx2.Limits | None = limits
+        self.proxy: str | httpx2.Proxy | None = proxy
+        self.timeout: httpx2.Timeout | float | None = timeout
         client_kwargs: _HTTPX2ClientKwargs = {}
         if limits is not None:
             client_kwargs["limits"] = limits

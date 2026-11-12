@@ -215,8 +215,8 @@ class ScreenTransportStub:
     def __init__(self, *, error: bool, non_object_response: bool) -> None:
         """Create a recording transport."""
         self.calls: list[dict[str, object]] = []
-        self.error = error
-        self.non_object_response = non_object_response
+        self.error: bool = error
+        self.non_object_response: bool = non_object_response
 
     def __call__(
         self,

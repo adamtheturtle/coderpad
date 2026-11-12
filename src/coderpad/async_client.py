@@ -621,9 +621,9 @@ class AsyncQuestionVariantsNamespace:
         """Use the Interview client's transport, origin, and
         credentials.
         """
-        self.transport = transport
-        self.base_url = base_url
-        self.headers = headers
+        self.transport: AsyncJSONTransport = transport
+        self.base_url: str = base_url
+        self.headers: dict[str, str] = headers
 
     async def _variant_request(
         self,
@@ -1378,7 +1378,7 @@ class AsyncCoderPad:
             proxy: Optional proxy for the default httpx transports.
             timeout: Optional timeout for the default httpx transports.
         """
-        self.base_url = base_url
+        self.base_url: str = base_url
         self._limits = limits
         self._proxy = proxy
         self._timeout = timeout
