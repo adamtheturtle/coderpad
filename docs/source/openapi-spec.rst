@@ -1,7 +1,7 @@
 OpenAPI Spec
 ============
 
-The canonical, community-maintained specification lives in `coderpad-openapi`_.
+The canonical, community-maintained specification is maintained in `coderpad-openapi`_.
 This SDK consumes ``spec/openapi.json`` through the ``spec`` Git submodule.
 The Git tree records an immutable commit, initially ``e1d67d75cc8fde40ee1f0f382793b2172302c6e3``.
 The shared repository preserves the original MIT license in ``spec/LICENSE``.
