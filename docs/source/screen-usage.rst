@@ -88,7 +88,7 @@ Message roles retain ``USER`` or ``ASSISTANT``.
 ISO 8601 creation timestamps are preserved as returned strings.
 ``output_items`` retains structured JSON, including unknown nested fields, text chunks, reasoning, and tool-call metadata.
 It is ``None`` when omitted and an empty list when explicitly empty.
-No output is collapsed into plain text.
+Output retains its original structure.
 Both synchronous and asynchronous clients support this operation.
 
 Candidate project archives

@@ -37,7 +37,7 @@ Every other field on :class:`~coderpad.types.Question` is populated by the serve
    * - ``file_contents``
      - Create and update
      - For multi-file questions.
-       Maps to the read-side pad environment files rather than to a single field.
+       Maps to the environment files returned when reading a pad.
    * - ``zip_file``
      - Create and update
      - Upload alternative to ``file_contents``.
@@ -102,8 +102,9 @@ Directory uploads
 
 Pass ``directory=Path(...)`` to create or update a multi-file question from local files.
 The client builds a ZIP in memory and sends it using the same multipart field as ``zip_file``.
-It preserves relative paths and file bytes, includes hidden files, and creates no temporary files.
-The asynchronous client performs file operations and compression in a worker thread.
+It preserves relative paths and file bytes, and includes hidden files.
+It creates the archive in memory.
+The asynchronous client uses a worker thread for file operations and compression.
 
 All files in the supplied directory are uploaded.
 Symbolic links inside the directory are rejected.
@@ -244,15 +245,15 @@ Every other field on :class:`~coderpad.types.Pad` is populated by the server and
      - Read only
      - Server-managed timestamp.
 
-Candidate instruction steps can carry an optional ``name`` alongside their ``instructions`` and ``default_visible`` values.
+Steps in the candidate instructions can include an optional ``name`` alongside their ``instructions`` and ``default_visible`` values.
 The clients preserve these names when reading or writing questions.
 Pass ``shared=True`` or ``shared=False`` to question creation and updates to set organization sharing explicitly.
 Only the author can change sharing.
 Pass ``custom_database_id`` to associate a question with a custom database.
 Omitted values retain the server defaults or existing settings.
 
-Project question starter files
-------------------------------
+Starter files for project questions
+-----------------------------------
 
 ``Question.file_contents`` contains starter overlays.
 These differ from ``custom_files``, which contains downloadable attachments.
@@ -262,7 +263,7 @@ Use the variants endpoint to retrieve full variants.
 ``QuestionFileContent`` accepts a required path and optional contents, ``hidden``, and ``deleted`` flags.
 A removal entry can contain just its path and ``deleted=True``.
 Omitted flags stay omitted.
-Empty contents stay empty.
+Empty contents are preserved.
 
 On creation, structured files overlay template files.
 An empty overlay uses the unmodified template.
@@ -295,7 +296,7 @@ Question filters and sorting
 ``questions.list`` and ``questions.all`` accept ``text`` and ``pad_types``.
 Pad types are ``any``, ``live``, and ``take_home``.
 Multiple values use repeated ``pad_types[]`` query keys.
-Organization question methods accept ``pad_type`` (``live`` or ``take_home``) and ``language``.
+Methods that list questions in an organization accept ``pad_type`` (``live`` or ``take_home``) and ``language``.
 The server includes questions usable in any pad when applying its usage filters.
 
 ``QuestionSortOrder`` supports title, usage count, and creation or update timestamps in either direction.
