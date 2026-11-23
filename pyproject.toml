@@ -68,7 +68,7 @@ dev = [
     "pylint-per-file-ignores==4.0.0",
     "pyproject-fmt==2.31.2",
     "pyprojroot==0.3.0",
-    "pyrefly==1.5.0",
+    "pyrefly==1.4.1",
     "pyright==1.1.414",
     "pyroma==5.0.1",
     "pytest==9.2.0",
@@ -561,7 +561,6 @@ num_workers = "auto"
 [tool.pyrefly]
 search_path = [ "." ]
 errors.non-exhaustive-match = "error"
-errors.partially-unknown-type = "warn"
 enabled-ignores = [ "pyrefly" ]
 preset = "all"
 
