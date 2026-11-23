@@ -10,6 +10,7 @@ import httpx
 import respx
 from openapi_mock import add_openapi_to_respx as add_response_routes
 
+from coderpad._screen_response import json_object
 from coderpad.json_types import JsonValue
 
 _HTTP_METHODS = frozenset({"delete", "get", "patch", "post", "put"})
@@ -19,9 +20,10 @@ _MULTIPART = "multipart/form-data"
 type JSONMapping = dict[str, JsonValue]
 
 
-def parse_json_mapping(*, text: str) -> JSONMapping:
+def parse_json_mapping(*, text: str | bytes) -> JSONMapping:
     """Parse a JSON document whose root is an object."""
-    return dict[str, JsonValue](json.loads(s=text))
+    decoded: object = json.loads(s=text)
+    return json_object(value=decoded)
 
 
 def add_openapi_to_respx(

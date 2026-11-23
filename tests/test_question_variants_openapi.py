@@ -26,7 +26,7 @@ def test_response_schema_matches_model(
     expected = model.model_json_schema(
         ref_template="#/components/schemas/{model}"
     )
-    _ = expected.pop("$defs", None)
+    _definitions: object = expected.pop("$defs", None)
     assert schemas[model.__name__] == expected
 
 

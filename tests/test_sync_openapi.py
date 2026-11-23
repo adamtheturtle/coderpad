@@ -13,6 +13,7 @@ from coderpad._openapi_sync import (
     apply_postman_corrections,
     run_sync,
 )
+from tests.openapi_mock import parse_json_mapping
 
 if TYPE_CHECKING:
     from coderpad.json_types import JsonValue
@@ -135,8 +136,10 @@ def test_main_writes_normalized_spec(tmp_path: Path) -> None:
         arguments=[str(object=source), "--target", str(object=target)],
     )
     assert exit_code == 0
-    written = json.loads(s=target.read_text(encoding="utf-8"))
-    assert written["paths"]["/api/pads/{id}"] == {"put": {"summary": "modify"}}
+    written = parse_json_mapping(text=target.read_text(encoding="utf-8"))
+    paths = written["paths"]
+    assert isinstance(paths, dict)
+    assert paths["/api/pads/{id}"] == {"put": {"summary": "modify"}}
 
 
 def test_main_reports_when_no_corrections_needed(

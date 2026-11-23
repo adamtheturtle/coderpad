@@ -12,6 +12,7 @@ import pytest
 import respx
 
 from coderpad import AsyncCoderPad, CoderPad, Pad, QuestionFileContent
+from tests.openapi_mock import parse_json_mapping
 from tests.pad_fixtures import pad_payload
 
 
@@ -99,7 +100,7 @@ async def test_project_pad(
             assert b"question[" not in request.content
         else:
             data = (
-                json.loads(s=request.content)["pad"]
+                parse_json_mapping(text=request.content)["pad"]
                 if emails is not None
                 else {
                     name: values[0]
@@ -108,9 +109,12 @@ async def test_project_pad(
                     ).items()
                 }
             )
+            assert isinstance(data, dict)
             assert data["language"] == "multifile_python"
             if source == "files":
-                assert json.loads(s=data["file_contents"]) == [
+                file_contents = data["file_contents"]
+                assert isinstance(file_contents, str)
+                assert json.loads(s=file_contents) == [
                     {"path": "main.py", "contents": "", "hidden": True},
                     {"path": "old.py", "deleted": True},
                 ]
