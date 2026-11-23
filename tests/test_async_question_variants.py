@@ -28,14 +28,13 @@ _VARIANT: dict[str, JsonValue] = {
 
 
 @pytest.mark.asyncio
-@respx.mock
-async def test_variant_crud() -> None:
+async def test_variant_crud(*, respx_mock: respx.MockRouter) -> None:
     """All five operations use nested routes and JSON mutations."""
-    listing = respx.get(url=_BASE).respond(json={"variants": [_VARIANT]})
-    showing = respx.get(url=_BASE + "/7").respond(json=_VARIANT)
-    creating = respx.post(url=_BASE).respond(json=_VARIANT)
-    updating = respx.put(url=_BASE + "/7").respond(json=_VARIANT)
-    deleting = respx.delete(url=_BASE + "/7").respond(status_code=204)
+    listing = respx_mock.get(url=_BASE).respond(json={"variants": [_VARIANT]})
+    showing = respx_mock.get(url=_BASE + "/7").respond(json=_VARIANT)
+    creating = respx_mock.post(url=_BASE).respond(json=_VARIANT)
+    updating = respx_mock.put(url=_BASE + "/7").respond(json=_VARIANT)
+    deleting = respx_mock.delete(url=_BASE + "/7").respond(status_code=204)
     async with AsyncCoderPad(api_key="variant-key") as client:
         variants = await client.questions.variants.list(question_id=42)
         assert [variant.id for variant in variants] == [7]
@@ -86,8 +85,9 @@ async def test_variant_crud() -> None:
     argvalues=["multifile_python", "multifile_typescript"],
 )
 @pytest.mark.asyncio
-@respx.mock
-async def test_project_variant_crud(project_template_slug: str) -> None:
+async def test_project_variant_crud(
+    *, respx_mock: respx.MockRouter, project_template_slug: str
+) -> None:
     """Project variants preserve null languages and template files."""
     payload: dict[str, JsonValue] = {
         **_VARIANT,
@@ -100,10 +100,10 @@ async def test_project_variant_crud(project_template_slug: str) -> None:
             {"path": "README.md", "contents": "Starter project"},
         ],
     }
-    _ = respx.get(url=_BASE).respond(json={"variants": [payload]})
-    _ = respx.get(url=_BASE + "/7").respond(json=payload)
-    creating = respx.post(url=_BASE).respond(json=payload)
-    updating = respx.put(url=_BASE + "/7").respond(json=payload)
+    _ = respx_mock.get(url=_BASE).respond(json={"variants": [payload]})
+    _ = respx_mock.get(url=_BASE + "/7").respond(json=payload)
+    creating = respx_mock.post(url=_BASE).respond(json=payload)
+    updating = respx_mock.put(url=_BASE + "/7").respond(json=payload)
     files = [
         QuestionVariantFileContent(
             path="README.md", contents="Starter project"
@@ -139,12 +139,13 @@ async def test_project_variant_crud(project_template_slug: str) -> None:
 
 @pytest.mark.parametrize(argnames="contents", argvalues=["", None])
 @pytest.mark.asyncio
-@respx.mock
-async def test_explicit_code_state(contents: str | None) -> None:
+async def test_explicit_code_state(
+    *, respx_mock: respx.MockRouter, contents: str | None
+) -> None:
     """Blank code and default-code resets retain their distinct JSON
     values.
     """
-    route = respx.put(url=_BASE + "/7").respond(json=_VARIANT)
+    route = respx_mock.put(url=_BASE + "/7").respond(json=_VARIANT)
     async with AsyncCoderPad(api_key="key") as client:
         _ = await client.questions.variants.update(
             question_id=42,
@@ -172,12 +173,13 @@ async def test_explicit_code_state(contents: str | None) -> None:
     ],
 )
 @pytest.mark.asyncio
-@respx.mock
 async def test_file_payload(
+    *,
+    respx_mock: respx.MockRouter,
     files: list[QuestionVariantFileContent] | str,
 ) -> None:
     """File payloads retain overlay flags and decoded paths."""
-    route = respx.post(url=_BASE).respond(json=_VARIANT)
+    route = respx_mock.post(url=_BASE).respond(json=_VARIANT)
     async with AsyncCoderPad(api_key="key") as client:
         _ = await client.questions.variants.create(
             question_id=42,
@@ -212,8 +214,9 @@ async def test_conflicting_sources(contents: str | None) -> None:
 
 
 @pytest.mark.asyncio
-@respx.mock
-async def test_flat_list_and_file_response() -> None:
+async def test_flat_list_and_file_response(
+    *, respx_mock: respx.MockRouter
+) -> None:
     """An unwrapped list decodes file metadata and literal paths."""
     payload: dict[str, JsonValue] = {
         **_VARIANT,
@@ -225,7 +228,7 @@ async def test_flat_list_and_file_response() -> None:
             }
         ],
     }
-    _ = respx.get(url=_BASE).respond(json=[payload])
+    _ = respx_mock.get(url=_BASE).respond(json=[payload])
     async with AsyncCoderPad(api_key="key") as client:
         variants = await client.questions.variants.list(question_id=42)
     assert variants[0].file_contents is not None
@@ -240,10 +243,9 @@ async def test_flat_list_and_file_response() -> None:
 
 
 @pytest.mark.asyncio
-@respx.mock
-async def test_variant_error() -> None:
+async def test_variant_error(*, respx_mock: respx.MockRouter) -> None:
     """Nested request errors use the existing exception mapping."""
-    _ = respx.get(url=_BASE + "/7").respond(
+    _ = respx_mock.get(url=_BASE + "/7").respond(
         status_code=404, json={"error": "missing"}
     )
     async with AsyncCoderPad(api_key="key") as client:
